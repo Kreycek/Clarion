@@ -13,7 +13,7 @@
   </head>
   <body>
 
-
+	<form (ngSubmit)="onLogin()">
 <div class="container" id="container">
 	<div class="form-container sign-up-container">
 		<form action="#">
@@ -40,10 +40,10 @@
 				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
 			</div>
 			<span style="display: none;">or use your account</span>
-			<input type="email" placeholder="Email" />
-			<input type="password" placeholder="Password" />
+			<input type="email" [(ngModel)]="username" name="username" placeholder="Email" />
+			<input type="password" [(ngModel)]="password" name="password" placeholder="Password" />
 			<a href="#">Esqueceu sua palavra chave?</a>
-			<button [routerLink]="['/aplicacao']">Entrar</button>
+			<button (click)="onLogin()">Entrar</button>
 		</form>
 	</div>
 	<div class="overlay-container">
@@ -62,6 +62,7 @@
 		</div>
 	</div>
 </div>
+	</form>
 
 <footer>
 	<p>
