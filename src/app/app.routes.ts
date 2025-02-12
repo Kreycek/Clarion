@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 
 import { AplicacaoComponent } from './aplicacao/aplicacao.component';
 import { LoginComponent } from './login/login.component';
+import { UsuarioComponent } from './modulos/ferramentaGestao/usuarios/usuario/usuario.component';
 
 export const routes: Routes = [
 
@@ -16,10 +17,10 @@ export const routes: Routes = [
                 path:'center',
                 component:CenterComponent    ,
             },
-            // {
-            //     path:'',
-            //     component:CenterComponent    ,
-            // }, 
+            {
+                path:'usuario',
+                component:UsuarioComponent    ,
+            }, 
            
         ]
     },   // Redireciona para login por padrão    

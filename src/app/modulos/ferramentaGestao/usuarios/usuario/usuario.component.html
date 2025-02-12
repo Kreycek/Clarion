@@ -1,0 +1,33 @@
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Usuários</h4>
+        <p class="card-description" style="display: none;"> Add class <code>.table-striped</code>
+        </p>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th> Nome </th>
+                <th> First name </th>
+                <th> Email </th>
+                <th> Último Nome </th>               
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of dados">
+                <td class="py-1">
+                  <img src="../../assets/images/faces/face1.jpg" alt="image" />
+                </td>
+                <td> {{item.Name}} </td>
+                <td> {{item.Email}} </td>
+                <td> {{item.LastName}} </td>
+               
+              </tr>
+             
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>

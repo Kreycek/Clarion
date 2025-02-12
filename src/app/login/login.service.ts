@@ -18,20 +18,11 @@ export class LoginService {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
-    }).pipe(
-      catchError((error) => {
-        throw new Error('Erro de login: ' + error.message);
-      })
-    );
+    });
   }
 
   // Método para validar o token logo após o login
   validateTokenAfterLogin(token: string): Observable<any> {
-    return this.authService.validateToken().pipe(
-        
-      catchError((error) => {
-        throw new Error('Erro na validação do token: ' + error.message);
-      })
-    );
+    return this.authService.validateToken();
   }
 }
