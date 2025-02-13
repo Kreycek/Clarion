@@ -9,7 +9,7 @@ import { ConfigService } from '../../../services/config.service';
 @Injectable({
   providedIn: 'root',
 })
-export class UsuarioService {
+export class PerfilService {
     // URL do seu backend para login
 
   constructor(
@@ -17,17 +17,8 @@ export class UsuarioService {
     private configService:ConfigService
   ) {}
 
-  getUsers(): Observable<any> {
-    return this.http.get(this.configService.apiUrl + "/getAllUsers", {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    });
-  }
-
-  
-  addUsers(user:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/addUser", user, {
+  gePerfil(): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/getPerfis", {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),

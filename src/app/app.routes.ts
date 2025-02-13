@@ -5,23 +5,27 @@ import { NgModule } from '@angular/core';
 import { AplicacaoComponent } from './aplicacao/aplicacao.component';
 import { LoginComponent } from './login/login.component';
 import { UsuarioComponent } from './modulos/ferramentaGestao/usuarios/usuario/usuario.component';
+import { AddUsuarioComponent } from './modulos/ferramentaGestao/usuarios/add-usuario/add-usuario.component';
 
 export const routes: Routes = [
 
     { path: '', redirectTo: '/aplicacao', pathMatch: 'full' },   // Redireciona para login por padrão    
     { 
         path:'aplicacao',
-        component:AplicacaoComponent    ,
+        component:AplicacaoComponent,
         children:[
             {
                 path:'center',
-                component:CenterComponent    ,
+                component:CenterComponent,
             },
             {
                 path:'usuario',
-                component:UsuarioComponent    ,
+                component:UsuarioComponent,
             }, 
-           
+            {
+                path:'addUser',
+                component:AddUsuarioComponent
+            }           
         ]
     },   // Redireciona para login por padrão    
     { 

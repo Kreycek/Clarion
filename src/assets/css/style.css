@@ -10527,7 +10527,7 @@ progress {
 .form-control::placeholder, .typeahead::placeholder,
 .tt-query::placeholder,
 .tt-hint::placeholder, .select2-container--default .select2-selection--single .select2-search__field::placeholder, .select2-container--default .select2-selection--single::placeholder, .dataTables_wrapper select::placeholder {
-  color: #c9c8c8;
+
   opacity: 1;
 }
 .form-control:disabled, .typeahead:disabled,
@@ -22855,7 +22855,7 @@ select.tt-hint, .select2-container--default .select2-selection--single select.se
   padding: 0.4375rem 0.75rem;
   border: 0;
   outline: 1px solid #CED4DA;
-  color: #c9c8c8;
+
 }
 select.form-control:focus, select.typeahead:focus,
 select.tt-query:focus,
@@ -22950,7 +22950,7 @@ select.form-select {
   padding: 0.4375rem 0.75rem;
   border: 0;
   outline: 1px solid #CED4DA;
-  color: #c9c8c8;
+  
 }
 select.form-select:focus {
   outline: 1px solid #CED4DA;
