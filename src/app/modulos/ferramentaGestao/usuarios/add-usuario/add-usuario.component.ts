@@ -7,7 +7,7 @@ import { catchError, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ModalOkComponent } from "../../../../modal/modal-ok/modal-ok.component";
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 export function passwordMatchValidator(): ValidatorFn {
@@ -43,7 +43,39 @@ export class AddUsuarioComponent {
   message=''
   isModalVisible = false;
   isEdit=false;
-  idUser:string |null = null
+  idUser:string |null = null 
+  formulario: FormGroup| null = null;
+
+  constructor(
+      private perfilService: PerfilService,
+      private fb: FormBuilder,
+      private usuarioService: UsuarioService,
+      private route: ActivatedRoute,
+      private router: Router, 
+  ) {} 
+
+
+  ngOnInit() {
+
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
+
+      if(id) {
+        this.isEdit=true;
+        this.usuarioService.getUserById(id??'0').subscribe((response)=>{
+          console.log('Editar user ',response);
+          this.idUser=id;    
+          this. createFormUser(response);
+          this.loadPerfil(response.Perfil);
+        })
+      }
+      else {
+        this.isEdit=false;
+        this. createFormUser({Active:true});
+        this.loadPerfil([]);
+      }
+    });    
+  }
 
   openModal(_message:string) {
     this.message=_message
@@ -55,15 +87,7 @@ export class AddUsuarioComponent {
     this.isModalVisible = false;
   }
  
-  formulario: FormGroup| null = null; 
-    constructor(
-        private perfilService: PerfilService,
-        private fb: FormBuilder,
-        private usuarioService: UsuarioService,
-        private route: ActivatedRoute
-    ) {
-      
-    }
+ 
 
     loadPerfil(perfisIds:[]) {
       this.perfilService.gePerfil().subscribe((perfis:any)=>{     
@@ -85,6 +109,7 @@ export class AddUsuarioComponent {
   
     createFormUser(obj:any) {
       this.formulario = this.fb.group({
+        active: [obj.Active, Validators.required],
         nome: [obj.Name, Validators.required],
         sobrenome: [obj.LastName, Validators.required],
         email: [{value:obj.Email, disabled: this.isEdit}, [Validators.required, Validators.email]],
@@ -99,28 +124,6 @@ export class AddUsuarioComponent {
       this.togglePasswordValidation()
     }
 
-
-  ngOnInit() {
-
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
-
-      if(id) {
-        this.isEdit=true;
-        this.usuarioService.getUserById(id??'0').subscribe((response)=>{
-          this.idUser=id;    
-          this. createFormUser(response);
-          this.loadPerfil(response.Perfil);
-        })
-      }
-      else {
-        this.isEdit=false;
-        this. createFormUser({});
-        this.loadPerfil([]);
-      }
-    });    
-  }
-
   get perfisForm() {
     return (this.formulario?.get('perfis') as FormArray);
   }
@@ -133,34 +136,33 @@ export class AddUsuarioComponent {
     });
   }
 
- retornaIdTipoPerfil(namePerfil:string ) : number  {
-  if(namePerfil.toLowerCase()=='administrador')
-    return 1
-  else  if(namePerfil.toLowerCase()=="super administrador") {
-    return 2
+  retornaIdTipoPerfil(namePerfil:string ) : number  {
+    if(namePerfil.toLowerCase()=='administrador')
+      return 1
+    else  if(namePerfil.toLowerCase()=="super administrador") {
+      return 2
+    }
+    else if(namePerfil.toLowerCase()=='utilizador') {
+      return 3
+    }
+    else {
+      return 0
+    }
   }
-  else if(namePerfil.toLowerCase()=='utilizador') {
-    return 3
-  }
-  else {
-    return 0
-  }
- }
 
  retornaNameIdPerfil(perfilId:number ) : string | null {
-  if(perfilId==1)
-    return 'Administrador'
-  else   if(perfilId==2) {
-    return 'Super administrador'
-  }
-  else  if(perfilId==3)  {
-    return 'Utilizador'
-  }
-  else {
-    return null
-  }
- }
- 
+    if(perfilId==1)
+      return 'Administrador'
+    else   if(perfilId==2) {
+      return 'Super administrador'
+    }
+    else  if(perfilId==3)  {
+      return 'Utilizador'
+    }
+    else {
+      return null
+    }
+ } 
 
   gravar() {
    
@@ -176,6 +178,7 @@ export class AddUsuarioComponent {
       lastName: string;
       email: string;
       passportNumber: string;
+      active:boolean;
       perfil: number[]; // Definindo o tipo correto para o array 'perfil'
      
       password:string
@@ -185,6 +188,7 @@ export class AddUsuarioComponent {
       lastName:formValues.sobrenome??'',
       email:formValues.email,
       passportNumber:formValues.passaporte??'',
+      active:formValues.active,
       perfil:[],
       
       password:formValues.password
@@ -206,29 +210,25 @@ export class AddUsuarioComponent {
       objGravar.id=this.idUser
       this.usuarioService.updateUser(objGravar).pipe(
         tap((response) =>    {
-          console.log('response',response);
-          this.openModal(response.message)
-          this.formulario?.controls['password'].setValue('',{ emitEvent: false })
-          this.formulario?.controls['passwordConfirm'].setValue('',{ emitEvent: false })
           this.formulario?.controls['password'].clearValidators();
           this.formulario?.controls['passwordConfirm']?.clearValidators();
+          this.formulario?.controls['password'].setValue('',{ emitEvent: false })
+          this.formulario?.controls['passwordConfirm'].setValue('',{ emitEvent: false })
+          this.openModal(response.message)
 
         }),
         catchError((error: HttpErrorResponse) => {
             
-          if (error.status === 500) {
-            console.log('Interceptando requisição:', error)
-
-            this.openModal(error.message)
-
-            // router.navigate(['/login']); // Redireciona para a página de login
-          }
+              if (error.status === 500) {
+                console.log('Interceptando requisição:', error)
+                this.openModal(error.message)         
+              }
 
               if (error.status === 401) {
                   console.log('Interceptando requisição:', error.status)
                   // router.navigate(['/login']); // Redireciona para a página de login
-                }
-            return throwError(() => error);
+              }
+              return throwError(() => error);
           })
         
         ).subscribe(()=>{})
@@ -243,22 +243,18 @@ export class AddUsuarioComponent {
             this.openModal("Usuário já cadastrado com esse email")
           
         } else {
-
               this.usuarioService.addUsers(objGravar).pipe(
-                  tap(() =>    this.openModal("Usuário cadastrado com sucesso")),
+                  tap(
+                    () =>    this.openModal("Usuário cadastrado com sucesso")
+                  ),
                   catchError((error: HttpErrorResponse) => {
                       
                         if (error.status === 401) {
-                            console.log('Interceptando requisição:', error.status)
-                            // router.navigate(['/login']); // Redireciona para a página de login
+                            console.log('Interceptando requisição:', error.status)                         
                           }
                       return throwError(() => error);
-                    })
-                  
-                  ).subscribe(()=>{})
-              
-        }
-      })).subscribe()
+                    })).subscribe(()=>{})              
+        }})).subscribe()
 
     }       
   }
@@ -299,5 +295,8 @@ export class AddUsuarioComponent {
     };
   }
  
+  cancel() {
+    this.router.navigate(['/aplicacao/usuario']);
+  }
 
 }

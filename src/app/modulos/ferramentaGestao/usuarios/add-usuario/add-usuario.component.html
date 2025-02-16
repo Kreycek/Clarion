@@ -8,9 +8,20 @@
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title">Novo Usuário</h4>
+        <h4 class="card-title">{{idUser ? 'Editar' : 'Novo'}} Usuário</h4>
         <p class="card-description" style="display: none;"> Basic form elements </p>
         <form class="forms-sample">
+<br>
+          <div class="form-group">
+            <label for="nome">Ativar usuário? <span class="required">*</span></label>
+            <input  type="checkbox"  formControlName="active" class="form-check-input">&nbsp;<label class="espacoLabel">Ativo</label> 
+            
+          </div>
+
+
+
+          
+
           <div class="form-group">
             <label for="nome">Nome <span class="required">*</span></label>
             <input
@@ -142,15 +153,10 @@
           </ngContainer>
           <div *ngIf="formulario.get('perfis')?.hasError('perfilNaoSelecionado') && formulario.get('perfis')?.touched">
             <p style="color: red;">Por favor, selecione ao menos um perfil.</p>
-          </div>
-
-          
+          </div>          
         </div>
       </div>
-    </div>
-
-
-             
+    </div>             
     <div class="col-12 grid-margin" style="display: none;">
       <div class="card">
         <div class="card-body">
@@ -195,8 +201,8 @@
       <div class="card">
         <div class="card-body">
           <div style="float: none;">
-            <button type="submit" class="btn btn-primary me-2" (click)="gravar()">Gravar</button>
-            <button class="btn btn-light">Cancelar</button>
+            <button type="submit" class="btn btn-primary me-2" [disabled]="formulario.invalid" (click)="gravar()">Gravar</button>
+            <button class="btn btn-light" (click)="cancel()">Cancelar</button>
           </div> 
         </div>
       </div>

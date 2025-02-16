@@ -23,6 +23,22 @@ export class UsuarioComponent {
     private usuarioService: UsuarioService,
     private perfilService: PerfilService
   ) {}
+
+  
+  ngOnInit() {
+    this.perfilService.gePerfil().subscribe((response:any)=>{
+
+      this.perfis=response;
+        console.log('perfis',response);
+    })
+
+    
+    this.usuarioService.getUsers().subscribe((response:any)=>{
+
+      this.dados=response;
+        console.log('users',response);
+    })
+   }
   
   searchName: string = '';
   searchEmail: string = '';
@@ -32,9 +48,9 @@ export class UsuarioComponent {
 
   searchUsers() {
 
-    console.log('searchName',this.searchName);
-    console.log('searchName',this.searchEmail);
-    console.log('searchName',this.searchRole);
+    // console.log('searchName',this.searchName);
+    // console.log('searchName',this.searchEmail);
+    // console.log('searchName',this.searchRole);
     // this.usuarioService.searchUsers().subscribe((response:any)=>{
 
     //   this.dados=response;
@@ -94,20 +110,6 @@ export class UsuarioComponent {
     console.log('$event',$event);
   }
 
-   ngOnInit() {
-    this.perfilService.gePerfil().subscribe((response:any)=>{
-
-      this.perfis=response;
-        console.log('perfis',response);
-    })
-
-    
-    this.usuarioService.getUsers().subscribe((response:any)=>{
-
-      this.dados=response;
-        console.log('users',response);
-    })
-   }
 
    addUser() {
     this.router.navigate(['/aplicacao/addUser']);
