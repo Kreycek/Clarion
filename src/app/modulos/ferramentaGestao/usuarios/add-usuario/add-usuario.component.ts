@@ -34,8 +34,7 @@ export function passwordMatchValidator(): ValidatorFn {
 export class AddUsuarioComponent {
    validaPerfilSelecionado: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     if (control instanceof FormArray) {
-      const hasSelected = control.controls.some(ctrl => ctrl.get('value')?.value);
-     
+      const hasSelected = control.controls.some(ctrl => ctrl.get('value')?.value);     
       return hasSelected ? null :  { perfilNaoSelecionado: true };
     }
     return null;
@@ -51,8 +50,7 @@ export class AddUsuarioComponent {
     this.isModalVisible = true;
   }
 
-  handleConfirm() {
-   
+  handleConfirm() {   
     console.log('Confirmado!');
     this.isModalVisible = false;
   }
@@ -101,11 +99,6 @@ export class AddUsuarioComponent {
       this.togglePasswordValidation()
     }
 
-    setPerfisSelecionados() {
-    
-    }
-
-
 
   ngOnInit() {
 
@@ -113,17 +106,11 @@ export class AddUsuarioComponent {
       const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
       if(id) {
-
         this.isEdit=true;
         this.usuarioService.getUserById(id??'0').subscribe((response)=>{
           this.idUser=id;    
-
           this. createFormUser(response);
           this.loadPerfil(response.Perfil);
-
-          
-       
-    
         })
       }
       else {
@@ -131,12 +118,7 @@ export class AddUsuarioComponent {
         this. createFormUser({});
         this.loadPerfil([]);
       }
-          // response.Perfil.forEach((perfilId:any) => {
-          //   // Marca o checkbox correspondente com 'true'
-          //   perfisFormArray.at(perfilId - 1).setValue(true);
-          // });
-    });
-    
+    });    
   }
 
   get perfisForm() {
@@ -278,11 +260,8 @@ export class AddUsuarioComponent {
         }
       })).subscribe()
 
-    }
-    
-            
+    }       
   }
-
   
   togglePasswordValidation() {
     const passwordControl = this.formulario?.get('password');
@@ -319,31 +298,6 @@ export class AddUsuarioComponent {
       return control.value === password ? null : { passwordsMismatch: true };
     };
   }
-  // criarDocumento(): FormGroup {
-  //   return this.fb.group({
-  //     documento: ['', Validators.required],
-  //     descricao: ['', Validators.required]
-  //   });
-  // }
-
-  // Adicionar novo documento
-  // adicionarDocumento(): void {
-  //   const documentos = this.formulario?.get('documentos') as FormArray;
-  //   documentos.push(this.criarDocumento());
-  // }
-
-
-  // onPerfilChange(e: any, perfil: string) {
-  //   const perfisArray = this.formulario?.get('perfis') as FormArray;
-
-  //   if (e.target.checked) {
-  //     perfisArray.push(this.fb.control(perfil));  // Adiciona o perfil selecionado
-  //   } else {
-  //     const index = perfisArray.controls.findIndex(x => x.value === perfil);
-  //     if (index !== -1) {
-  //       perfisArray.removeAt(index);  // Remove o perfil desmarcado
-  //     }
-  //   }
-  // }
+ 
 
 }
