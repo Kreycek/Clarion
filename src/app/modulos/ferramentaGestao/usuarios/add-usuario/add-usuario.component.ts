@@ -1,59 +1,143 @@
 import { Component } from '@angular/core';
 import { PerfilService } from '../../perfil/perfil.service';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { UsuarioService } from '../usuario.service';
 import { catchError, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+
+import { ModalOkComponent } from "../../../../modal/modal-ok/modal-ok.component";
+import { ActivatedRoute } from '@angular/router';
+
+
+export function passwordMatchValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('passwordConfirm')?.value;
+
+    return password && confirmPassword && password === confirmPassword
+      ? null // válido, os dois campos são iguais
+      : { passwordMismatch: true }; // inválido, os campos não são iguais
+  };
+}
 
 
 @Component({
   selector: 'app-add-usuario',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule ],
+  imports: [CommonModule, ReactiveFormsModule, ModalOkComponent],
   templateUrl: './add-usuario.component.html',
   styleUrl: './add-usuario.component.css'
 })
-export class AddUsuarioComponent {
 
+
+export class AddUsuarioComponent {
+   validaPerfilSelecionado: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    if (control instanceof FormArray) {
+      const hasSelected = control.controls.some(ctrl => ctrl.get('value')?.value);
+     
+      return hasSelected ? null :  { perfilNaoSelecionado: true };
+    }
+    return null;
+  };
   
+  message=''
+  isModalVisible = false;
+  isEdit=false;
+  idUser:string |null = null
+
+  openModal(_message:string) {
+    this.message=_message
+    this.isModalVisible = true;
+  }
+
+  handleConfirm() {
+   
+    console.log('Confirmado!');
+    this.isModalVisible = false;
+  }
  
   formulario: FormGroup| null = null; 
-  constructor(
-    private perfilService: PerfilService,
-    private fb: FormBuilder,
-    private usuarioService: UsuarioService
-  ) {
-    
-  }
+    constructor(
+        private perfilService: PerfilService,
+        private fb: FormBuilder,
+        private usuarioService: UsuarioService,
+        private route: ActivatedRoute
+    ) {
+      
+    }
 
+    loadPerfil(perfisIds:[]) {
+      this.perfilService.gePerfil().subscribe((perfis:any)=>{     
+        const _perfilForm = this.formulario?.get('perfis') as FormArray;
+
+        perfis.forEach((element:any) => {      
+          let perfil=0;
+          perfil=perfisIds.filter((perfilId:number)=> {              
+           
+              return this.retornaIdTipoPerfil(element.name)==perfilId
+            
+            })[0];
+
+        
+          _perfilForm.push(this.criarPerfil(element.ID,element.name, perfil>0 ? true : false));
+        });            
+      })  
+    }
   
+    createFormUser(obj:any) {
+      this.formulario = this.fb.group({
+        nome: [obj.Name, Validators.required],
+        sobrenome: [obj.LastName, Validators.required],
+        email: [{value:obj.Email, disabled: this.isEdit}, [Validators.required, Validators.email]],
+        password: [''],
+        passwordConfirm: [''],
+        passaporte: [obj.PassportNumber],
+        perfis: this.fb.array([], [Validators.required,this.validaPerfilSelecionado] )  // Array para perfis selecionados
+        // documentos: this.fb.array([this.criarDocumento()])  // Começa com um documento
+      }, 
+      // { validators: passwordMatchValidator() }
+    ); 
+      this.togglePasswordValidation()
+    }
+
+    setPerfisSelecionados() {
+    
+    }
+
+
+
   ngOnInit() {
 
-    this.perfilService.gePerfil().subscribe((perfis:any)=>{
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
-     
-      const _perfilForm = this.formulario?.get('perfis') as FormArray;
-      perfis.forEach((element:any) => {       
-        _perfilForm.push(this.criarPerfil(element.ID,element.name, false));
-      });   
+      if(id) {
+
+        this.isEdit=true;
+        this.usuarioService.getUserById(id??'0').subscribe((response)=>{
+          this.idUser=id;    
+
+          this. createFormUser(response);
+          this.loadPerfil(response.Perfil);
+
+          
        
-    })
-
-    this.formulario = this.fb.group({
-      nome: ['', Validators.required],
-      sobrenome: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      passaporte: ['', Validators.required],
-      perfis: this.fb.array([], Validators.required),  // Array para perfis selecionados
-      // documentos: this.fb.array([this.criarDocumento()])  // Começa com um documento
-    }); 
+    
+        })
+      }
+      else {
+        this.isEdit=false;
+        this. createFormUser({});
+        this.loadPerfil([]);
+      }
+          // response.Perfil.forEach((perfilId:any) => {
+          //   // Marca o checkbox correspondente com 'true'
+          //   perfisFormArray.at(perfilId - 1).setValue(true);
+          // });
+    });
     
   }
-
-  // get documentosForm() {
-  //   return (this.formulario?.get('documentos') as FormArray);
-  // }
 
   get perfisForm() {
     return (this.formulario?.get('perfis') as FormArray);
@@ -67,7 +151,174 @@ export class AddUsuarioComponent {
     });
   }
 
+ retornaIdTipoPerfil(namePerfil:string ) : number  {
+  if(namePerfil.toLowerCase()=='administrador')
+    return 1
+  else  if(namePerfil.toLowerCase()=="super administrador") {
+    return 2
+  }
+  else if(namePerfil.toLowerCase()=='utilizador') {
+    return 3
+  }
+  else {
+    return 0
+  }
+ }
 
+ retornaNameIdPerfil(perfilId:number ) : string | null {
+  if(perfilId==1)
+    return 'Administrador'
+  else   if(perfilId==2) {
+    return 'Super administrador'
+  }
+  else  if(perfilId==3)  {
+    return 'Utilizador'
+  }
+  else {
+    return null
+  }
+ }
+ 
+
+  gravar() {
+   
+    console.log('this.formulario',this.formulario);
+    if (this.formulario?.invalid) {
+      this.formulario.markAllAsTouched();
+      return;
+    }
+    const formValues=this.formulario?.value;
+    const objGravar: { 
+      id?:string |null;
+      name: string;
+      lastName: string;
+      email: string;
+      passportNumber: string;
+      perfil: number[]; // Definindo o tipo correto para o array 'perfil'
+     
+      password:string
+    } ={
+      id:null,
+      name:formValues.nome,
+      lastName:formValues.sobrenome??'',
+      email:formValues.email,
+      passportNumber:formValues.passaporte??'',
+      perfil:[],
+      
+      password:formValues.password
+    }
+    objGravar.perfil=[];
+
+   
+    if(formValues.perfis && formValues.perfis.length) {
+      formValues.perfis.forEach((element:any) => {
+      
+          if(element.value) {
+            objGravar.perfil.push(this.retornaIdTipoPerfil(element.name))           
+          }
+      });
+    }
+
+    if(this.idUser) {
+
+      objGravar.id=this.idUser
+      this.usuarioService.updateUser(objGravar).pipe(
+        tap((response) =>    {
+          console.log('response',response);
+          this.openModal(response.message)
+          this.formulario?.controls['password'].setValue('',{ emitEvent: false })
+          this.formulario?.controls['passwordConfirm'].setValue('',{ emitEvent: false })
+          this.formulario?.controls['password'].clearValidators();
+          this.formulario?.controls['passwordConfirm']?.clearValidators();
+
+        }),
+        catchError((error: HttpErrorResponse) => {
+            
+          if (error.status === 500) {
+            console.log('Interceptando requisição:', error)
+
+            this.openModal(error.message)
+
+            // router.navigate(['/login']); // Redireciona para a página de login
+          }
+
+              if (error.status === 401) {
+                  console.log('Interceptando requisição:', error.status)
+                  // router.navigate(['/login']); // Redireciona para a página de login
+                }
+            return throwError(() => error);
+          })
+        
+        ).subscribe(()=>{})
+    }
+
+    else {
+
+    this.usuarioService.verifyExistsUsers({email:objGravar.email}).pipe(
+
+      tap((response)=>{
+        if(response.message) {
+            this.openModal("Usuário já cadastrado com esse email")
+          
+        } else {
+
+              this.usuarioService.addUsers(objGravar).pipe(
+                  tap(() =>    this.openModal("Usuário cadastrado com sucesso")),
+                  catchError((error: HttpErrorResponse) => {
+                      
+                        if (error.status === 401) {
+                            console.log('Interceptando requisição:', error.status)
+                            // router.navigate(['/login']); // Redireciona para a página de login
+                          }
+                      return throwError(() => error);
+                    })
+                  
+                  ).subscribe(()=>{})
+              
+        }
+      })).subscribe()
+
+    }
+    
+            
+  }
+
+  
+  togglePasswordValidation() {
+    const passwordControl = this.formulario?.get('password');
+    const passwordConfirmControl = this.formulario?.get('passwordConfirm');
+
+    if (this.isEdit) {
+      // Se for edição, remove as validações de senha
+      passwordControl?.clearValidators();
+      passwordConfirmControl?.clearValidators();
+    } else {
+      // Se for criação, adiciona as validações obrigatórias
+      passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
+      passwordConfirmControl?.setValidators([Validators.required, this.matchPasswords()]);
+    }
+
+    // Se o usuário digitar uma senha, ativa a validação
+    passwordControl?.valueChanges.subscribe(value => {
+      if (value) {
+        passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
+        passwordConfirmControl?.setValidators([Validators.required, this.matchPasswords()]);
+      } else {
+        passwordControl?.clearValidators();
+        passwordConfirmControl?.clearValidators();
+      }
+      passwordControl?.updateValueAndValidity();
+      passwordConfirmControl?.updateValueAndValidity();
+    });
+  }
+
+  // Função para verificar se os campos de senha coincidem
+  matchPasswords() {
+    return (control: any) => {
+      const password = this.formulario?.get('password')?.value;
+      return control.value === password ? null : { passwordsMismatch: true };
+    };
+  }
   // criarDocumento(): FormGroup {
   //   return this.fb.group({
   //     documento: ['', Validators.required],
@@ -94,59 +345,5 @@ export class AddUsuarioComponent {
   //     }
   //   }
   // }
-
-  gravar() {
-
-
-    const formValues=this.formulario?.value;
-    const objGravar: { 
-      id?:string |null;
-      name: string;
-      lastName: string;
-      email: string;
-      passportNumber: string;
-      perfil: number[]; // Definindo o tipo correto para o array 'perfil'
-     
-      password:string
-    } ={
-      id:null,
-      name:formValues.nome,
-      lastName:formValues.sobrenome,
-      email:formValues.email,
-      passportNumber:formValues.passaporte,
-      perfil:[],
-      
-      password:'$2a$10$.3BNGTrYkITOuIf7fKor0u1mUgskkHhOSEhz1EmAVv6hZ.Fq9W76S'
-    }
-    objGravar.perfil=[];
-
-    console.log('formValues',formValues);
-    if(formValues.perfis && formValues.perfis.length) {
-      formValues.perfis.forEach((element:any) => {
-        console.log('element',element);
-        if(element.name=='Administrador')
-        objGravar.perfil.push(1)
-      else  if(element.name=='Super Administrador') {
-        objGravar.perfil.push(2)
-      }
-      else  if(element.name=='Utilizador') {
-        objGravar.perfil.push(3)
-      }
-      });
-    }
-    this.usuarioService.addUsers(objGravar).pipe(
-
-    tap(() => console.log('Interceptando requisição:')),
-    catchError((error: HttpErrorResponse) => {
-         
-           if (error.status === 401) {
-               console.log('Interceptando requisição:', error.status)
-               // router.navigate(['/login']); // Redireciona para a página de login
-             }
-         return throwError(() => error);
-       })
-    
-    ).subscribe(()=>{})
-  }
 
 }

@@ -23,9 +23,13 @@ export const routes: Routes = [
                 component:UsuarioComponent,
             }, 
             {
+                path:'addUser/:id',
+                component:AddUsuarioComponent
+            }   , 
+            {
                 path:'addUser',
                 component:AddUsuarioComponent
-            }           
+            }         
         ]
     },   // Redireciona para login por padrão    
     { 

@@ -1,3 +1,9 @@
+<app-modal-ok
+  [isVisible]="isModalVisible"
+  [message]="message"
+  (onConfirm)="handleConfirm()"
+
+  ></app-modal-ok>
 <form [formGroup]="formulario" *ngIf="formulario">
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
@@ -6,41 +12,103 @@
         <p class="card-description" style="display: none;"> Basic form elements </p>
         <form class="forms-sample">
           <div class="form-group">
-            <label for="exampleInputUsername1">Nome</label>
-            <input 
-                  type="text" 
-                  class="form-control" 
-                  formControlName="nome" 
-                  id="nome" 
-                  placeholder="Digite o nome">
+            <label for="nome">Nome <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="nome"
+              id="nome"
+              (keydown.space)="$event.preventDefault()"
+              placeholder="Digite o nome"
+              [ngClass]="{'is-invalid': formulario.get('nome')?.invalid && formulario.get('nome')?.touched}"
+            />
+            <div class="invalid-feedback" *ngIf="formulario.get('nome')?.invalid && formulario.get('nome')?.touched">
+              O nome é obrigatório.
+            </div>
           </div>
+  
           <div class="form-group">
-            <label for="exampleInputUsername1">Último Nome</label>
-            <input 
-                type="text" 
-                class="form-control" 
-                formControlName="sobrenome" 
-                id="sobrenome" 
-                placeholder="Digite o último nome">
+            <label for="sobrenome">Último Nome </label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="sobrenome"
+              id="sobrenome"
+              placeholder="Digite o último nome"
+             
+            />
+        
           </div>
+  
           <div class="form-group">
-            <label for="email">Email</label>
-            <input 
-                type="text" 
-                class="form-control"
-                 formControlName="email" 
-                 id="email" 
-                 placeholder="email">
+            <label for="email">Email <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="email"
+              id="email"
+              (keydown.space)="$event.preventDefault()"
+              placeholder="Digite o email"
+              [ngClass]="{'is-invalid': formulario.get('email')?.invalid && formulario.get('email')?.touched}"
+              
+  
+            />
+            <div class="invalid-feedback" *ngIf="formulario.get('email')?.invalid && formulario.get('email')?.touched">
+              Digite um email válido.
+            </div>
           </div>
+
+
+          <div class="form-group">
+            <label for="email">Senha <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="password"
+              id="email"
+              (keydown.space)="$event.preventDefault()"
+              placeholder="Digite a senha"
+              [ngClass]="{'is-invalid': formulario.get('password')?.invalid && formulario.get('password')?.touched}"
+  
+            />
+            <small *ngIf="formulario.get('password')?.invalid && formulario.get('password')?.touched" class="text-danger">
+              Senha deve ter pelo menos 6 caracteres.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Confirme a senha <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="passwordConfirm"
+              id="email"
+              (keydown.space)="$event.preventDefault()"
+              placeholder="Confirme a senha"
+              [ngClass]="{'is-invalid': formulario.get('passwordConfirm')?.invalid && formulario.get('passwordConfirm')?.touched}"
+  
+            />
+            <div class="invalid-feedback" *ngIf="formulario.get('passwordConfirm')?.invalid && formulario.get('passwordConfirm')?.touched">
+             Confirme a senha
+            </div>
+            <small *ngIf="formulario.get('passwordConfirm')?.hasError('passwordsMismatch')" class="text-danger">
+              As senhas não coincidem.
+            </small>
+          </div>
+  
           <div class="form-group">
             <label for="passaporte">Passaporte</label>
-            <input 
-                type="text" 
-                class="form-control" 
-                formControlName="passaporte" 
-                id="passaporte" 
-                placeholder="Username">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="passaporte"
+              id="passaporte"
+              placeholder="Digite o passaporte"
+            
+            />
+           
           </div>
+  
           
           <div class="form-group" style="display: none;float: none;">
             <label for="documento">Documento</label>
@@ -50,7 +118,6 @@
               <option>212 - Recebimento</option>
             </select>
           </div>
-
         
         </form>
       </div>
@@ -59,82 +126,81 @@
   
   <!-- <div class="row d-flex"> -->
 
-   
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Perfis <span class="required">*</span></h4>                    
 
+          <ngContainer formArrayName="perfis">                     
+            <div class="form-group perfis-container">            
+              <div *ngFor="let perfil of perfisForm.controls; let i = index;let isLast = last ">
+                <ngContainer [formGroupName]="i">
+                    <input  type="checkbox"  formControlName="value" class="form-check-input">&nbsp;<label class="espacoLabel">{{ perfil.get("name")?.value }}</label> <span  *ngIf="!isLast">/</span>
+                  </ngContainer>
+              </div> 
+            </div> 
+          </ngContainer>
+          <div *ngIf="formulario.get('perfis')?.hasError('perfilNaoSelecionado') && formulario.get('perfis')?.touched">
+            <p style="color: red;">Por favor, selecione ao menos um perfil.</p>
+          </div>
 
-              <div class="col-md-12 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Perfis</h4>                    
-
-                    <ngContainer formArrayName="perfis">                     
-                      <div class="form-group perfis-container">            
-                        <div *ngFor="let perfil of perfisForm.controls; let i = index;let isLast = last ">
-                          <ngContainer [formGroupName]="i">
-                              <input  type="checkbox"  formControlName="value" class="form-check-input">&nbsp;<label class="espacoLabel">{{ perfil.get("name")?.value }}</label> <span  *ngIf="!isLast">/</span>
-                            </ngContainer>
-                        </div> 
-                      </div> 
-                    </ngContainer>
-
-
-                    
-                  </div>
-                </div>
-              </div>
+          
+        </div>
+      </div>
+    </div>
 
 
              
-              <div class="col-12 grid-margin" style="display: none;">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Documentos</h4>                     
-                      <div class="row">
-                        <div class="col-md-3">
-                          <div class="form-group row"> 
-                            <div class="col-sm-9">                            
-                              <div style="width: 100%;" style="margin-bottom: 10px;"> Tipo</div>
-                              <select class="form-select">
-                                <option value="1">NIF</option>
-                                <option value="2">CNPJ</option>
-                              </select>
-                            </div>                          
-                          </div>
-                        </div>
-                        <div class="col-md-3">
-                          <div class="form-group row">  
-                            <div class="col-sm-9">
-                              <div style="width: 100%;" style="margin-bottom: 10px;"> País</div>
-                              <select class="form-select">
-                                <option value="1">Brasil</option>
-                                <option value="2">Portugal</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-3">
-                          <div class="form-group row">
-                            <div class="col-sm-12">
-                              <div style="width: 100%;" style="margin-bottom: 10px;"> Documento</div>                             
-                              <input type="text" class="form-control" maxlength="22" />
-                            </div>
-                          </div>
-                        </div>                       
-                      </div>
+    <div class="col-12 grid-margin" style="display: none;">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Documentos</h4>                     
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group row"> 
+                  <div class="col-sm-9">                            
+                    <div style="width: 100%;" style="margin-bottom: 10px;"> Tipo</div>
+                    <select class="form-select">
+                      <option value="1">NIF</option>
+                      <option value="2">CNPJ</option>
+                    </select>
+                  </div>                          
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group row">  
+                  <div class="col-sm-9">
+                    <div style="width: 100%;" style="margin-bottom: 10px;"> País</div>
+                    <select class="form-select">
+                      <option value="1">Brasil</option>
+                      <option value="2">Portugal</option>
+                    </select>
                   </div>
                 </div>
               </div>
+              <div class="col-md-3">
+                <div class="form-group row">
+                  <div class="col-sm-12">
+                    <div style="width: 100%;" style="margin-bottom: 10px;"> Documento</div>                             
+                    <input type="text" class="form-control" maxlength="22" />
+                  </div>
+                </div>
+              </div>                       
+            </div>
+        </div>
+      </div>
+    </div>
 
-              <div class="col-md-12 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <div style="float: none;">
-                      <button type="submit" class="btn btn-primary me-2" (click)="gravar()">Gravar</button>
-                      <button class="btn btn-light">Cancelar</button>
-                    </div> 
-                  </div>
-                </div>
-              </div>
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div style="float: none;">
+            <button type="submit" class="btn btn-primary me-2" (click)="gravar()">Gravar</button>
+            <button class="btn btn-light">Cancelar</button>
+          </div> 
+        </div>
+      </div>
+    </div>
              
             <!-- </div> -->
 </form>

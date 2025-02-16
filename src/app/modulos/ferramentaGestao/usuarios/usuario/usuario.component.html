@@ -13,6 +13,39 @@
         <h4 class="card-title">Usuários</h4>
         <p class="card-description" style="display: none;"> Add class <code>.table-striped</code>
         </p>
+
+        <div class="search-container" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+              <div class="form-group">
+                <label for="searchName">Nome:</label>
+                <input type="text" id="searchName" [(ngModel)]="searchName" class="form-control" placeholder="Digite o nome">
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-5 col-sm-6 col-12">
+              <div class="form-group">
+                <label for="searchEmail">Email:</label>
+                <input type="text" id="searchEmail" [(ngModel)]="searchEmail" class="form-control" placeholder="Digite o email">
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+              <div class="form-group">
+                <label for="searchRole">Tipo de Usuário:</label>
+                <select id="searchRole" [(ngModel)]="searchRole" class="form-control">
+                  <option value="">Todos</option>
+                  <option *ngFor="let perfil of perfis" [value]="perfil.name">{{ perfil.name }}</option>
+                </select>
+              </div>
+            </div>
+        
+            <div class="col-lg-3 col-md-12 text-md-right text-center" style="margin-top: 30px;">
+              <button class="btn btn-primary" (click)="searchUsers()">Pesquisar</button>
+            </div>
+          </div>
+        </div>
+  
         <div class="table-responsive">
           <table class="table table-striped">
             <thead>              
@@ -35,6 +68,17 @@
                 <td> {{item.Email}} </td>
                 <td> {{item.LastName}} </td>
                 <td style="text-align: right;"> 
+
+                  
+
+                      
+                  <i (click)="updateUser(item.ID)" style="font-size: 20px; cursor: pointer; " 
+                  title="Editar usuário" 
+                  class="mdi mdi-table-edit"></i>
+
+                  &nbsp;
+                  &nbsp;&nbsp;
+
                   <i (click)="openModal()" style="font-size: 20px; cursor: pointer; " 
                   title="Excluir usuário" 
                   class="mdi mdi-delete">

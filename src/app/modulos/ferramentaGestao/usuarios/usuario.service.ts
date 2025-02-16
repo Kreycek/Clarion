@@ -33,4 +33,37 @@ export class UsuarioService {
       }),
     });
   }
+
+  updateUser(user:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/updateUser", user, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
+
+
+  verifyExistsUsers(user:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/verifyExistUser", user, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
+
+  searchUsers(user:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/searchUsers", user, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
+
+  getUserById(id:string): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/getUserById?id="+id, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
 }
