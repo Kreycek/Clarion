@@ -1,0 +1,107 @@
+<app-modal-confirmation 
+  [isVisible]="isModalVisible"
+  [message]="'Deseja excluir este item?'"
+  (onConfirm)="handleConfirm()"
+  (onCancel)="handleCancel()"
+  
+  >
+</app-modal-confirmation>
+
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Plano de contas</h4>
+        <p class="card-description" style="display: none;"> Add class <code>.table-striped</code>
+        </p>
+
+        <div class="search-container" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+              <div class="form-group">
+                <label for="searchName">Código da conta:</label>
+                <input type="text" id="searchName" [(ngModel)]="searchCodConta" class="form-control" placeholder="Digite o nome">
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-5 col-sm-6 col-12">
+              <div class="form-group">
+                <label for="searchEmail">Descrição:</label>
+                <input type="text" id="searchEmail" [(ngModel)]="searchDescricao" class="form-control" placeholder="Digite o email">
+              </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-2 col-sm-6 col-12">
+              <div class="form-group">
+                <label for="searchRole">Ano:</label>
+                <select id="searchRole" [(ngModel)]="searchYear" class="form-control" multiple>
+                  <option value="">Todos</option>
+                  <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-6 col-12">
+                <div class="form-group">
+                  <label for="searchRole">Tipo:</label>
+                  <select id="searchRole" [(ngModel)]="searchType" class="form-control">
+                    <option value="">Todos</option>
+                    <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+                  </select>
+                </div>
+              </div>
+        
+            <div class="col-lg-2 col-md-2 text-md-right text-center" style="margin-top: 30px;">
+              <button class="btn btn-primary" (click)="searchChartOfAccount(1)">Pesquisar</button>
+            </div>
+          </div>
+        </div>
+  
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>              
+              <tr>
+                <th colspan="5" style="text-align: right;" >                   
+                    <i class="mdi mdi-account-plus" (click)="addChartOfAccount()" title="Adicionar usuário" style="font-size: 24px; cursor: pointer;"></i>                   
+               </th>                         
+              </tr>              
+              <tr>
+                <th> Cod. Conta </th>              
+                <th> Descrição </th>            
+                <th> Exercício </th>                    
+                <th> Tipo </th>   
+                <th> Status </th>   
+                <th>  </th> 
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of dados">              
+                <td> {{item.CodAccount}} </td>
+                <td> {{item.Description}} </td>
+                <td> 
+                    <ng-container *ngFor="let year of item.Year; let ilast=last">
+                        <span>{{ year }} {{!ilast?',':''}}</span>
+                    </ng-container>
+                </td>
+                <td>{{item.Type}}</td>
+                <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
+                <td style="text-align: right;">                                        
+                  <i (click)="updateChartOfAccount(item.ID)" style="font-size: 20px; cursor: pointer; " 
+                  title="Editar plano de conta" 
+                  class="mdi mdi-table-edit"></i>
+                  &nbsp;&nbsp;&nbsp;
+                  <i (click)="openModal()" style="font-size: 20px; cursor: pointer; " 
+                  title="Excluir plano de conta" 
+                  class="mdi mdi-delete">
+                </i> </td>               
+              </tr>             
+            </tbody>
+          </table>
+          <app-paginator
+          [totalPages]="totalPages"
+          [currentPage]="currentPage"          
+          (pageChange)="onPageChange($event)">
+        </app-paginator>
+        </div>
+      </div>
+    </div>
+  </div>

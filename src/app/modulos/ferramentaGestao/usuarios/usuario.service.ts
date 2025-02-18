@@ -17,8 +17,8 @@ export class UsuarioService {
     private configService:ConfigService
   ) {}
 
-  getUsers(): Observable<any> {
-    return this.http.get(this.configService.apiUrl + "/getAllUsers", {
+  getUsers(page:number, limit:number): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/getAllUsers?page="+page + "&limit="+limit , {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),

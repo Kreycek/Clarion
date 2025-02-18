@@ -116,6 +116,7 @@ export class AddUsuarioComponent {
         password: [''],
         passwordConfirm: [''],
         passaporte: [obj.PassportNumber],
+        mobile: [obj.Mobile],
         perfis: this.fb.array([], [Validators.required,this.validaPerfilSelecionado] )  // Array para perfis selecionados
         // documentos: this.fb.array([this.criarDocumento()])  // Começa com um documento
       }, 
@@ -179,9 +180,9 @@ export class AddUsuarioComponent {
       email: string;
       passportNumber: string;
       active:boolean;
-      perfil: number[]; // Definindo o tipo correto para o array 'perfil'
-     
-      password:string
+      perfil: number[]; // Definindo o tipo correto para o array 'perfil'     
+      password:string;
+      mobile:string
     } ={
       id:null,
       name:formValues.nome,
@@ -189,9 +190,9 @@ export class AddUsuarioComponent {
       email:formValues.email,
       passportNumber:formValues.passaporte??'',
       active:formValues.active,
-      perfil:[],
-      
-      password:formValues.password
+      perfil:[],      
+      password:formValues.password,
+      mobile:formValues.mobile
     }
     objGravar.perfil=[];
 

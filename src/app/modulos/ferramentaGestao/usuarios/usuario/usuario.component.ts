@@ -6,13 +6,15 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ModalConfirmationComponent } from '../../../../modal/modal-confirmation/modal-confirmation.component';
 import { PerfilService } from '../../perfil/perfil.service';
+
 import { FormsModule } from '@angular/forms';
+import { PaginatorComponent } from '../../../../paginator/paginator.component';
 
 
 @Component({
   selector: 'app-usuario',
   standalone: true,
-  imports: [CommonModule,ModalConfirmationComponent,FormsModule ],
+  imports: [CommonModule,ModalConfirmationComponent,FormsModule,PaginatorComponent ],
   templateUrl: './usuario.component.html',
   styleUrl: './usuario.component.css'
 })
@@ -24,6 +26,17 @@ export class UsuarioComponent {
     private perfilService: PerfilService
   ) {}
 
+  searchName: string = '';
+  searchEmail: string = '';
+  searchRole: string = '';
+
+  totalUsers: number = 0;
+  totalPages: number = 1;
+  currentPage: number = 1;
+  limit: number = 2;
+
+  filteredUsers = []; // Inicialmente, exibe todos os usuários
+  
   
   ngOnInit() {
     this.perfilService.gePerfil().subscribe((response:any)=>{
@@ -33,40 +46,34 @@ export class UsuarioComponent {
     })
 
     
-    this.usuarioService.getUsers().subscribe((response:any)=>{
+    this.usuarioService.getUsers(this.currentPage,this.limit).subscribe((response:any)=>{
 
-      this.dados=response;
+      this.dados=response.users;
         console.log('users',response);
+      
+        this.totalUsers = response.total;
+      this.totalPages = response.pages;
     })
    }
   
-  searchName: string = '';
-  searchEmail: string = '';
-  searchRole: string = '';
 
-  filteredUsers = []; // Inicialmente, exibe todos os usuários
 
-  searchUsers() {
-
-    // console.log('searchName',this.searchName);
-    // console.log('searchName',this.searchEmail);
-    // console.log('searchName',this.searchRole);
-    // this.usuarioService.searchUsers().subscribe((response:any)=>{
-
-    //   this.dados=response;
-    //     console.log('users',response);
-    // })
+  searchUsers(currentPagepage:number) {
 
     let objPesquisar: { 
       name: string;
       email: string;      
       perfil: number[]; // Definindo o tipo correto para o array 'perfil'
+      page:number;
+      limit:number;
     }
 
     objPesquisar= { 
       name: this.searchName, 
       email: this.searchEmail, 
-      perfil: [] 
+      perfil: [],
+      page:currentPagepage,
+      limit:this.limit
     };
 
     if(this.searchRole=='Administrador')
@@ -80,8 +87,9 @@ export class UsuarioComponent {
 
     this.usuarioService.searchUsers(objPesquisar).subscribe((response:any)=>{
 
-      this.dados=response;
-        console.log('users',response);
+      this.dados=response.users;    
+      this.totalUsers = response.total;
+      this.totalPages = response.pages;
     })
 
   }
@@ -120,4 +128,8 @@ export class UsuarioComponent {
    
    } 
   
+   onPageChange(newPage: number) {
+    this.currentPage = newPage;
+    this.searchUsers(this.currentPage);
+  }
 }

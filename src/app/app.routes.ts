@@ -6,6 +6,7 @@ import { AplicacaoComponent } from './aplicacao/aplicacao.component';
 import { LoginComponent } from './login/login.component';
 import { UsuarioComponent } from './modulos/ferramentaGestao/usuarios/usuario/usuario.component';
 import { AddUsuarioComponent } from './modulos/ferramentaGestao/usuarios/add-usuario/add-usuario.component';
+import { ChartOfAccountsComponent } from './modulos/ferramentaGestao/chart-of-accounts/chart-of-accounts.component';
 
 export const routes: Routes = [
 
@@ -29,7 +30,11 @@ export const routes: Routes = [
             {
                 path:'addUser',
                 component:AddUsuarioComponent
-            }         
+            },
+            {
+                path:'chartOfAccount',
+                component:ChartOfAccountsComponent
+            }
         ]
     },   // Redireciona para login por padrão    
     { 
