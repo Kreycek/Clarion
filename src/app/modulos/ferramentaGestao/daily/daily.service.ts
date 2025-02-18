@@ -6,7 +6,7 @@ import { ConfigService } from '../../../services/config.service';
 @Injectable({
   providedIn: 'root',
 })
-export class ChartOfAccountService {
+export class DailyService {
     // URL do seu backend para login
 
   constructor(
@@ -14,24 +14,33 @@ export class ChartOfAccountService {
     private configService:ConfigService
   ) {}
 
-  getChartOfAccounts(page:number, limit:number): Observable<any> {
-    return this.http.get(this.configService.apiUrl + "/getAllChartOfAccount?page="+page + "&limit="+limit , {
+  getAllDaily(page:number, limit:number): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/getAllDailys?page="+page + "&limit="+limit , {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
   }
   
-  addChartOfAccounts(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/addChartOfAccounts", chartOfAccount, {
+  //Carregar todos os diários sem documentos
+  getAllOnlyDaily(): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/getAllOnlyDailys" , {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
   }
 
-  updateUser(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/updateChartOfAccounts", chartOfAccount, {
+  addChartOfAccounts(chartOfAccount:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/insertChartOfAccount", chartOfAccount, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
+
+  updateChartOfAccounts(chartOfAccount:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/updateChartOfAccount", chartOfAccount, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -39,7 +48,7 @@ export class ChartOfAccountService {
   }
 
   verifyExistsChartOfAccounts(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/verifyExistChartOfAccounts", chartOfAccount, {
+    return this.http.post(this.configService.apiUrl + "/VerifyExistChartOfAccount", chartOfAccount, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -47,7 +56,7 @@ export class ChartOfAccountService {
   }
 
   searchChartOfAccount(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/SearchChartOfAccountsHandler", chartOfAccount, {
+    return this.http.post(this.configService.apiUrl + "/searchChartOfAccounts", chartOfAccount, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -56,6 +65,15 @@ export class ChartOfAccountService {
 
   getChartOfAccountById(id:string): Observable<any> {
     return this.http.get(this.configService.apiUrl + "/getChartOfAccountById?id="+id, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
+
+
+  updateAllChartOfAccountWithNextYear(chartOfAccount:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/updateAllYearOfAccounts", chartOfAccount, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),

@@ -1,0 +1,14 @@
+
+.required {
+    color: red;
+    margin-left: 5px;
+  }
+  
+  .is-invalid {
+    border: 1px solid red;
+  }
+  
+  .invalid-feedback {
+    color: red;
+    font-size: 0.9rem;
+  }

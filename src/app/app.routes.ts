@@ -6,7 +6,9 @@ import { AplicacaoComponent } from './aplicacao/aplicacao.component';
 import { LoginComponent } from './login/login.component';
 import { UsuarioComponent } from './modulos/ferramentaGestao/usuarios/usuario/usuario.component';
 import { AddUsuarioComponent } from './modulos/ferramentaGestao/usuarios/add-usuario/add-usuario.component';
-import { ChartOfAccountsComponent } from './modulos/ferramentaGestao/chart-of-accounts/chart-of-accounts.component';
+import { ChartOfAccountsComponent } from './modulos/contabilidade/chart-of-accounts/chart-of-accounts.component';
+import { AddChartOfAccountsComponent } from './modulos/contabilidade/add-chart-of-accounts/add-chart-of-accounts.component';
+import { DailyComponent } from './modulos/ferramentaGestao/daily/daily.component';
 
 export const routes: Routes = [
 
@@ -34,7 +36,25 @@ export const routes: Routes = [
             {
                 path:'chartOfAccount',
                 component:ChartOfAccountsComponent
+            },
+            {
+                path:'addChartOfAccount',
+                component:AddChartOfAccountsComponent
+            }, 
+            {
+                path:'addChartOfAccount/:id',
+                component:AddChartOfAccountsComponent
+            }  , 
+            {
+                path:'daily/:id',
+                component:DailyComponent
+            } , 
+            {
+                path:'daily',
+                component:DailyComponent
             }
+
+            
         ]
     },   // Redireciona para login por padrão    
     { 

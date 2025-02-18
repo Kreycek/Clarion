@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-modal-confirmation',
@@ -9,23 +10,31 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './modal-confirmation.component.css'
 })
 export class ModalConfirmationComponent {
+  @Input() isVisible = false;
+  @Input() message: string = '';
 
-  @Input() isVisible = false; // Controla a exibição da modal
-  @Input() message: string = 'Tem certeza que deseja continuar?'; // Mensagem personalizada
+  private responseSubject = new Subject<boolean>();
 
-  @Output() onConfirm = new EventEmitter<void>(); // Evento para confirmar
-  @Output() onCancel = new EventEmitter<void>(); // Evento para cancelar
-  @Output() teste = new EventEmitter<number>(); // Evento para cancelar
+  // Método para abrir o modal e retornar um Observable
+  openModal(): Promise<boolean> {
+    this.isVisible = true;
+    return new Promise(resolve => {
+      this.responseSubject = new Subject<boolean>();
+      this.responseSubject.subscribe(response => {
+        this.isVisible = false;
+        resolve(response);
+      });
+    });
+  }
 
   confirm() {
-    this.onConfirm.emit(); // Emite o evento de confirmação
-    this.isVisible = true;
-    this.teste.emit(1);
+    this.responseSubject.next(true);
+    this.responseSubject.complete();
   }
 
   cancel() {
-    this.onCancel.emit(); // Emite o evento de cancelamento
-    this.isVisible = false;
+    this.responseSubject.next(false);
+    this.responseSubject.complete();
   }
   
 }
