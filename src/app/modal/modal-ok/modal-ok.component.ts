@@ -11,13 +11,14 @@ import { Subject } from 'rxjs';
 })
 export class ModalOkComponent {
 
-    @Input() isVisible = false;
-    @Input() message: string = '';
+    isVisible = false;
+    message: string = '';
   
     private responseSubject = new Subject<boolean>();
   // Método para abrir o modal e retornar um Observable
-  openModal(): Promise<boolean> {
-    this.isVisible = true;
+  openModal(message:string, isVisible:boolean): Promise<boolean> {
+    this.isVisible = isVisible;
+    this.message=message
     return new Promise(resolve => {
       this.responseSubject = new Subject<boolean>();
       this.responseSubject.subscribe(response => {
@@ -28,6 +29,7 @@ export class ModalOkComponent {
   }
 
   confirm() {
+    this.isVisible = false;
     this.responseSubject.next(true);
     this.responseSubject.complete();
   }

@@ -8,9 +8,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalOkComponent } from '../../../modal/modal-ok/modal-ok.component';
-import { ChartOfAccountService } from '../chart-of-accounts/chartOfAccount.service';
-import { ConfigService } from '../../../services/config.service';
+import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
+import { ChartOfAccountService } from '../chartOfAccount.service';
+import { ConfigService } from '../../../../services/config.service';
 
 @Component({
   selector: 'app-add-chart-of-accounts',
@@ -21,8 +21,8 @@ import { ConfigService } from '../../../services/config.service';
 })
 export class AddChartOfAccountsComponent {
   
-  message=''
-  isModalVisible = false;
+
+  
   isEdit=false;
   idUser:string |null = null 
   formulario: FormGroup| null = null;
@@ -94,11 +94,6 @@ export class AddChartOfAccountsComponent {
     }   
   }
 
-
-  handleConfirm() {   
-    console.log('Confirmado!');
-    this.isModalVisible = false;
-  }
   
   requiredCheckboxValidator(formArray: FormArray): { [key: string]: boolean } | null {
     const selected = formArray.controls.some(control => control.value); // Verifica se algum checkbox foi marcado
@@ -118,8 +113,8 @@ export class AddChartOfAccountsComponent {
 
     
   async abrirModalConfirmacao(msgModal:string) {
-    this.message=msgModal;
-    const resultado = await this.modal.openModal(); 
+  
+    const resultado = await this.modal.openModal(msgModal,true); 
 
     if (resultado) {
      
@@ -128,10 +123,7 @@ export class AddChartOfAccountsComponent {
     }
   }
   
-  async openModalOk(_message:string) {
-    this.message=_message
-    this.isModalVisible = true;
-  }
+
 
   gravar() {
    
@@ -172,8 +164,8 @@ export class AddChartOfAccountsComponent {
       objGravar.id=this.idUser
         this.coaService.updateChartOfAccounts(objGravar).pipe(
         tap(async (response:any) =>    {    
-         this.message=response.message
-         const resultado = await this.modal.openModal(); 
+        
+         const resultado = await this.modal.openModal(response.message,true); 
          if (resultado) {
 
          }
@@ -183,8 +175,8 @@ export class AddChartOfAccountsComponent {
             
               if (error.status === 500) {
                 console.log('Interceptando requisição:', error)
-                this.message=error.message;
-                const resultado = await this.modal.openModal(); 
+              
+                const resultado = await this.modal.openModal(error.message,true); 
                 if (resultado) {
 
                 }
@@ -205,8 +197,8 @@ export class AddChartOfAccountsComponent {
 
       this.coaService.verifyExistsChartOfAccounts({codAccount:objGravar.codAccount}).subscribe((async (response:any)=>{
         if(response.message) {
-            this.message="Essa conta já está cadastrada tente outra";
-            const resultado = await this.modal.openModal(); 
+           
+            const resultado = await this.modal.openModal("Essa conta já está cadastrada tente outra",true); 
             if (resultado) {
 
             }
@@ -219,11 +211,10 @@ export class AddChartOfAccountsComponent {
               }
               return throwError(() => error);
             })
-          ).subscribe(async () => { 
-            this.message = "Usuário cadastrado com sucesso";
+          ).subscribe(async () => {            
           
             // Aguarda o resultado do modal antes de continuar
-            const resultado = await this.modal.openModal(); 
+            const resultado = await this.modal.openModal("Usuário cadastrado com sucesso",true); 
           
             if (resultado) {
               console.log("Usuário confirmou!");

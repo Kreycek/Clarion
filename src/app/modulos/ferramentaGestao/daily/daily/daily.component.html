@@ -1,17 +1,13 @@
-<app-modal-confirmation 
-  [isVisible]="isModalVisible"
-  [message]="messageModal"
-  (onConfirm)="handleConfirm()"
-  (onCancel)="handleCancel()"
-  
-  >
-</app-modal-confirmation>
 
-<app-modal-ok
-  [isVisible]="isModalOkVisible"
-  [message]="messageOK"
-  (onConfirm)="handleOkCancel()"
-  ></app-modal-ok>
+
+<app-modal-documents
+
+
+
+>
+    
+</app-modal-documents>
+
 
 <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
@@ -30,9 +26,6 @@
                     <option value="">Todos</option>
                     <option *ngFor="let daily of dailys" [value]="daily.codDaily">{{ daily.codDaily + " - " +  daily.description }}</option>
                   </select>
-
-
-              
               </div>
             </div>
             
@@ -40,15 +33,14 @@
             <div class="col-lg-4 col-md-4 col-sm-6 col-12">
               <div class="form-group">
                 <label for="document">Documentos:</label>
-                <select id="document" [(ngModel)]="searchDocuments"  class="form-control" multiple>
-                 
+                <select id="document" [(ngModel)]="searchDocuments"  class="form-control" multiple>                 
                   <option *ngFor="let document of documents" [value]="document.codDocument">{{document.codDocument + ' - '  + document.description }}</option>
                 </select>
               </div>
             </div>
         
             <div class="col-lg-2 col-md-2 text-md-right text-center" style="margin-top: 30px;">
-              <button class="btn btn-primary" (click)="searchChartOfAccount(1)">Pesquisar</button>
+              <button class="btn btn-primary" (click)="searchDaily(1)">Pesquisar</button>
             </div>
           </div>
         </div>
@@ -58,7 +50,7 @@
             <thead>              
               <tr>
                 <th colspan="5" style="text-align: right;" >                   
-                    <i class="mdi mdi-account-plus" (click)="addChartOfAccount()" title="Adicionar plano de contas" style="font-size: 24px; cursor: pointer;"></i>                   
+                    <i class="mdi mdi-account-plus" (click)="addDaily()" title="Adicionar plano de contas" style="font-size: 24px; cursor: pointer;"></i>                   
                </th>                         
               </tr>              
               <tr>
@@ -74,14 +66,13 @@
                 <td> {{item.CodDaily}} </td>
                 <td> {{item.Description}} </td>
                 <td> 
-                    <ng-container *ngFor="let year of item.Year; let ilast=last">
-                        <span>{{ year }} {{!ilast?',':''}}</span>
-                    </ng-container>
+                  <span style="font-size: 15px; cursor: pointer;" (click)="viewDailyDocuments(item)">Visualizar</span>
+                 
                 </td>
-                <td>{{item.Type}}</td>
+               
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
                 <td style="text-align: right;">                                        
-                  <i (click)="updateChartOfAccount(item.ID)" style="font-size: 20px; cursor: pointer; " 
+                  <i (click)="updateDaily(item.ID)" style="font-size: 20px; cursor: pointer; " 
                   title="Editar plano de conta" 
                   class="mdi mdi-table-edit"></i>
                 

@@ -10,24 +10,26 @@ import { Subject } from 'rxjs';
   styleUrl: './modal-confirmation.component.css'
 })
 export class ModalConfirmationComponent {
-  @Input() isVisible = false;
-  @Input() message: string = '';
+  isVisible = false;
+  message: string = '';
 
   private responseSubject = new Subject<boolean>();
 
   // Método para abrir o modal e retornar um Observable
-  openModal(): Promise<boolean> {
-    this.isVisible = true;
+  openModal(isVisible:boolean, message:string): Promise<boolean> {
+    this.isVisible = isVisible;
+    this.message=message;
     return new Promise(resolve => {
       this.responseSubject = new Subject<boolean>();
       this.responseSubject.subscribe(response => {
-        this.isVisible = false;
+        // this.isVisible = false;
         resolve(response);
       });
     });
   }
 
   confirm() {
+    console.log('confirm');
     this.responseSubject.next(true);
     this.responseSubject.complete();
   }
@@ -35,6 +37,7 @@ export class ModalConfirmationComponent {
   cancel() {
     this.responseSubject.next(false);
     this.responseSubject.complete();
+    this.isVisible =false;
   }
   
 }

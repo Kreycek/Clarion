@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UsuarioService } from '../usuario.service';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,7 @@ import { PerfilService } from '../../perfil/perfil.service';
 
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../../paginator/paginator.component';
+import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class UsuarioComponent {
     private perfilService: PerfilService
   ) {}
 
+   @ViewChild(ModalConfirmationComponent) modal!: ModalConfirmationComponent;
   searchName: string = '';
   searchEmail: string = '';
   searchRole: string = '';
@@ -33,25 +35,22 @@ export class UsuarioComponent {
   totalUsers: number = 0;
   totalPages: number = 1;
   currentPage: number = 1;
-  limit: number = 2;
+  limit: number = 20;
 
   filteredUsers = []; // Inicialmente, exibe todos os usuários
+  dados:any
+  perfis:any
   
   
   ngOnInit() {
     this.perfilService.gePerfil().subscribe((response:any)=>{
-
       this.perfis=response;
         console.log('perfis',response);
     })
 
-    
     this.usuarioService.getUsers(this.currentPage,this.limit).subscribe((response:any)=>{
-
       this.dados=response.users;
-        console.log('users',response);
-      
-        this.totalUsers = response.total;
+      this.totalUsers = response.total;
       this.totalPages = response.pages;
     })
    }
@@ -93,31 +92,17 @@ export class UsuarioComponent {
     })
 
   }
- 
-  dados:any
-  perfis:any
 
-  isModalVisible = false;
-
-  openModal() {
-    this.isModalVisible = true;
+  async openModal() {
+    const resultado = await this.modal.openModal(true,""); 
+    if (resultado) {
+      // this.modal.isVisible=false;
+      this.modal.isVisible=false;
+    } else {
+      this.modal.isVisible=false;
+      console.log("Usuário cancelou.");
+    }
   }
-
-  handleConfirm() {
-   
-    console.log('Confirmado!');
-    this.isModalVisible = false;
-  }
-
-  handleCancel() {
-    console.log('Cancelado!');
-    this.isModalVisible = false;
-  }
-
-  teste($event:any) {
-    console.log('$event',$event);
-  }
-
 
    addUser() {
     this.router.navigate(['/aplicacao/addUser']);

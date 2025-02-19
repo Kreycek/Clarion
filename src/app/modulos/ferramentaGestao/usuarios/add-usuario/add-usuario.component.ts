@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { PerfilService } from '../../perfil/perfil.service';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { UsuarioService } from '../usuario.service';
 import { catchError, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-
 import { ModalOkComponent } from "../../../../modal/modal-ok/modal-ok.component";
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -21,7 +20,6 @@ export function passwordMatchValidator(): ValidatorFn {
   };
 }
 
-
 @Component({
   selector: 'app-add-usuario',
   standalone: true,
@@ -30,8 +28,8 @@ export function passwordMatchValidator(): ValidatorFn {
   styleUrl: './add-usuario.component.css'
 })
 
-
 export class AddUsuarioComponent {
+
    validaPerfilSelecionado: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     if (control instanceof FormArray) {
       const hasSelected = control.controls.some(ctrl => ctrl.get('value')?.value);     
@@ -40,8 +38,8 @@ export class AddUsuarioComponent {
     return null;
   };
   
-  message=''
-  isModalVisible = false;
+  @ViewChild(ModalOkComponent) modal!: ModalOkComponent;
+  
   isEdit=false;
   idUser:string |null = null 
   formulario: FormGroup| null = null;
@@ -54,7 +52,6 @@ export class AddUsuarioComponent {
       private router: Router, 
   ) {} 
 
-
   ngOnInit() {
 
     this.route.paramMap.subscribe(params => {
@@ -63,7 +60,7 @@ export class AddUsuarioComponent {
       if(id) {
         this.isEdit=true;
         this.usuarioService.getUserById(id??'0').subscribe((response)=>{
-          console.log('Editar user ',response);
+          
           this.idUser=id;    
           this. createFormUser(response);
           this.loadPerfil(response.Perfil);
@@ -75,39 +72,24 @@ export class AddUsuarioComponent {
         this.loadPerfil([]);
       }
     });    
-  }
+  } 
 
-  openModal(_message:string) {
-    this.message=_message
-    this.isModalVisible = true;
-  }
-
-  handleConfirm() {   
-    console.log('Confirmado!');
-    this.isModalVisible = false;
-  }
- 
- 
-
-    loadPerfil(perfisIds:[]) {
+  loadPerfil(perfisIds:[]) {
       this.perfilService.gePerfil().subscribe((perfis:any)=>{     
         const _perfilForm = this.formulario?.get('perfis') as FormArray;
 
         perfis.forEach((element:any) => {      
           let perfil=0;
-          perfil=perfisIds.filter((perfilId:number)=> {              
-           
-              return this.retornaIdTipoPerfil(element.name)==perfilId
-            
+          perfil=perfisIds.filter((perfilId:number)=> {           
+              return this.retornaIdTipoPerfil(element.name)==perfilId;            
             })[0];
-
         
           _perfilForm.push(this.criarPerfil(element.ID,element.name, perfil>0 ? true : false));
         });            
       })  
     }
   
-    createFormUser(obj:any) {
+  createFormUser(obj:any) {
       this.formulario = this.fb.group({
         active: [obj.Active, Validators.required],
         nome: [obj.Name, Validators.required],
@@ -167,7 +149,7 @@ export class AddUsuarioComponent {
 
   gravar() {
    
-    console.log('this.formulario',this.formulario);
+    
     if (this.formulario?.invalid) {
       this.formulario.markAllAsTouched();
       return;
@@ -196,7 +178,6 @@ export class AddUsuarioComponent {
     }
     objGravar.perfil=[];
 
-   
     if(formValues.perfis && formValues.perfis.length) {
       formValues.perfis.forEach((element:any) => {
       
@@ -210,19 +191,27 @@ export class AddUsuarioComponent {
 
       objGravar.id=this.idUser
       this.usuarioService.updateUser(objGravar).pipe(
-        tap((response) =>    {
+        tap(async (response) =>    {
           this.formulario?.controls['password'].clearValidators();
           this.formulario?.controls['passwordConfirm']?.clearValidators();
           this.formulario?.controls['password'].setValue('',{ emitEvent: false })
           this.formulario?.controls['passwordConfirm'].setValue('',{ emitEvent: false })
-          this.openModal(response.message)
-
+          const resultado = await this.modal.openModal(response.message,true); 
+          if (resultado) {           
+          } else {
+            console.log("Usuário cancelou.");
+          }     
         }),
-        catchError((error: HttpErrorResponse) => {
+        catchError(async (error: HttpErrorResponse) => {
             
-              if (error.status === 500) {
-                console.log('Interceptando requisição:', error)
-                this.openModal(error.message)         
+              if (error.status === 500) {     
+                const resultado = await this.modal.openModal(error.message,true);
+                if (resultado) {
+                 
+                } else {
+                  console.log("Usuário cancelou.");
+                }
+
               }
 
               if (error.status === 401) {
@@ -239,15 +228,26 @@ export class AddUsuarioComponent {
 
     this.usuarioService.verifyExistsUsers({email:objGravar.email}).pipe(
 
-      tap((response)=>{
-        if(response.message) {
-            this.openModal("Usuário já cadastrado com esse email")
+      tap(async (response)=>{
+        if(response.message) {          
+          const resultado = await this.modal.openModal("Usuário já cadastrado com esse email",true);
+          if (resultado) {           
+          } else {
+            console.log("Usuário cancelou.");
+          }         
           
         } else {
               this.usuarioService.addUsers(objGravar).pipe(
-                  tap(
-                    () =>    this.openModal("Usuário cadastrado com sucesso")
-                  ),
+                  tap(async () =>{
+                  
+                    const resultado = await this.modal.openModal("Usuário cadastrado com sucesso",true); 
+
+                    if (resultado) {
+
+                    } else {
+                    
+                    }                   
+                  }),
                   catchError((error: HttpErrorResponse) => {
                       
                         if (error.status === 401) {

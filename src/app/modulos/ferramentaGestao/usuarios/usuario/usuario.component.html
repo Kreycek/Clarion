@@ -1,9 +1,6 @@
 <app-modal-confirmation 
-  [isVisible]="isModalVisible"
-  [message]="'Deseja excluir este item?'"
-  (onConfirm)="handleConfirm()"
-  (onCancel)="handleCancel()"
-  (teste)="teste($event)"
+ 
+#modal
   >
 </app-modal-confirmation>
 
@@ -59,7 +56,7 @@
                 <th> Email </th>
                 <th> Último Nome </th>         
                 <th> Status </th>                    
-                <th></th> 
+                <th style="display: none;"></th> 
               </tr>
             </thead>
             <tbody>
@@ -69,11 +66,11 @@
                 <td> {{item.LastName}} </td>
                 <td> {{item.Active ? 'Ativo' : 'Inativo'}} </td>
                 <td style="text-align: right;">                                        
-                  <i (click)="updateUser(item.ID)" style="font-size: 20px; cursor: pointer; " 
-                  title="Editar usuário" 
-                  class="mdi mdi-table-edit"></i>
+                    <i (click)="updateUser(item.ID)" style="font-size: 20px; cursor: pointer; " 
+                    title="Editar usuário" 
+                    class="mdi mdi-table-edit"></i>
                   &nbsp;&nbsp;&nbsp;
-                  <i (click)="openModal()" style="font-size: 20px; cursor: pointer; " 
+                  <i  (click)="openModal()" style="font-size: 20px; display: none; cursor: pointer; " 
                   title="Excluir usuário" 
                   class="mdi mdi-delete">
                 </i> </td>               

@@ -31,52 +31,47 @@ export class DailyService {
     });
   }
 
-  addChartOfAccounts(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/insertChartOfAccount", chartOfAccount, {
+  getDailyById(id:string): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/getDailyById?id="+id, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
   }
 
-  updateChartOfAccounts(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/updateChartOfAccount", chartOfAccount, {
+  addDaily(daily:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/InsertDaily", daily, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
   }
 
-  verifyExistsChartOfAccounts(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/VerifyExistChartOfAccount", chartOfAccount, {
+  updateDaily(daily:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/UpdateDaily", daily, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
   }
 
-  searchChartOfAccount(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/searchChartOfAccounts", chartOfAccount, {
+  verifyExistsDaily(daily:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/VerifyExistDaily", daily, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
   }
 
-  getChartOfAccountById(id:string): Observable<any> {
-    return this.http.get(this.configService.apiUrl + "/getChartOfAccountById?id="+id, {
+  searchDaily(daily:any): Observable<any> {
+    return this.http.post(this.configService.apiUrl + "/SearchDailys", daily, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
     });
   }
 
+ 
 
-  updateAllChartOfAccountWithNextYear(chartOfAccount:any): Observable<any> {
-    return this.http.post(this.configService.apiUrl + "/updateAllYearOfAccounts", chartOfAccount, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    });
-  }
+
 }

@@ -1,13 +1,13 @@
 import { Component, ViewChild } from '@angular/core';
-import { ModalConfirmationComponent } from "../../../modal/modal-confirmation/modal-confirmation.component";
+import { ModalConfirmationComponent } from "../../../../modal/modal-confirmation/modal-confirmation.component";
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ChartOfAccountService } from './chartOfAccount.service';
-import { PaginatorComponent } from "../../../paginator/paginator.component";
+import { ChartOfAccountService } from '../chartOfAccount.service';
+import { PaginatorComponent } from "../../../../paginator/paginator.component";
 
-import { ConfigService } from '../../../services/config.service';
-import { ModalOkComponent } from "../../../modal/modal-ok/modal-ok.component";
+import { ConfigService } from '../../../../services/config.service';
+import { ModalOkComponent } from "../../../../modal/modal-ok/modal-ok.component";
 
 
 
@@ -44,7 +44,7 @@ export class ChartOfAccountsComponent {
 
   currentYear: number = new Date().getFullYear();
   filteredChartOfAccount = []; // Inicialmente, exibe todos os usuários  
-  messageModal='';
+;
   messageOK=''
   dados:any
   perfis:any
@@ -92,25 +92,6 @@ export class ChartOfAccountsComponent {
 
   }
 
-  openModal() {
-    this.isModalVisible = true;
-  }
-
-  handleOkCancel() {    
-    this.isModalOkVisible = false;
-  }
-
-  handleConfirm() {      
-    this.isModalVisible = false;
-  }
-
-  handleCancel() {    
-    this.isModalVisible = false;
-  }
-
-  teste($event:any) {
-    console.log('$event',$event);
-  }
 
   addChartOfAccount() {
     this.router.navigate(['/aplicacao/addChartOfAccount']);
@@ -127,8 +108,8 @@ export class ChartOfAccountsComponent {
 
   async updateAllChartOfAccountWithNextYear() {
 
-    this.messageModal="Deseja atualiar todas as contas para "+ (this.currentYear + 1);
-    const resultado = await this.modal.openModal(); 
+
+    const resultado = await this.modal.openModal(true,"Deseja atualiar todas as contas para "+ (this.currentYear + 1)); 
 
     if (resultado) {
       this.chartOfAccountService.updateAllChartOfAccountWithNextYear({year:this.currentYear+1}).subscribe()

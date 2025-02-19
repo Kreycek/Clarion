@@ -1,47 +1,53 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChartOfAccountService } from '../../contabilidade/chart-of-accounts/chartOfAccount.service';
-import { ConfigService } from '../../../services/config.service';
-import { ModalConfirmationComponent } from '../../../modal/modal-confirmation/modal-confirmation.component';
+import { ChartOfAccountService } from '../../../contabilidade/chartOfAccount/chartOfAccount.service';
+import { ConfigService } from '../../../../services/config.service';
+import { ModalConfirmationComponent } from '../../../../modal/modal-confirmation/modal-confirmation.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PaginatorComponent } from '../../../paginator/paginator.component';
-import { ModalOkComponent } from '../../../modal/modal-ok/modal-ok.component';
-import { DailyService } from './daily.service';
+import { PaginatorComponent } from '../../../../paginator/paginator.component';
+import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
+import { DailyService } from '../daily.service';
+import { ModalDocumentsComponent } from "../modal-documents/modal-documents.component";
 
 @Component({
   selector: 'app-daily',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorComponent, ModalOkComponent, ModalConfirmationComponent],
+  imports: [CommonModule, FormsModule, PaginatorComponent, ModalOkComponent, ModalConfirmationComponent, ModalDocumentsComponent],
   templateUrl: './daily.component.html',
   styleUrl: './daily.component.css'
 })
 export class DailyComponent { 
     
     @ViewChild(ModalConfirmationComponent) modal!: ModalConfirmationComponent;
+    @ViewChild(ModalDocumentsComponent) modalDocuments!: ModalDocumentsComponent;
 
     documents:any[]=[]
     searchCodDaily: any = '';
     searchDescricao: string = '';
-    searchDocuments: any;
+    searchDocuments: any[]=[];
     searchType=''
   
   
     totalRegistros: number = 0;
     totalPages: number = 1;
     currentPage: number = 1;
-    limit: number = 50;
+    limit: number = 2;
   
     currentYear: number = new Date().getFullYear();
     filteredChartOfAccount = []; // Inicialmente, exibe todos os usuários  
-    messageModal='';
+   
     messageOK=''
     dados:any
     perfis:any
     isModalVisible = false;
+
     isModalOkVisible = false;
 
+    
+    documentModalList:any[]=[]
     dailys:any[]=[]
+
     
     
 
@@ -80,20 +86,18 @@ export class DailyComponent {
 
     if(_documents) {
       this.documents=[];
-      console.log('dailyAAA',_documents);
+      
       if(_documents.documents && _documents.documents.length>0)    {
-        _documents.documents=[];
-        _documents.documents.unshift({
+       
+         this.documents= [..._documents.documents];
+        this.documents.unshift({
           "codDocument": "",
           "description": "Todos",
           "dtAdd": ""
         } )
-
-        this.documents= [..._documents.documents];
       }
       else 
-        this.documents=[]
-    
+        this.documents=[]    
     }
     else {
       this.documents=[]
@@ -101,27 +105,15 @@ export class DailyComponent {
 
     console.log('daily',this.documents);
   }
-
-
-  handleOkCancel() {    
-    this.isModalOkVisible = false;
-  }
-
-  handleConfirm() {      
-    this.isModalVisible = false;
-  }
   
-  handleCancel() {    
-    this.isModalVisible = false;
-  }
 
   onPageChange(newPage: number) {
     this.currentPage = newPage;
-    this.searchChartOfAccount(this.currentPage);
+    this.searchDaily(this.currentPage);
   }
 
   
-  searchChartOfAccount(currentPage:number) {    
+  searchDaily(currentPage:number) {    
 
     let objPesquisar: { 
       codDaily: string;
@@ -138,28 +130,30 @@ export class DailyComponent {
       documents: this.searchDocuments,      
       page:currentPage,
       limit:this.limit
-    };   
+    };
 
-    // this.chartOfAccountService.searchChartOfAccount(objPesquisar).subscribe((response:any)=>{
-    //   this.dados=response.chartOfAccounts;    
-    //   this.totalRegistros = response.total;
-    //   this.totalPages = response.pages;
-    // })
+    console.log('objPesquisar',objPesquisar);
+
+    this.dailyService.searchDaily(objPesquisar).subscribe((response:any)=>{
+      this.dados=response.dailys;    
+      this.totalRegistros = response.total;
+      this.totalPages = response.pages;
+    })
 
   }
 
-  addChartOfAccount() {
-    this.router.navigate(['/aplicacao/addChartOfAccount']);
+  addDaily() {
+    this.router.navigate(['/aplicacao/addDaily']);
   }
 
-  updateChartOfAccount(id:string) {
-    this.router.navigate(['/aplicacao/addChartOfAccount', id]);   
+  updateDaily(id:string) {
+    this.router.navigate(['/aplicacao/addDaily', id]);   
    } 
   
    async updateAllChartOfAccountWithNextYear() {
 
-    this.messageModal="Deseja atualiar todas as contas para "+ (this.currentYear + 1);
-    const resultado = await this.modal.openModal(); 
+   
+    const resultado = await this.modal.openModal(true,"Deseja atualiar todas as contas para "+ (this.currentYear + 1)); 
 
     if (resultado) {
       // this.chartOfAccountService.updateAllChartOfAccountWithNextYear({year:this.currentYear+1}).subscribe()
@@ -167,8 +161,31 @@ export class DailyComponent {
       this.messageOK='Contas atualizadas com sucesso';
     } else {
       console.log("Usuário cancelou.");
-    }
- 
+    } 
   }
 
+  async viewDailyDocuments(item:any) {
+    console.log('list ',item);
+
+   if(item.Documents && item.Documents.length>0) {
+      this.documentModalList=[];         
+
+      item.Documents.forEach(async (element:any)=>{
+        this.documentModalList.push({
+                    cod:element.codDocument, 
+                    description:element.description
+                  });   
+      })
+
+      const resultado = await this.modalDocuments.openModal(
+        this.documentModalList,
+       "Lista de documentos do diário <br\><br\>" + item.CodDaily + ' - ' + item.Description,
+        true); 
+
+      if (resultado) {      
+      } else {
+        console.log("Usuário cancelou.");
+      }
+    }        
+  }
 }

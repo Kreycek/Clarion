@@ -6,9 +6,10 @@ import { AplicacaoComponent } from './aplicacao/aplicacao.component';
 import { LoginComponent } from './login/login.component';
 import { UsuarioComponent } from './modulos/ferramentaGestao/usuarios/usuario/usuario.component';
 import { AddUsuarioComponent } from './modulos/ferramentaGestao/usuarios/add-usuario/add-usuario.component';
-import { ChartOfAccountsComponent } from './modulos/contabilidade/chart-of-accounts/chart-of-accounts.component';
-import { AddChartOfAccountsComponent } from './modulos/contabilidade/add-chart-of-accounts/add-chart-of-accounts.component';
-import { DailyComponent } from './modulos/ferramentaGestao/daily/daily.component';
+import { ChartOfAccountsComponent } from './modulos/contabilidade/chartOfAccount/chart-of-accounts/chart-of-accounts.component';
+import { AddChartOfAccountsComponent } from './modulos/contabilidade/chartOfAccount/add-chart-of-accounts/add-chart-of-accounts.component';
+import { DailyComponent } from './modulos/ferramentaGestao/daily/daily/daily.component';
+import { AddDailyComponent } from './modulos/ferramentaGestao/daily/add-daily/add-daily.component';
 
 export const routes: Routes = [
 
@@ -52,6 +53,14 @@ export const routes: Routes = [
             {
                 path:'daily',
                 component:DailyComponent
+            }, 
+            {
+                path:'addDaily/:id',
+                component:AddDailyComponent
+            } , 
+            {
+                path:'addDaily',
+                component:AddDailyComponent
             }
 
             
