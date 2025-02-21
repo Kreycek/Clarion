@@ -6,14 +6,13 @@ import { ModalConfirmationComponent } from '../../../../modal/modal-confirmation
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../../paginator/paginator.component';
-import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
 import { DailyService } from '../daily.service';
 import { ModalDocumentsComponent } from "../modal-documents/modal-documents.component";
 
 @Component({
   selector: 'app-daily',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorComponent, ModalOkComponent, ModalConfirmationComponent, ModalDocumentsComponent],
+  imports: [CommonModule, FormsModule, PaginatorComponent, ModalDocumentsComponent],
   templateUrl: './daily.component.html',
   styleUrl: './daily.component.css'
 })
@@ -25,31 +24,15 @@ export class DailyComponent {
     documents:any[]=[]
     searchCodDaily: any = '';
     searchDescricao: string = '';
-    searchDocuments: any[]=[];
-    searchType=''
-  
-  
+    searchDocuments: any[]=[];  
     totalRegistros: number = 0;
     totalPages: number = 1;
     currentPage: number = 1;
-    limit: number = 2;
-  
+    limit: number = 2;  
     currentYear: number = new Date().getFullYear();
-    filteredChartOfAccount = []; // Inicialmente, exibe todos os usuários  
-   
-    messageOK=''
     dados:any
-    perfis:any
-    isModalVisible = false;
-
-    isModalOkVisible = false;
-
-    
     documentModalList:any[]=[]
-    dailys:any[]=[]
-
-    
-    
+    dailys:any[]=[]    
 
     constructor(
       private router: Router, 
@@ -65,11 +48,9 @@ export class DailyComponent {
         this.dailys=response;
         console.log('getAllOnlyDaily',response);
 
-      })
-
-      
+      })      
       this.dailyService.getAllDaily(this.currentPage,this.limit).subscribe((response:any)=>{     
-        console.log('response',response);
+
           this.dados=response.dailys;  
           this.totalRegistros = response.total;
           this.totalPages = response.pages;
@@ -102,8 +83,6 @@ export class DailyComponent {
     else {
       this.documents=[]
     }
-
-    console.log('daily',this.documents);
   }
   
 
@@ -150,19 +129,6 @@ export class DailyComponent {
     this.router.navigate(['/aplicacao/addDaily', id]);   
    } 
   
-   async updateAllChartOfAccountWithNextYear() {
-
-   
-    const resultado = await this.modal.openModal(true,"Deseja atualiar todas as contas para "+ (this.currentYear + 1)); 
-
-    if (resultado) {
-      // this.chartOfAccountService.updateAllChartOfAccountWithNextYear({year:this.currentYear+1}).subscribe()
-      this.isModalOkVisible=true;
-      this.messageOK='Contas atualizadas com sucesso';
-    } else {
-      console.log("Usuário cancelou.");
-    } 
-  }
 
   async viewDailyDocuments(item:any) {
     console.log('list ',item);

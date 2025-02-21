@@ -19,37 +19,31 @@ import { ModalOkComponent } from "../../../../modal/modal-ok/modal-ok.component"
   styleUrl: './chart-of-accounts.component.css'
 })
 export class ChartOfAccountsComponent {
-
   
   @ViewChild(ModalConfirmationComponent) modal!: ModalConfirmationComponent;
+  @ViewChild(ModalOkComponent) modalOk!: ModalOkComponent;  
   constructor(
     private router: Router, 
     private chartOfAccountService: ChartOfAccountService,
     public configService:ConfigService
     
   ) {}
-
     
   years:number[]=[]
   searchCodConta: string = '';
   searchDescricao: string = '';
   searchYear: [] = []
   searchType=''
-
-
   totalRegistros: number = 0;
   totalPages: number = 1;
   currentPage: number = 1;
   limit: number = 50;
-
   currentYear: number = new Date().getFullYear();
   filteredChartOfAccount = []; // Inicialmente, exibe todos os usuários  
-;
-  messageOK=''
   dados:any
   perfis:any
   isModalVisible = false;
-  isModalOkVisible = false;
+
   
   ngOnInit() {
 
@@ -110,11 +104,20 @@ export class ChartOfAccountsComponent {
 
 
     const resultado = await this.modal.openModal(true,"Deseja atualiar todas as contas para "+ (this.currentYear + 1)); 
+    console.log('resultado');
 
     if (resultado) {
+      this.modal.isVisible=false;
       this.chartOfAccountService.updateAllChartOfAccountWithNextYear({year:this.currentYear+1}).subscribe()
-      this.isModalOkVisible=true;
-      this.messageOK='Contas atualizadas com sucesso';
+      
+
+      const resultadook = await this.modalOk.openModal('Contas atualizadas com sucesso',true); 
+
+      if (resultadook) { 
+
+
+      }
+
     } else {
       console.log("Usuário cancelou.");
     }

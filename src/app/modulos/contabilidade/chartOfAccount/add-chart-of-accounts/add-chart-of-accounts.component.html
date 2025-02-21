@@ -37,7 +37,7 @@
             <label for="description">Descrição<span class="required">*</span></label>
             <input
               type="text"
-              class="form-control"
+              class="form-select"
               formControlName="description"
               id="description"
               placeholder="Digite a descrição da conta"   
@@ -53,7 +53,7 @@
             <select 
             id="searchRole" 
             formControlName="type" 
-            class="form-control"
+            class="form-select"
             [ngClass]="{'is-invalid': formulario.get('type')?.invalid && formulario.get('type')?.touched}">
                 <option value="">Selecione</option>
                 <option *ngFor="let type of configService.types" [value]="type">{{ type }}</option>

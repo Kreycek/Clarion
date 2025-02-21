@@ -1,0 +1,100 @@
+
+  /* Estilo Geral */
+  .custom-body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Ajuste de espaçamento entre as colunas */
+  .custom-row {
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+
+  /* Ajuste de espaçamento das colunas */
+  .custom-col {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  /* Estilo do formulário */
+  .custom-form-group {
+    margin-bottom: 2px;
+  }
+
+  /* Título dos cards */
+  .custom-card-title {
+    font-size: 1.25rem;
+    margin-bottom: 15px;
+  }
+
+  /* Estilo para o botão */
+  .custom-button {
+    margin-right: 10px;
+  }
+
+  /* Estilo de campos com erro */
+  .custom-is-invalid {
+    border-color: #dc3545;
+  }
+
+  .custom-invalid-feedback {
+    font-size: 0.875rem;
+    color: #dc3545;
+  }
+
+  /* Tabela */
+  .custom-table-responsive {
+    margin-top: 10px;
+  }
+
+  .custom-table-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
+
+  /* Estilo dos inputs e selects */
+  .custom-input, .custom-select {
+    padding: 8px 10px;
+    font-size: 0.875rem;
+    border-radius: 4px;
+  }
+
+  /* Estilo das caixas de verificação */
+  .custom-form-check-input {
+    margin-top: 5px;
+    margin-left: 0;
+  }
+
+  /* Espaçamento entre os campos do card */
+  .custom-card-body {
+    padding: 15px;
+  }
+
+  /* Ajuste na formatação das colunas do documento */
+  .custom-col-doc {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  /* Ajuste de espaçamento para o formulário de documentos */
+  .custom-form-group-compact {
+    margin-bottom: 2px;
+  }
+
+  /* Estilo para os botões de ação */
+  .custom-btn {
+    font-size: 0.875rem;
+    padding: 10px 20px;
+  }
+
+  /* Ajuste de espaçamento para colunas específicas */
+  .custom-col-sm-9 {
+    padding-right: 2px;
+  }
+
+  /* Div com borda no formulário de documentos */
+  .custom-grid-margin {
+    padding: 0;
+  }
+

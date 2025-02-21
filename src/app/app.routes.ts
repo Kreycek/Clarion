@@ -4,12 +4,14 @@ import { NgModule } from '@angular/core';
 
 import { AplicacaoComponent } from './aplicacao/aplicacao.component';
 import { LoginComponent } from './login/login.component';
-import { UsuarioComponent } from './modulos/ferramentaGestao/usuarios/usuario/usuario.component';
-import { AddUsuarioComponent } from './modulos/ferramentaGestao/usuarios/add-usuario/add-usuario.component';
+import { UsuarioComponent } from './modulos/ferramentaGestao/users/usuario/usuario.component';
+import { AddUsuarioComponent } from './modulos/ferramentaGestao/users/add-usuario/add-usuario.component';
 import { ChartOfAccountsComponent } from './modulos/contabilidade/chartOfAccount/chart-of-accounts/chart-of-accounts.component';
 import { AddChartOfAccountsComponent } from './modulos/contabilidade/chartOfAccount/add-chart-of-accounts/add-chart-of-accounts.component';
 import { DailyComponent } from './modulos/ferramentaGestao/daily/daily/daily.component';
 import { AddDailyComponent } from './modulos/ferramentaGestao/daily/add-daily/add-daily.component';
+import { CompanyComponent } from './modulos/ferramentaGestao/company/company/company.component';
+import { AddCompanyComponent } from './modulos/ferramentaGestao/company/add-company/add-company.component';
 
 export const routes: Routes = [
 
@@ -61,6 +63,18 @@ export const routes: Routes = [
             {
                 path:'addDaily',
                 component:AddDailyComponent
+            }, 
+            {
+                path:'company',
+                component:CompanyComponent
+            }, 
+            {
+                path:'addCompany/:id',
+                component:AddCompanyComponent
+            } , 
+            {
+                path:'addCompany',
+                component:AddCompanyComponent
             }
 
             
