@@ -12,6 +12,8 @@ import { DailyComponent } from './modulos/ferramentaGestao/daily/daily/daily.com
 import { AddDailyComponent } from './modulos/ferramentaGestao/daily/add-daily/add-daily.component';
 import { CompanyComponent } from './modulos/ferramentaGestao/company/company/company.component';
 import { AddCompanyComponent } from './modulos/ferramentaGestao/company/add-company/add-company.component';
+import { MovimentComponent } from './modulos/contabilidade/moviment/moviment.component';
+import { AddMovimentComponent } from './modulos/contabilidade/add-moviment/add-moviment.component';
 
 export const routes: Routes = [
 
@@ -75,6 +77,18 @@ export const routes: Routes = [
             {
                 path:'addCompany',
                 component:AddCompanyComponent
+            }, 
+            {
+                path:'moviment',
+                component:MovimentComponent
+            }, 
+            {
+                path:'addmoviment/:id',
+                component:AddMovimentComponent
+            } , 
+            {
+                path:'addmoviment',
+                component:AddMovimentComponent
             }
 
             

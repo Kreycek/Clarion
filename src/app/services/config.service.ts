@@ -13,19 +13,17 @@ export class ConfigService {
     public  types=['R','I','M']
 
     public retornaCoutryName(code:string) {
-
       return this.countrys.filter((reponse:any)=>{
-
         return reponse.phoneCode===code
-      })[0]
+      })[0];
     }
-
     
-     public currentYear: number = new Date().getFullYear();
-     public years=[
-      2023,2024,2025,2026,2027,2028,2029,2030,2031
-     ]
-      public months= [
+    public currentYear: number = new Date().getFullYear();
+    public years=[2023,2024,2025,2026,2027,2028,2029,2030,2031]
+    public codCountryStandard=244;
+    public nameCountryStandard='Angola';
+
+    public months= [
         { "value": 1, "name": "Janeiro", "shortName": "Jan" },
         { "value": 2, "name": "Fevereiro", "shortName": "Fev" },
         { "value": 3, "name": "Março", "shortName": "Mar" },

@@ -21,13 +21,13 @@
             <div class="col-lg-3 col-md-3 col-sm-6 col-12">
               <div class="form-group">
                 <label for="searchCodDaily">Código da empresa:</label> 
-                  <input type="text" [(ngModel)]="searchCodCompany" class="form-control" maxlength="10" />
+                  <input type="text" [(ngModel)]="searchCodCompany"   (keydown.space)="$event.preventDefault()" class="form-control" maxlength="10" />
               </div>
             </div>
             <div class="col-lg-3 col-md-3 col-sm-6 col-12">
               <div class="form-group">
-                <label for="document">Nif:</label>
-                <input type="text" [(ngModel)]="searchDocument" class="form-control" maxlength="14" />
+                <label for="document">NIF:</label>
+                <input type="text" [(ngModel)]="searchDocument"   (keydown.space)="$event.preventDefault()" class="form-control" maxlength="14" />
               </div>
             </div>
 
@@ -48,14 +48,15 @@
           <table class="table table-striped">
             <thead>              
               <tr>
-                <th colspan="5" style="text-align: right;" >                   
+                <th colspan="7" style="text-align: right;" >                   
                     <i class="mdi mdi-account-plus" (click)="addCompany()" title="Adicionar plano de contas" style="font-size: 24px; cursor: pointer;"></i>                   
                </th>                         
               </tr>              
               <tr>
-                <th> Cod. Empresa </th>              
-                <th> NIF </th>   
-                <th> Endereço </th>            
+                <th> Cod. Empresa </th>     
+                <th> Nome </th>               
+                <th> Exercício </th>   
+                <th> Telefones </th>            
                 <th> Documentos </th>                                  
                 <th> Status </th>   
                 <th>  </th> 
@@ -64,8 +65,9 @@
             <tbody>
               <tr *ngFor="let item of dados">              
                 <td> {{item.CodCompany}} </td>
-                <td> {{item.Nif}} </td>
-                <td> {{item.Address}} </td>
+                <td> {{item.Name}} </td>
+                <td> <span style="font-size: 15px; cursor: pointer;" (click)="viewCompanyExercises(item)">Visualizar</span>   </td>
+                <td>  <span style="font-size: 15px; cursor: pointer;" (click)="viewCompanyPhones(item)">Visualizar</span>   </td>
                 <td> 
                   <span style="font-size: 15px; cursor: pointer;" (click)="viewCompanyDocuments(item)">Visualizar</span>                 
                 </td>               

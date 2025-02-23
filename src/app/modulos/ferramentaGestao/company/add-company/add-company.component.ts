@@ -22,16 +22,6 @@ export class AddCompanyComponent {
     documentMiniFormCod:string=''
     documentMiniFormDescription:string=''
 
-    isVisibleValidationCodDocumento=false;
-    isVisibleValidationDescription=false;
-
-    isVisibleValidationCodCountryPhone=false;
-    isVisibleValidationCodStatePhone=false;
-    isVisibleValidationPhoneNumberPhone=false;
-
-    isVisibleValidationYearExecise=false;
-    isVisibleValidationStartMonthExercise=false;
-    isVisibleValidationEndMonthExercise=false;
      
     isEdit=false;
     idCompany:string |null = null 
@@ -52,13 +42,13 @@ export class AddCompanyComponent {
      
 
      async addDocument() {
-
      
       if(this.formulario?.controls["FormNewDocuments"].valid) {
         const form = this.formulario?.controls["FormNewDocuments"] as FormGroup;
         const result = this.documentForm.controls.filter((element:any)=>{
-            const valor=(element as FormGroup).controls["codDocument"].value;
-            return valor==form.controls["codDocument"].value
+            let valor=(element as FormGroup).controls["codDocument"].value;
+          
+            return valor==form.controls["codDocument"].value.trim()
         })[0];
         if(result) {
           const resultado = await this.modal.openModal("Essa documento já está cadastrado para esse diário",true); 
@@ -68,8 +58,8 @@ export class AddCompanyComponent {
         }
         else {
           this.documentForm.push(this.createDocumentForm(
-            form.controls["codDocument"].value,
-            form.controls["description"].value,
+            form.controls["documentNumber"].value,
+            form.controls["nameDocument"].value,
             form.controls["codPostal"].value,
             form.controls["country"].value,         
             form.controls["city"].value,
@@ -77,10 +67,10 @@ export class AddCompanyComponent {
             form.controls["addressNumber"].value,
             form.controls["addressComplement"].value));
 
-          form.controls["codDocument"].setValue('',{ emitEvent: false })
-          form.controls["description"].setValue('',{ emitEvent: false })
+          form.controls["documentNumber"].setValue('',{ emitEvent: false })
+          form.controls["nameDocument"].setValue('',{ emitEvent: false })
           form.controls["codPostal"].setValue('',{ emitEvent: false })
-          form.controls["country"].setValue('',{ emitEvent: false })
+          form.controls["country"].setValue(this.configService.nameCountryStandard,{ emitEvent: false })
           form.controls["city"].setValue('',{ emitEvent: false })
           form.controls["address"].setValue('',{ emitEvent: false })
           form.controls["addressNumber"].setValue('',{ emitEvent: false })
@@ -102,8 +92,8 @@ export class AddCompanyComponent {
     }
 
     createDocumentForm(
-      codDocument:string, 
-      description:string, 
+      documentNumber:string, 
+      nameDocument:string, 
       codPostal:string, 
       country:string, 
       city:string, 
@@ -112,14 +102,14 @@ export class AddCompanyComponent {
       addressComplement:string
       ): FormGroup {
       return this.fb.group({  
-        codDocument: [codDocument],
-        description: [description]  ,
-        codPostal: [codPostal],
-        country: [country],
-        city: [city],
-        address: [address],
-        addressNumber: [addressNumber],
-        addressComplement: [addressComplement]       
+        documentNumber: [documentNumber??null],
+        nameDocument: [nameDocument??null]  ,
+        codPostal: [codPostal??null],
+        country: [country??null],
+        city: [city??null],
+        address: [address??null],
+        addressNumber: [addressNumber??null],
+        addressComplement: [addressComplement??null]       
       });
     }
     
@@ -137,10 +127,10 @@ export class AddCompanyComponent {
         const phoneNumber=form.controls["phoneNumber"].value;
 
         const result = this.phoneForm.controls.filter((element:any)=>{           
-            const _codCountry=(element as FormGroup).controls["codState"].value;
+            const _codCountry=+(element as FormGroup).controls["codState"].value;
             const _codeState=(element as FormGroup).controls["codCountry"].value;
             const _phoneNumber=(element as FormGroup).controls["phoneNumber"].value;
-            return codCountry==_codCountry && codeState==_codeState && phoneNumber==_phoneNumber
+            return codCountry===_codCountry && codeState===_codeState && phoneNumber===_phoneNumber
         })[0];
         if(result) {
           const resultado = await this.modal.openModal("Esse telefone já está cadastrado para essa empresa",true); 
@@ -150,7 +140,7 @@ export class AddCompanyComponent {
         }
         else {
           this.phoneForm.push(this.createPhoneForm(codCountry,codeState,phoneNumber));
-          form.controls["codCountry"].setValue('',{ emitEvent: false })
+          form.controls["codCountry"].setValue(this.configService.codCountryStandard,{ emitEvent: false })
           form.controls["codState"].setValue('',{ emitEvent: false })
           form.controls["phoneNumber"].setValue('',{ emitEvent: false })
 
@@ -173,9 +163,9 @@ export class AddCompanyComponent {
 
     createPhoneForm(codCountry:string, codState:string, phoneNumber:String): FormGroup {
       return this.fb.group({  
-        codCountry: [codCountry],
-        codState: [codState],
-        phoneNumber: [phoneNumber, Validators.required]        
+        codCountry: [codCountry.toString()??null],
+        codState: [codState??null],
+        phoneNumber: [phoneNumber??null, Validators.required]        
       });
     }
     
@@ -185,14 +175,13 @@ export class AddCompanyComponent {
       if(this.formulario?.controls["FormNewExercise"].valid) {
         const form = this.formulario?.controls["FormNewExercise"] as FormGroup;
        
-        const year=form.controls["year"].value;
+        const year=+form.controls["year"].value;
         console.log('year 1',year);
         const startMonth=form.controls["startMonth"].value;
         const endMonth=form.controls["endMonth"].value;
 
         const result = this.exerciseForm.controls.filter((element:any)=>{          
-            const _year=(element as FormGroup).controls["year"].value;        
-           
+            const _year=(element as FormGroup).controls["year"].value;           
             return year===_year;
         })[0];
 
@@ -218,30 +207,26 @@ export class AddCompanyComponent {
       }      
     }
 
- 
-   
-
     get exerciseForm() {
       return (this.formulario?.get('exercise') as FormArray);
     }
 
-
-    createExerciseForm(year:string, startMonth:string, endMonth:String): FormGroup {
+    createExerciseForm(year:number, startMonth:string, endMonth:String): FormGroup {
       return this.fb.group({  
-        year: [year],
-        startMonth: [startMonth],
-        endMonth: [endMonth]        
+        year: [year??null],
+        startMonth: [startMonth??null],
+        endMonth: [endMonth??null]        
       });
     }
 
      createForm(obj:any) {
 
-      obj.Country=!obj.Country ? 'Portugal' : obj.Country
+      obj.Country=!obj.Country ? this.configService.nameCountryStandard : obj.Country
       console.log('obj.Country',obj.Country);
       this.formulario = this.fb.group({
         active: [obj.Active, Validators.required],
         codCompany: [obj.CodCompany, Validators.required],
-        name: [obj.Description, Validators.required],
+        name: [obj.Name, Validators.required],
         cae: [obj.CAE, Validators.required],
         mainActivity: [obj.MainActivity],
         otherActivities: [obj.OtherActivities],
@@ -252,17 +237,16 @@ export class AddCompanyComponent {
         publicCapital: [obj.PublicCapital],
         country: [obj.Country],
         city: [obj.City],
-        vATRegime: [obj.VATRegime],
+        vATRegime: [obj.VATRegime??'Mensal'],
         email: [obj.Email],
-        webSite: [obj.WebSite],
-        adress: [obj.Address],
+        webSite: [obj.WebSite],       
         documents: this.fb.array([] ),
         phone: this.fb.array([] ),
         exercise: this.fb.array([] ),
         FormNewDocuments: new FormGroup({  // Subformulário dentro do formulário principal
-          codDocument: new FormControl('',[Validators.required]),
-          description: new FormControl('',[Validators.required]),
-          country:new FormControl('Angola',[Validators.required]),
+          documentNumber: new FormControl('',[Validators.required]),
+          nameDocument: new FormControl('',[Validators.required]),
+          country:new FormControl(this.configService.nameCountryStandard,[Validators.required]),
           codPostal:new FormControl(''),
           city:new FormControl(''),
           address:new FormControl('',[Validators.required]),
@@ -270,7 +254,7 @@ export class AddCompanyComponent {
           addressComplement:new FormControl(''),
         }),
         FormNewPhones: new FormGroup({  // Subformulário dentro do formulário principal
-          codCountry: new FormControl('244',[Validators.required]),
+          codCountry: new FormControl(this.configService.codCountryStandard,[Validators.required]),
           codState: new FormControl(''),
           phoneNumber: new FormControl('',[Validators.required])
         }),
@@ -284,10 +268,10 @@ export class AddCompanyComponent {
       this.formulario.get('FormNewDocuments.codDocument')?.valueChanges.subscribe(value => {
         console.log('Novo valor de codDocument:', value);
         if(value) {
-          this.isVisibleValidationCodDocumento=true;
+         
         }
         else {
-          this.isVisibleValidationCodDocumento=false;
+         
         }
       });
   
@@ -295,10 +279,10 @@ export class AddCompanyComponent {
       this.formulario.get('FormNewDocuments.description')?.valueChanges.subscribe(value => {
 
         if(value) {
-          this.isVisibleValidationDescription=true;
+         
         }
         else {
-          this.isVisibleValidationDescription=false;
+          
         }
         
         console.log('Valores do FormNewDocuments:', value);
@@ -323,14 +307,39 @@ export class AddCompanyComponent {
               response.Documents.forEach((element:any) => {
                 console.log('element',element);
                 this.documentForm.push(this.createDocumentForm(
-                  element.codDocument,
-                  element.description,
+                  element.documentNumber,
+                  element.nameDocument,
                   element.codPostal,
                   element.country,
                   element.city,
                   element.address,
                   element.addressNumber,
                   element.addressComplement
+                ));
+              });
+            }
+
+            if(response.Phone && response.Phone.length>0) {
+              response.Phone.forEach((element:any) => {
+                console.log('element',element);
+                this.phoneForm.push(this.createPhoneForm(
+                  element.codCountry,
+                  element.codState,
+                  element.phoneNumber
+              
+                ));
+              });
+            }
+
+            if(response.Exercise && response.Exercise.length>0) {
+              response.Exercise.forEach((element:any) => {
+                console.log('element',element);
+                this.exerciseForm.push(this.createExerciseForm(
+                  element.year,
+                  element.startMonth,
+                  element.endMonth
+
+              
                 ));
               });
             }
@@ -346,18 +355,16 @@ export class AddCompanyComponent {
 
     
   formataEndereco(objItem:any) : string {
-    const ds=objItem as FormGroup;
 
+    const formatedAddress=objItem as FormGroup;
 
-    return        ds.controls['description'].value + '-' + 
-                  ds.controls['codDocument'].value +           
-                  (ds.controls['country'].value ? ' /  ' + 'País: ' + ds.controls['country'].value : '') + 
-                  (ds.controls['city'].value ? ' / Cidade: ' + ds.controls['city'].value : '')+ 
-                   ' Logradouro: ' + ds.controls['address'].value+ ','  + ds.controls['codPostal'].value+ ',' +  
-                    ds.controls['addressNumber'].value+ ', '+ 
-                   ds.controls['addressComplement'].value  ;
-
-
+    return        formatedAddress.controls['nameDocument'].value + '-' + 
+                   formatedAddress.controls['documentNumber'].value +           
+                  (formatedAddress.controls['country'].value ? ' /  ' + 'País: ' + formatedAddress.controls['country'].value : '') + 
+                  (formatedAddress.controls['city'].value ? ' / Cidade: ' + formatedAddress.controls['city'].value : '')+ 
+                   ' / Logradouro: ' + formatedAddress.controls['address'].value+ ','  + formatedAddress.controls['codPostal'].value+ ',' +  
+                   formatedAddress.controls['addressNumber'].value+ ', '+ 
+                   formatedAddress.controls['addressComplement'].value  ;
   }
 
   async gravar() {      
@@ -370,7 +377,7 @@ export class AddCompanyComponent {
    this.moduloService.desabilitaCamposFormGroup(formPonesInsert);
    this.moduloService.desabilitaCamposFormGroup(formExercideInsert);
 
-       console.log('Passou',this.formulario);
+      
 
       if (this.formulario?.invalid) {
         const resultado = await this.modal.openModal("Existem campos por prencher no formulário, corrija",true); 
@@ -385,33 +392,63 @@ export class AddCompanyComponent {
     this.moduloService.habilitaCamposFormGroup(formPonesInsert,['codCountry','codState','phoneNumber'])
     this.moduloService.habilitaCamposFormGroup(formExercideInsert,['codDocument','description','address'])
 
-      console.log('Passou 2');
-
-      return false;
+      
       
       const formValues=this.formulario?.value;
+
+      console.log('formValues',formValues);
+
       const objGravar: { 
         id?:string |null;
-        codDaily: string;
-        description: string;
         active:boolean;
-        documents: any[]; // Definindo o tipo correto para o array 'perfil'    
-        
-      } ={
+        codCompany: string;
+        name: string;
+        cae:string;
+        documents:any[];
+        mainActivity:string;
+        otherActivities:string;
+        legalNature:string;
+        socialCapital:string;
+        nationalCapital:string;
+        extraCapital:string;
+        publicCapital:string;
+        vatRegime:string;
+        email:string;
+        webSite:string;
+        phone:any[];
+        exercise:any[];
+
+      }   ={
         id:null,
-        codDaily:formValues.codDaily,
-        description:formValues.description??'',       
-        active:formValues.active,
-        documents:[],           
-      }     
+        active:formValues.active,       
+        codCompany:formValues.codCompany,
+        name:formValues.name,
+        cae:formValues.cae,
+        documents:formValues.documents,
+        mainActivity:formValues.mainActivity,
+        otherActivities:formValues.otherActivities,
+        legalNature:formValues.legalNature,
+        socialCapital:formValues.socialCapital,
+        nationalCapital:formValues.nationalCapital,
+        extraCapital:formValues.extraCapital,
+        publicCapital:formValues.publicCapital,
+        vatRegime:formValues.vATRegime,
+        email:formValues.email,
+        webSite:formValues.webSite,
+        phone:formValues.phone,
+        exercise:formValues.exercise,
+
+      }
+
+      console.log('Passou',objGravar);
       
-      if(formValues.documents && formValues.documents.length) {       
-        formValues.documents.forEach((element:any) => {       
-          objGravar.documents.push({codDocument:element.codDocument, description:element.description})  
-        });              
-      }   
+      // if(formValues.documents && formValues.documents.length) {       
+      //   formValues.documents.forEach((element:any) => {       
+      //     objGravar.documents.push({codDocument:element.codDocument, description:element.description})  
+      //   });              
+      // }   
   
-      console.log('objGravar',objGravar);
+      // console.log('objGravar',objGravar);
       if(this.idCompany) {
   
         objGravar.id=this.idCompany
@@ -421,21 +458,17 @@ export class AddCompanyComponent {
             const resultado = await this.modal.openModal(response.message,true); 
             if (resultado) {
   
-            }
-  
+            }  
           }),
           catchError(async (error: HttpErrorResponse) => {
               
                 if (error.status === 500) {
-                  console.log('Interceptando requisição:', error)
-                
+                  console.log('Interceptando requisição:', error)                
                   const resultado = await this.modal.openModal(error.message,true); 
                   if (resultado) {
   
-                  }
-                  
-                }
-  
+                  }                  
+                }  
                 if (error.status === 401) {
                     console.log('Interceptando requisição:', error.status)
                     // router.navigate(['/login']); // Redireciona para a página de login
@@ -447,7 +480,7 @@ export class AddCompanyComponent {
       }  
       else {
   
-        this.companyService.verifyExistsCompany({codDaily:objGravar.codDaily}).subscribe((async (response:any)=>{
+        this.companyService.verifyExistsCompany({codCompany:objGravar.codCompany}).subscribe((async (response:any)=>{
           if(response.message) {              
               const resultado = await this.modal.openModal("Esse código de empresa já está cadastrado tente outro",true); 
               if (resultado) {
@@ -483,7 +516,7 @@ export class AddCompanyComponent {
     }         
          
     cancel() {
-      this.router.navigate(['/aplicacao/daily']);
+      this.router.navigate(['/aplicacao/company']);
     }
 
     deleteDocument(index:number) {

@@ -45,7 +45,7 @@
                   <label for="searchType">Tipo:</label>
                   <select id="searchType" [(ngModel)]="searchType" class="form-select">
                     <option value="">Todos</option>
-                    <option ></option>
+                    <option *ngFor="let type of configService.types" [value]="type">{{type}}</option>
                   </select>
                 </div>
               </div>

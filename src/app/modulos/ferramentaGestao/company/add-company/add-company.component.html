@@ -9,92 +9,126 @@
       <div class="card-body">
         <h4 class="card-title">{{idCompany ? 'Editar' : 'Nova'}} Empresa</h4>
         <p class="card-description" style="display: none;"> Basic form elements </p>
-        
-        <br>
-          <div class="form-group">
-            <label for="nome">Ativo? <span class="required">*</span></label>
-            <input  type="checkbox"  formControlName="active" class="form-check-input">
-            
-          </div>          
+        <p></p>
+        <div class="form-group">
+          <label for="nome" style="font-size: 20px; color: blue;">Ativar? <span class="required">*</span></label>
+          <input  type="checkbox"  formControlName="active" class="form-check-input">            
+        </div>          
 
-          <div class="form-group">
-            <label for="nome">Cód. da empresa <span class="required">*</span></label>
+        <div class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Dados principais</h4>
+                <p class="card-description" style="display: none;"> A simple suggestion engine </p>
+        <div class="form-group row" >
+          <div class="col">
+            <label>Cod. Empresa <span class="required">*</span></label>
             <input
-              type="text"
-              class="form-control"
-              formControlName="codCompany"
-              id="nome"
-              (keydown.space)="$event.preventDefault()"
-              placeholder="Digite o código da empresa"
-              [ngClass]="{'is-invalid': formulario.get('codCompany')?.invalid && formulario.get('codCompany')?.touched}"
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('codCompany')?.invalid && formulario.get('codCompany')?.touched">
-              O código da empresa é obrigatório.
+            type="text"
+            class="form-control"
+            formControlName="codCompany"
+            id="nome"
+            maxlength="5"
+            (keydown.space)="$event.preventDefault()"
+            placeholder="Digite o código da empresa"
+            [ngClass]="{'is-invalid': formulario.get('codCompany')?.invalid && formulario.get('codCompany')?.touched}"
+          />
+          <div class="invalid-feedback" *ngIf="formulario.get('codCompany')?.invalid && formulario.get('codCompany')?.touched">
+            O código da empresa é obrigatório.
+          </div>
+          </div>
+
+          <div class="col">
+            <label> Nome da empresa <span class="required">*</span></label>
+            <input
+            type="text"
+            class="form-control"
+            formControlName="name"
+            id="name"
+            maxlength="60"
+            placeholder="Digite o nome da empresa"   
+            [ngClass]="{'is-invalid': formulario.get('name')?.invalid && formulario.get('name')?.touched}"          
+          />
+          <div class="invalid-feedback" *ngIf="formulario.get('name')?.invalid && formulario.get('name')?.touched">
+             A descrição do diário é obrigatória.
             </div>
           </div>
-  
-          <div class="form-group">
-            <label for="description">Nome da empresa<span class="required">*</span></label>
+ 
+          <div class="col">
+            <label>CAE <span class="required">*</span></label>
             <input
-              type="text"
-              class="form-control"
-              formControlName="name"
-              id="name"
-              placeholder="Digite o nome da empresa"   
-              [ngClass]="{'is-invalid': formulario.get('name')?.invalid && formulario.get('name')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('name')?.invalid && formulario.get('name')?.touched">
-               A descrição do diário é obrigatória.
-              </div>
+            type="text"
+            class="form-control"
+            formControlName="cae"
+            id="cae"
+            maxlength="16"
+            (keydown.space)="$event.preventDefault()"
+            placeholder="Digite o CAE"   
+            [ngClass]="{'is-invalid': formulario.get('cae')?.invalid && formulario.get('cae')?.touched}"          
+          />
+          <div class="invalid-feedback" *ngIf="formulario.get('cae')?.invalid && formulario.get('cae')?.touched">
+            O CAE é obrigatório.
+            </div>
           </div>
-          <div class="form-group">
-            <label for="description">CAE<span class="required">*</span></label>
+
+          <div class="col">
+            <label> Atividade principal</label>
             <input
-              type="text"
-              class="form-control"
-              formControlName="cae"
-              id="cae"
-              placeholder="Digite o CAE"   
-              [ngClass]="{'is-invalid': formulario.get('cae')?.invalid && formulario.get('cae')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('cae')?.invalid && formulario.get('cae')?.touched">
-              O CAE é obrigatório.
-              </div>
+            type="text"
+            class="form-control"
+            formControlName="mainActivity"
+            id="mainActivity"
+            maxlength="100"
+            placeholder="Digite a atividade principal"   
+            [ngClass]="{'is-invalid': formulario.get('mainActivity')?.invalid && formulario.get('mainActivity')?.touched}"          
+          />
+          <div class="invalid-feedback" *ngIf="formulario.get('mainActivity')?.invalid && formulario.get('mainActivity')?.touched">
+            A atividade principal é obrigatória.
+            </div>
           </div>
-          <div class="form-group">
-            <label for="description">Atividade principal<span class="required">*</span></label>
+        </div>           
+        
+        <div class="form-group row" >
+          <div class="col">
+            <label> Email da empresa</label>
             <input
-              type="text"
-              class="form-control"
-              formControlName="mainActivity"
-              id="mainActivity"
-              placeholder="Digite a atividade principal"   
-              [ngClass]="{'is-invalid': formulario.get('mainActivity')?.invalid && formulario.get('mainActivity')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('mainActivity')?.invalid && formulario.get('mainActivity')?.touched">
-              A atividade principal é obrigatória.
-              </div>
+            type="text"
+            class="form-control"
+            formControlName="email"
+            (keydown.space)="$event.preventDefault()"
+            id="email"
+            maxlength="60"
+            placeholder="Digite o email da empresa"   
+            [ngClass]="{'is-invalid': formulario.get('email')?.invalid && formulario.get('email')?.touched}"          
+          />
+          <div class="invalid-feedback" *ngIf="formulario.get('email')?.invalid && formulario.get('email')?.touched">
+             A email é obrigatório.
+            </div>
           </div>
-          <div class="form-group">
-            <label for="description">Outras atividades<span class="required">*</span></label>
+
+          <div class="col">
+            <label>Outras atividades </label>
             <input
-              type="text"
-              class="form-control"
-              formControlName="otherActivities"
-              id="otherActivities"
-              placeholder="Digite a atividade principal"   
-              [ngClass]="{'is-invalid': formulario.get('otherActivities')?.invalid && formulario.get('otherActivities')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('otherActivities')?.invalid && formulario.get('otherActivities')?.touched">
-             Outras atividades é obrigatório.
-              </div>
-          </div>
-          <div class="form-group">
-            <label for="description">Natureza Juridica<span class="required">*</span></label>
-            <input
+            type="text"
+            class="form-control"
+            formControlName="otherActivities"
+            maxlength="100"
+            id="otherActivities"
+            placeholder="Digite a atividade principal"   
+            [ngClass]="{'is-invalid': formulario.get('otherActivities')?.invalid && formulario.get('otherActivities')?.touched}"          
+          />
+          <div class="invalid-feedback" *ngIf="formulario.get('otherActivities')?.invalid && formulario.get('otherActivities')?.touched">
+           Outras atividades é obrigatório.
+            </div>
+        </div>
+
+        <div class="col">
+          <label>Natureza Juridica </label>
+          <input
               type="text"
               class="form-control"
               formControlName="legalNature"
+              maxlength="100"
               id="legalNature"
               placeholder="Digite a natureza Juridica"   
               [ngClass]="{'is-invalid': formulario.get('legalNature')?.invalid && formulario.get('legalNature')?.touched}"          
@@ -102,64 +136,104 @@
             <div class="invalid-feedback" *ngIf="formulario.get('legalNature')?.invalid && formulario.get('legalNature')?.touched">
                 Natureza Juridica é obrigatória.
               </div>
-          </div>
-          <div class="form-group">
-            <label for="description">Capital social<span class="required">*</span></label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="socialCapital"
-              id="socialCapital"
-              placeholder="Digite o capital social"   
-              [ngClass]="{'is-invalid': formulario.get('socialCapital')?.invalid && formulario.get('socialCapital')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('socialCapital')?.invalid && formulario.get('socialCapital')?.touched">
-                Capital social é obrigatório.
-              </div>
-          </div>
-          <div class="form-group">
-            <label for="description">Capital nacional<span class="required">*</span></label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="nationalCapital"
-              id="nationalCapital"
-              placeholder="Digite o capital nacional"   
-              [ngClass]="{'is-invalid': formulario.get('nationalCapital')?.invalid && formulario.get('nationalCapital')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('nationalCapital')?.invalid && formulario.get('nationalCapital')?.touched">
-                capital nacional é obrigatório.
-              </div>
-          </div>
-          <div class="form-group">
-            <label for="description">Capital extra<span class="required">*</span></label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="extraCapital"
-              id="extraCapital"
-              placeholder="Digite o capital extra"   
-              [ngClass]="{'is-invalid': formulario.get('extraCapital')?.invalid && formulario.get('extraCapital')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('extraCapital')?.invalid && formulario.get('extraCapital')?.touched">
-                capital extra é obrigatório.
-              </div>
-          </div>
-          <div class="form-group">
-            <label for="description">Capital público<span class="required">*</span></label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="publicCapital"
-              id="publicCapital"
-              placeholder="Digite o capital público"   
-              [ngClass]="{'is-invalid': formulario.get('publicCapital')?.invalid && formulario.get('publicCapital')?.touched}"          
-            />
-            <div class="invalid-feedback" *ngIf="formulario.get('publicCapital')?.invalid && formulario.get('publicCapital')?.touched">
-                capital público é obrigatório.
-              </div>
-          </div>
+      </div>
 
+      <div class="col" style="font-size:13px;">
+        <label>Regime do IVA </label>
+
+        
+        <br/>
+        <input type="radio" class="form-check-input" formControlName="vATRegime" value="Mensal"> Mensal <br/>
+        <input type="radio" class="form-check-input" formControlName="vATRegime" value="Trimestral"> Trimestral<br/>
+        <input type="radio" class="form-check-input" formControlName="vATRegime" value="Isento"> Isento<br/>
+      
+       
+    </div>
+  </div>
+</div>
+        </div>
+        </div>
+          
+      
+       
+
+          <div class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Capital</h4>
+                <p class="card-description" style="display: none;"> A simple suggestion engine </p>
+                
+                <div class="form-group row">
+                  <div class="col">
+                    <label>Social</label>
+                    <input
+                    type="text"
+                    class="form-control"
+                    formControlName="socialCapital"
+                    maxlength="100"
+                    id="socialCapital"
+                    placeholder="Digite o capital social"   
+                    [ngClass]="{'is-invalid': formulario.get('socialCapital')?.invalid && formulario.get('socialCapital')?.touched}"          
+                  />
+                  <div class="invalid-feedback" *ngIf="formulario.get('socialCapital')?.invalid && formulario.get('socialCapital')?.touched">
+                      Capital social é obrigatório.
+                    </div>
+                  </div>
+
+                  <div class="col">
+                    <label> Nacional</label>
+                    <input
+                    type="text"
+                    class="form-control"
+                    formControlName="nationalCapital"
+                    maxlength="100"
+                    id="nationalCapital"
+                    placeholder="Digite o capital nacional"   
+                    [ngClass]="{'is-invalid': formulario.get('nationalCapital')?.invalid && formulario.get('nationalCapital')?.touched}"          
+                  />
+                  <div class="invalid-feedback" *ngIf="formulario.get('nationalCapital')?.invalid && formulario.get('nationalCapital')?.touched">
+                      capital nacional é obrigatório.
+                    </div>
+                  </div>
+
+                  <div class="col">
+                        <label> Extra</label>
+                        <input
+                        type="text"
+                        class="form-control"
+                        formControlName="extraCapital"
+                        maxlength="100"
+                        id="extraCapital"
+                        placeholder="Digite o capital extra"   
+                        [ngClass]="{'is-invalid': formulario.get('extraCapital')?.invalid && formulario.get('extraCapital')?.touched}"          
+                      />
+                      <div class="invalid-feedback" *ngIf="formulario.get('extraCapital')?.invalid && formulario.get('extraCapital')?.touched">
+                        capital extra é obrigatório.
+                      </div>
+                    </div>
+                    <div class="col">
+                      <label> Público</label>
+                      <input
+                      type="text"
+                      class="form-control"
+                      formControlName="publicCapital"
+                      maxlength="100"
+                      id="publicCapital"
+                      placeholder="Digite o capital público"   
+                      [ngClass]="{'is-invalid': formulario.get('publicCapital')?.invalid && formulario.get('publicCapital')?.touched}"          
+                    />
+                    <div class="invalid-feedback" *ngIf="formulario.get('publicCapital')?.invalid && formulario.get('publicCapital')?.touched">
+                        capital público é obrigatório.
+                      </div>
+                  </div>
+                  </div>              
+                </div>
+                
+              </div>
+            </div>
+          
+
+      
           <div formGroupName="FormNewDocuments" class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;">
             <div class="card">
               <div class="card-body">
@@ -172,13 +246,15 @@
                     <div id="bloodhound">
                       <input 
                       type="text" 
-                      formControlName="description" 
+                      formControlName="nameDocument" 
+                      maxlength="10"
                       class="form-control" 
+                      
                       maxlength="10" 
-                      [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.description')?.invalid && formulario.get('FormNewDocuments.description')?.touched}"          
+                      [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.nameDocument')?.invalid && formulario.get('FormNewDocuments.nameDocument')?.touched}"          
                       />
-                      <div style="color:red;; font-size:12px" *ngIf="moduloService.isFieldInvalid('description',formulario.get('FormNewDocuments'))">
-                        O código da empresa é obrigatório
+                      <div style="color:red;; font-size:12px" *ngIf="moduloService.isFieldInvalid('nameDocument',formulario.get('FormNewDocuments'))">
+                      O tipo do documento é obrigatório
                        </div>
                     </div>
                   </div>
@@ -187,13 +263,16 @@
                     <div id="the-basics">
                       <input 
                       type="text" 
-                      formControlName="codDocument" 
+                      formControlName="documentNumber" 
+                      
+                      maxlength="18"
+                      (keydown.space)="$event.preventDefault()"
                       class="form-control" 
                       maxlength="10" 
-                      [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.codDocument')?.invalid && formulario.get('FormNewDocuments.codDocument')?.touched}"          
+                      [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.documentNumber')?.invalid && formulario.get('FormNewDocuments.documentNumber')?.touched}"          
                       />
-                      <div style="color:red;; font-size:12px" *ngIf="moduloService.isFieldInvalid('codDocument',formulario.get('FormNewDocuments'))">
-                        O código da empresa é obrigatório
+                      <div style="color:red;; font-size:12px" *ngIf="moduloService.isFieldInvalid('documentNumber',formulario.get('FormNewDocuments'))">
+                        O número do documento é obrigatório
                        </div>
                     </div>
                   </div>
@@ -205,6 +284,7 @@
                       class="form-control"
                       formControlName="codPostal"
                       id="codPostal"
+                      (keydown.space)="$event.preventDefault()"
                       maxlength="9"
                       placeholder="Digite a cidade"   
                       [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.codPostal')?.invalid && formulario.get('FormNewDocuments.codPostal')?.touched}"          
@@ -245,6 +325,7 @@
                         type="text"
                         class="form-control"
                         formControlName="city"
+                        maxlength="100"
                         id="city"
                         placeholder="Digite a cidade"   
                         [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.city')?.invalid && formulario.get('FormNewDocuments.city')?.touched}"          
@@ -262,6 +343,7 @@
                         type="text"
                         class="form-control"
                         formControlName="address"
+                        maxlength="300"
                         id="address"
                         placeholder="Digite o endereço"   
                         [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.address')?.invalid && formulario.get('FormNewDocuments.address')?.touched}"          
@@ -286,6 +368,7 @@
                       type="text"
                       class="form-control"
                       formControlName="addressNumber"
+                      maxlength="6"
                       id="address"
                       placeholder="Digite o número do logradouro"   
                       [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.addressNumber')?.invalid && formulario.get('FormNewDocuments.addressNumber')?.touched}"          
@@ -305,6 +388,7 @@
                     type="text"
                     class="form-control"
                     formControlName="addressComplement"
+                    maxlength="80"
                     id="address"
                     placeholder="Digite o complemento do logradouro"   
                     [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.addressComplement')?.invalid && formulario.get('FormNewDocuments.addressComplement')?.touched}"          
@@ -374,6 +458,7 @@
                       <select 
                       id="year" 
                       formControlName="codCountry"  
+                      (keydown.space)="$event.preventDefault()"
                       class="form-select"
                       [ngClass]="{'is-invalid': formulario.get('FormNewPhones.codCountry')?.invalid && formulario.get('FormNewPhones.codCountry')?.touched}"          
                       >              
@@ -392,6 +477,8 @@
                       type="text"
                       class="form-control"
                       formControlName="codState"
+                      (keydown.space)="$event.preventDefault()"
+                      maxlength="5"
                       id="codState"
                       placeholder="Digite código do estado"   
                       [ngClass]="{'is-invalid': formulario.get('FormNewPhones.codState')?.invalid && formulario.get('FormNewPhones.codState')?.touched}"          
@@ -409,6 +496,8 @@
                       type="text"
                       class="form-control"
                       formControlName="phoneNumber"
+                      (keydown.space)="$event.preventDefault()"
+                      maxlength="14"
                       id="phoneNumber"
                       placeholder="Digite número do telefone"   
                       [ngClass]="{'is-invalid': formulario.get('FormNewPhones.phoneNumber')?.invalid && formulario.get('FormNewPhones.phoneNumber')?.touched}"          
