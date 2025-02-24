@@ -28,7 +28,7 @@ export class CompanyComponent {
     totalRegistros: number = 0;
     totalPages: number = 1;
     currentPage: number = 1;
-    limit: number = 2;  
+    limit: number = this.configService.limitPaginator;  
     dados:any    
     documentModalList:any[]=[]
     

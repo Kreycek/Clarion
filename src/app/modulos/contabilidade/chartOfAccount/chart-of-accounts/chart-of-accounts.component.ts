@@ -37,7 +37,7 @@ export class ChartOfAccountsComponent {
   totalRegistros: number = 0;
   totalPages: number = 1;
   currentPage: number = 1;
-  limit: number = 50;
+  limit: number = this.configService.limitPaginator;
   currentYear: number = new Date().getFullYear();
   filteredChartOfAccount = []; // Inicialmente, exibe todos os usuários  
   dados:any

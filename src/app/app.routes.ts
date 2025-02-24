@@ -12,8 +12,10 @@ import { DailyComponent } from './modulos/ferramentaGestao/daily/daily/daily.com
 import { AddDailyComponent } from './modulos/ferramentaGestao/daily/add-daily/add-daily.component';
 import { CompanyComponent } from './modulos/ferramentaGestao/company/company/company.component';
 import { AddCompanyComponent } from './modulos/ferramentaGestao/company/add-company/add-company.component';
-import { MovimentComponent } from './modulos/contabilidade/moviment/moviment.component';
-import { AddMovimentComponent } from './modulos/contabilidade/add-moviment/add-moviment.component';
+import { MovimentComponent } from './modulos/contabilidade/movement/movement/moviment.component';
+import { AddMovimentComponent } from './modulos/contabilidade/movement/addMovement/add-moviment.component';
+import { CostCenterComponent } from './modulos/ferramentaGestao/costCenter/cost-center/cost-center.component';
+import { AddCostCenterComponent } from './modulos/ferramentaGestao/costCenter/add-cost-center/add-cost-center.component';
 
 export const routes: Routes = [
 
@@ -79,16 +81,28 @@ export const routes: Routes = [
                 component:AddCompanyComponent
             }, 
             {
-                path:'moviment',
+                path:'movement',
                 component:MovimentComponent
             }, 
             {
-                path:'addmoviment/:id',
+                path:'addMovement/:id',
                 component:AddMovimentComponent
             } , 
             {
-                path:'addmoviment',
+                path:'addMovement',
                 component:AddMovimentComponent
+            }, 
+            {
+                path:'costCenter',
+                component:CostCenterComponent
+            }, 
+            {
+                path:'addCostCenter/:id',
+                component:AddCostCenterComponent
+            } , 
+            {
+                path:'addCostCenter',
+                component:AddCostCenterComponent
             }
 
             

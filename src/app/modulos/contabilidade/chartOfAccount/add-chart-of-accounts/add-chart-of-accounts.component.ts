@@ -214,7 +214,7 @@ export class AddChartOfAccountsComponent {
           ).subscribe(async () => {            
           
             // Aguarda o resultado do modal antes de continuar
-            const resultado = await this.modal.openModal("Usuário cadastrado com sucesso",true); 
+            const resultado = await this.modal.openModal("Plano de contas cadastrado com sucesso",true); 
           
             if (resultado) {
               console.log("Usuário confirmou!");

@@ -22,6 +22,7 @@ export class ConfigService {
     public years=[2023,2024,2025,2026,2027,2028,2029,2030,2031]
     public codCountryStandard=244;
     public nameCountryStandard='Angola';
+    public limitPaginator=50;
 
     public months= [
         { "value": 1, "name": "Janeiro", "shortName": "Jan" },

@@ -5,21 +5,30 @@ import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFo
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfigService } from '../../../../services/config.service';
-import { DailyService } from '../daily.service';
+import { MovementService } from '../movement.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap, throwError } from 'rxjs';
+import { DailyService } from '../../../ferramentaGestao/daily/daily.service';
+
 
 @Component({
-  selector: 'app-add-daily',
+  selector: 'app-add-moviment',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ModalOkComponent, FormsModule],
-  templateUrl: './add-daily.component.html',
-  styleUrl: './add-daily.component.css'
+  imports: [
+    ModalOkComponent, 
+    CommonModule, 
+    FormsModule, 
+    ReactiveFormsModule,
+ 
+  ],
+  templateUrl: './add-moviment.component.html',
+  styleUrl: './add-moviment.component.css',
+
 })
-export class AddDailyComponent {
+export class AddMovimentComponent {
+  @ViewChild(ModalOkComponent) modal!: ModalOkComponent;  
 
-    @ViewChild(ModalOkComponent) modal!: ModalOkComponent;  
-
+  
       documentMiniFormCod:string=''
       documentMiniFormDescription:string=''
       isVisibleValidationCodDocumento=false;
@@ -30,26 +39,39 @@ export class AddDailyComponent {
      formulario: FormGroup| null = null;
      years:number[]=[]
      currentYear: number = new Date().getFullYear();
+     dailys:any[]=[] 
+     documents:any[]=[] 
+
     get documentForm() {
        return (this.formulario?.get('documents') as FormArray);
      }
      constructor(     
          private fb: FormBuilder,
-         private dailyService:DailyService,
+         private movimentService:MovementService,
          private route: ActivatedRoute,
          private router: Router, 
          public configService:ConfigService,
-         private cdr: ChangeDetectorRef
+         private cdr: ChangeDetectorRef,
+         private dailyService: DailyService,
      ) {} 
 
 
   ngOnInit() {
+
+    
+    this.dailyService.getAllOnlyDaily().subscribe((response:any)=>{     
+      this.dailys=response;
+      console.log('getAllOnlyDaily',response);
+
+    })  
+
+
       this.route.paramMap.subscribe(params => {
         const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
         if(id) {
           this.isEdit=true;
-          this.dailyService.getDailyById(id??'0').subscribe((response)=>{       
+          this.movimentService.getMovementById(id??'0').subscribe((response)=>{       
             console.log('dailys',response);
             this.idDaily=id;    
             this.createForm(response);  
@@ -70,11 +92,40 @@ export class AddDailyComponent {
       });    
   }
 
+  filterComponents(codDaily:any) {
+
+    let _documents=[]
+    _documents=this.dailys.filter((response:any)=>{
+      return response.codDaily===codDaily
+
+    } )[0]
+
+    if(_documents) {
+      this.documents=[];
+      
+      if(_documents.documents && _documents.documents.length>0)    {
+       
+         this.documents= [..._documents.documents];
+        this.documents.unshift({
+          "codDocument": "",
+          "description": "Todos",
+          "dtAdd": ""
+        } )
+      }
+      else 
+        this.documents=[]    
+    }
+    else {
+      this.documents=[]
+    }
+  }
+
     
   createForm(obj:any) {
         this.formulario = this.fb.group({
           active: [obj.Active, Validators.required],
           codDaily: [obj.CodDaily, Validators.required],
+          codDocument: [obj.codDocument, Validators.required],
           description: [obj.Description, Validators.required],
           documents: this.fb.array([] ),
           FormNewDocuments: new FormGroup({  // Subformulário dentro do formulário principal
@@ -173,7 +224,7 @@ export class AddDailyComponent {
       if(this.idDaily) {
   
         objGravar.id=this.idDaily
-          this.dailyService.updateDaily(objGravar).pipe(
+          this.movimentService.updateMovement(objGravar).pipe(
           tap(async (response:any) =>    {    
           
             const resultado = await this.modal.openModal(response.message,true); 
@@ -205,7 +256,7 @@ export class AddDailyComponent {
       }  
       else {
   
-        this.dailyService.verifyExistsDaily({codDaily:objGravar.codDaily}).subscribe((async (response:any)=>{
+        this.movimentService.verifyExistsMovement({codDaily:objGravar.codDaily}).subscribe((async (response:any)=>{
           if(response.message) {              
               const resultado = await this.modal.openModal("Esse código de diário já está cadastrado tente outro",true); 
               if (resultado) {
@@ -214,7 +265,7 @@ export class AddDailyComponent {
           }
           else {
             
-            this.dailyService.addDaily(objGravar).pipe(
+            this.movimentService.addMovement(objGravar).pipe(
               catchError((error: HttpErrorResponse) => {   
                 if (error.status === 401) {
                   console.log('Interceptando requisição:', error.status);
@@ -224,7 +275,7 @@ export class AddDailyComponent {
             ).subscribe(async () => {            
             
               // Aguarda o resultado do modal antes de continuar
-              const resultado = await this.modal.openModal("Diário cadastrado com sucesso",true);             
+              const resultado = await this.modal.openModal("Movimento cadastrado com sucesso",true);             
               if (resultado) {
                 console.log("Usuário confirmou!");
                 // Insira aqui a lógica para continuar após a confirmação

@@ -46,9 +46,9 @@ export class AddCompanyComponent {
       if(this.formulario?.controls["FormNewDocuments"].valid) {
         const form = this.formulario?.controls["FormNewDocuments"] as FormGroup;
         const result = this.documentForm.controls.filter((element:any)=>{
-            let valor=(element as FormGroup).controls["codDocument"].value;
+            let valor=(element as FormGroup).controls["documentNumber"].value;
           
-            return valor==form.controls["codDocument"].value.trim()
+            return valor==form.controls["documentNumber"].value.trim()
         })[0];
         if(result) {
           const resultado = await this.modal.openModal("Essa documento já está cadastrado para esse diário",true); 

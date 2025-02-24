@@ -10,6 +10,7 @@ import { PerfilService } from '../../perfil/perfil.service';
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../../paginator/paginator.component';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
+import { ConfigService } from '../../../../services/config.service';
 
 
 @Component({
@@ -24,7 +25,8 @@ export class UsuarioComponent {
   constructor(
     private router: Router, 
     private usuarioService: UsuarioService,
-    private perfilService: PerfilService
+    private perfilService: PerfilService,
+    private configService: ConfigService
   ) {}
 
    @ViewChild(ModalConfirmationComponent) modal!: ModalConfirmationComponent;
@@ -35,7 +37,7 @@ export class UsuarioComponent {
   totalUsers: number = 0;
   totalPages: number = 1;
   currentPage: number = 1;
-  limit: number = 20;
+  limit: number = this.configService.limitPaginator;
 
   filteredUsers = []; // Inicialmente, exibe todos os usuários
   dados:any

@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import { HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { AuthInterceptor } from './auth.interceptor';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 export const appConfig: ApplicationConfig = {
@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),  // Fornece o HttpClient para a aplicação
     HttpClientModule,
     ReactiveFormsModule,
-
+    BrowserAnimationsModule,
     provideRouter(routes),
     provideHttpClient(withInterceptors([AuthInterceptor]))
   
