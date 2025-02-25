@@ -20,7 +20,7 @@
               <div class="form-group">
                 <label for="searchCodDaily">Código do centro de custo:</label>
 
-                <select id="year" [(ngModel)]="searchCodCostCenter" (change)="filterCostCenterSub(searchCodCostCenter)" class="form-select">
+                <select id="costCenter" [(ngModel)]="searchCodCostCenter" (change)="filterCostCenterSub(searchCodCostCenter)" class="form-select">
                     <option value="">Todos</option>
                     <option *ngFor="let cc of costCenters" [value]="cc.codCostCenter">{{ cc.codCostCenter + " - " +  cc.description }}</option>
                   </select>
@@ -32,7 +32,7 @@
               <div class="form-group" style="display: none;">
                 <label for="document">Centro custo sub:</label>
                 <select id="document" [(ngModel)]="searchCostCenterSub"  class="form-control" multiple>                 
-                  <option *ngFor="let ccs of costCentersSub" [value]="ccs.codDocument">{{ccs.codCostCenterSub + ' - '  + ccs.description }}</option>
+                  <option *ngFor="let ccs of costCentersSub" [value]="ccs.codCostCenterSub">{{ccs.codCostCenterSub + ' - '  + ccs.description }}</option>
                 </select>
               </div>
             </div>

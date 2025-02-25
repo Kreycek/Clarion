@@ -1,16 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-
-import { catchError, tap, throwError } from 'rxjs';
+import { AbstractControl,FormControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';import { catchError, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-
-
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
 import { ChartOfAccountService } from '../chartOfAccount.service';
 import { ConfigService } from '../../../../services/config.service';
+import { CostCenterService } from '../../../ferramentaGestao/costCenter/costCenter.service';
 
 @Component({
   selector: 'app-add-chart-of-accounts',
@@ -21,20 +17,22 @@ import { ConfigService } from '../../../../services/config.service';
 })
 export class AddChartOfAccountsComponent {
   
-
-  
   isEdit=false;
   idUser:string |null = null 
   formulario: FormGroup| null = null;
   years:number[]=[]
   currentYear: number = new Date().getFullYear();
+  costCenters:any[]=[]    
+  costCentersSub:any[]=[]
+  listCostCenters:any[]=[];
 
   constructor(     
       private fb: FormBuilder,
       private coaService:ChartOfAccountService,
       private route: ActivatedRoute,
       private router: Router, 
-      public configService:ConfigService
+      public configService:ConfigService,
+      private costCenterService: CostCenterService,
   ) {} 
 
   @ViewChild(ModalOkComponent) modal!: ModalOkComponent;
@@ -62,6 +60,13 @@ export class AddChartOfAccountsComponent {
 
   ngOnInit() {
 
+    this.costCenterService.getAllOnlyCostCenter().subscribe((response:any)=>{     
+      this.costCenters=response;
+
+      console.log('costCenters',this.costCenters);
+     
+    })   
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
@@ -80,20 +85,15 @@ export class AddChartOfAccountsComponent {
         this.loadYear([])
       }
       
-
-      console.log('this.formulario',this.formulario);
     });    
   }
 
   loadYear(years:[]) {    
     for(let year=2023;year<=this.currentYear+1;year++) {   
-
-      const exist:boolean=years.filter((_year:number)=>year==_year)[0]
-    
+      const exist:boolean=years.filter((_year:number)=>year==_year)[0]    
       this.yearForm.push(this.criarYear(year, exist?true:false));
     }   
   }
-
   
   requiredCheckboxValidator(formArray: FormArray): { [key: string]: boolean } | null {
     const selected = formArray.controls.some(control => control.value); // Verifica se algum checkbox foi marcado
@@ -107,11 +107,16 @@ export class AddChartOfAccountsComponent {
           codAccount: [obj.CodAccount, Validators.required],
           description: [obj.Description, Validators.required],
           type: [!obj.Type? '' : obj.Type, Validators.required],        
-          year: this.fb.array([], [Validators.required, this.validaYearSelecionado] )  // Array para perfis selecionados          
+          year: this.fb.array([], [Validators.required, this.validaYearSelecionado] ),  // Array para perfis selecionados          
+          FormNewCostCenter: new FormGroup({  // Subformulário dentro do formulário principal
+                  codCostCenter:new FormControl('',[Validators.required]),
+                  codCostCenterName:new FormControl(''),
+                  codCostCenterSub: new FormControl('',[Validators.required]),
+                  codCostCenterSubName: new FormControl('')
+                })
         }); 
-    }
+  }
 
-    
   async abrirModalConfirmacao(msgModal:string) {
   
     const resultado = await this.modal.openModal(msgModal,true); 
@@ -122,8 +127,6 @@ export class AddChartOfAccountsComponent {
       console.log("Usuário cancelou.");
     }
   }
-  
-
 
   gravar() {
    
@@ -169,7 +172,6 @@ export class AddChartOfAccountsComponent {
          if (resultado) {
 
          }
-
         }),
         catchError(async (error: HttpErrorResponse) => {
             
@@ -179,10 +181,8 @@ export class AddChartOfAccountsComponent {
                 const resultado = await this.modal.openModal(error.message,true); 
                 if (resultado) {
 
-                }
-                
+                }                
               }
-
               if (error.status === 401) {
                   console.log('Interceptando requisição:', error.status)
                   // router.navigate(['/login']); // Redireciona para a página de login
@@ -225,14 +225,95 @@ export class AddChartOfAccountsComponent {
           });
           
           }
-      }))
-
-   
+      }))   
      }       
-  }
-  
+  }  
  
   cancel() {
     this.router.navigate(['/aplicacao/chartOfAccount']);
+  }
+
+  addCostCenter() {
+
+    const formNewCostCenter = this.formulario?.controls["FormNewCostCenter"] as FormGroup; 
+    const cadastrado = this.listCostCenters.filter((response:any)=>{
+      return response.codCostCenter===formNewCostCenter.controls['codCostCenter'].value
+    } )[0]
+
+
+    const _costCenters = this.costCenters.filter((response:any)=>{
+      return response.codCostCenter===formNewCostCenter.controls['codCostCenter'].value
+    } )[0]
+
+    let _costCentersSecondary:any[]=[]
+
+    if(!cadastrado) {   
+
+        if(_costCenters) {             
+              if(_costCenters.costCenterSub && _costCenters.costCenterSub.length>0) {
+                _costCentersSecondary=_costCenters.costCenterSub?.filter((response:any)=>{
+                  return response.codCostCenterSub===formNewCostCenter.controls['codCostCenterSub'].value
+                } )
+              }
+
+              this.listCostCenters.push(
+                { 
+                  id:_costCenters.ID, 
+                  codCostCenter:_costCenters.codCostCenter,
+                  description:_costCenters.description,
+                  expanded:false,
+                  costCentersSecondary:_costCentersSecondary
+                })
+
+          }
+    } else {
+      _costCentersSecondary=_costCenters.costCenterSub?.filter((response:any)=>{
+        return response.codCostCenterSub===formNewCostCenter.controls['codCostCenterSub'].value
+      } )[0];
+
+      cadastrado.costCentersSecondary.push(_costCentersSecondary)
+    }
+  }
+  
+  filterCostCenterSub(codCostCenter:any) {
+
+    console.log('codCostCenter',codCostCenter);
+    let _costCenters=[]
+    _costCenters=this.costCenters.filter((response:any)=>{
+      return response.codCostCenter===codCostCenter
+
+    } )[0]
+
+    if(_costCenters) {
+      this.costCentersSub=[];
+
+      if(_costCenters.costCenterSub && _costCenters.costCenterSub.length>0)    {       
+        this.costCentersSub= [..._costCenters.costCenterSub];
+        this.costCentersSub.unshift({
+          "codCostCenterSub": "",
+          "description": "Todos",
+          "dtAdd": ""
+        } )
+      }
+      else 
+        this.costCentersSub=[]    
+    }
+    else {
+      this.costCentersSub=[]
+    }
+  }
+
+  toggleSubList(codCostCenter: string) {
+    const cc = this.listCostCenters.find(cat => cat.codCostCenter === codCostCenter);
+    if (cc) {
+      cc.expanded = !cc.expanded;
+    }
+  }
+
+  deleteItem(codCostCenter: string, itemId: string) {   
+    const cc = this.listCostCenters.find(cat => cat.codCostCenter === codCostCenter);     
+    if (cc) {
+      cc.costCentersSecondary = cc.costCentersSecondary.filter((item:any) => item.codCostCenterSub !== itemId);
+    }   
   }
 }

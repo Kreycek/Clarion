@@ -59,7 +59,7 @@
                 <option *ngFor="let type of configService.types" [value]="type">{{ type }}</option>
               </select>                  
               <div class="invalid-feedback" *ngIf="formulario.get('type')?.invalid && formulario.get('type')?.touched">
-                A descrição da conta é obrigatória.
+                O tipo de conta é obrigatório.
                </div>
           </div>
       </div>
@@ -86,7 +86,78 @@
           </div>   
         </div>
       </div>
-    </div>             
+    </div>        
+    
+    
+    <div class="col-md-12 grid-margin stretch-card"  formGroupName="FormNewCostCenter" style="border-style: solid; border-width: 1px;">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Centro de custo</h4>
+          <p class="card-description" style="display: none;"> A simple suggestion engine </p>
+          
+          <div class="form-group row">
+            <div class="col">
+              <label>Principal</label>
+
+              <select id="costCenter" 
+              formControlName="codCostCenter"  
+              (change)="filterCostCenterSub(formulario.get('FormNewCostCenter.codCostCenter')?.value)" 
+              class="form-select"
+              [ngClass]="{'is-invalid': formulario.get('FormNewCostCenter.codCostCenter')?.invalid && formulario.get('FormNewCostCenter.codCostCenter')?.touched}"          
+              >
+                <option value="">Todos</option>
+                <option *ngFor="let cc of costCenters" [value]="cc.codCostCenter">{{ cc.codCostCenter + " - " +  cc.description }}</option>
+              </select>
+            <div class="invalid-feedback" *ngIf="formulario.get('FormNewCostCenter.codCostCenter')?.invalid && formulario.get('FormNewCostCenter.codCostCenter')?.touched">
+                O centro de custo é obrigatório.
+              </div>
+            </div>
+
+            <div class="col">
+              <label>Secundário</label>
+
+              <select 
+                id="codCostCenterSub"  
+                formControlName="codCostCenterSub"   
+                class="form-select">                 
+                <option *ngFor="let ccs of costCentersSub" [value]="ccs.codCostCenterSub">{{ccs.codCostCenterSub + ' - '  + ccs.description }}</option>
+              </select>           
+                      <div class="invalid-feedback" *ngIf="formulario.get('FormNewCostCenter.codCostCenterSub')?.invalid && formulario.get('FormNewCostCenter.codCostCenterSub')?.touched">
+                          O sub código do centro de custo é obrigatório
+                      </div>
+              </div>
+
+              <div class="col">
+                <label>&nbsp;</label>
+                <div id="bloodhound">
+                  <button type="button" (click)="addCostCenter()" class="btn btn-primary me-2">Adicionar</button>
+                </div>
+              </div> 
+          
+             
+            </div>    
+            <div class="list-wrapperCOA">
+              <div class="list-container">
+                <div *ngFor="let cc of listCostCenters">
+                  <div class="main-category" (click)="toggleSubList(cc.codCostCenter)">
+                    {{ cc.description }}
+                    <button class="expand-btn">{{ cc.expanded ? 'Colapsar' : 'Expandir' }}</button>
+                  </div>
+                  <ul *ngIf="cc.expanded" class="sub-list">
+                    <li *ngFor="let item of cc.costCentersSecondary">
+                       {{ item.description }}
+                      <i class="mdi mdi-delete-forever" (click)="deleteItem(cc.codCostCenter.toString(),item.codCostCenterSub)"></i>
+                      
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+      </div>
   
 
     <div class="col-md-12 grid-margin stretch-card">
