@@ -25,14 +25,14 @@ export class CostCenterComponent {
 
     searchCodCostCenter: any = '';
     searchDescricao: string = '';
-    searchDocuments: any[]=[];  
+    searchCostCenterSub: any[]=[];  
     totalRegistros: number = 0;
     totalPages: number = 1;
     currentPage: number = 1;
     limit: number = this.configService.limitPaginator;  
     currentYear: number = new Date().getFullYear();
     dados:any
-    documentModalList:any[]=[]
+    costCenterSubModalList:any[]=[]
     costCenters:any[]=[]    
     costCentersSub:any[]=[]
 
@@ -54,7 +54,7 @@ export class CostCenterComponent {
 
        
       this.costCenterService.getAllCostCenter(this.currentPage,this.limit).subscribe((response:any)=>{     
-
+        console.log('response',response);
           this.dados=response.costCenters;  
           this.totalRegistros = response.total;
           this.totalPages = response.pages;
@@ -70,7 +70,7 @@ export class CostCenterComponent {
     } )[0]
 
     if(_costCenters) {
-      this.costCenters=[];
+      this.costCentersSub=[];
       
       if(_costCenters.costCenterSub && _costCenters.costCenterSub.length>0)    {
        
@@ -99,18 +99,18 @@ export class CostCenterComponent {
   searchCostCenters(currentPage:number) {    
 
     let objPesquisar: { 
-      codDaily: string;
+      codCostCenter: string;
       description: string;      
-      documents: any[]; // Definindo o tipo correto para o array 'perfil'
+      codCostCenterSub: any[]; // Definindo o tipo correto para o array 'perfil'
     
       page:number;
       limit:number;
     }
 
     objPesquisar= { 
-      codDaily: this.searchCodCostCenter, 
+      codCostCenter: this.searchCodCostCenter, 
       description: this.searchDescricao, 
-      documents: this.searchDocuments,      
+      codCostCenterSub: this.searchCostCenterSub,      
       page:currentPage,
       limit:this.limit
     };
@@ -137,19 +137,19 @@ export class CostCenterComponent {
   async viewSubCostCenter(item:any) {
     console.log('list ',item);
 
-   if(item.Documents && item.Documents.length>0) {
-      this.documentModalList=[];         
+   if(item.CostCenterSub    && item.CostCenterSub.length>0) {
+      this.costCenterSubModalList=[];         
 
-      item.Documents.forEach(async (element:any)=>{
-        this.documentModalList.push({
-                    cod:element.codDocument, 
+      item.CostCenterSub.forEach(async (element:any)=>{
+        this.costCenterSubModalList.push({
+                    cod:element.codCostCenterSub, 
                     description:element.description
                   });   
       })
 
       const resultado = await this.modalDocuments.openModal(
-        this.documentModalList,
-       "Lista de documentos do diário <br\><br\>" + item.CodDaily + ' - ' + item.Description,
+        this.costCenterSubModalList,
+       "Lista de centro de sub custo do centro de custo do centro de custo <br\><br\>" + item.CodCostCenter + ' - ' + item.Description,
         true); 
 
       if (resultado) {      

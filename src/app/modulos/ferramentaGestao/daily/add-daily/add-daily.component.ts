@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
-import { ModalConfirmationComponent } from '../../../../modal/modal-confirmation/modal-confirmation.component';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
@@ -8,6 +7,7 @@ import { ConfigService } from '../../../../services/config.service';
 import { DailyService } from '../daily.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap, throwError } from 'rxjs';
+import { ModuloService } from '../../../modulo.service';
 
 @Component({
   selector: 'app-add-daily',
@@ -39,6 +39,7 @@ export class AddDailyComponent {
          private route: ActivatedRoute,
          private router: Router, 
          public configService:ConfigService,
+         public moduloService:ModuloService,
          private cdr: ChangeDetectorRef
      ) {} 
 
@@ -78,8 +79,8 @@ export class AddDailyComponent {
           description: [obj.Description, Validators.required],
           documents: this.fb.array([] ),
           FormNewDocuments: new FormGroup({  // Subformulário dentro do formulário principal
-            codDocument: new FormControl(''),
-            description: new FormControl('')
+            codDocument: new FormControl('',[ Validators.required]),
+            description: new FormControl('',[ Validators.required])
           })
         }); 
 
@@ -116,7 +117,9 @@ export class AddDailyComponent {
   }
 
   async addDocument() {    
-    if(this.isVisibleValidationDescription && this.isVisibleValidationDescription) {
+
+
+      if(this.formulario?.controls["FormNewDocuments"].valid) {
      
       const form = this.formulario?.controls["FormNewDocuments"] as FormGroup;
       const result = this.documentForm.controls.filter((element:any)=>{
@@ -133,20 +136,28 @@ export class AddDailyComponent {
         this.documentForm.push(this.createDocumentForm(form.controls["codDocument"].value,form.controls["description"].value));
         form.controls["codDocument"].setValue('',{ emitEvent: false })
         form.controls["description"].setValue('',{ emitEvent: false })
-        this.isVisibleValidationCodDocumento=false; 
-        this.isVisibleValidationDescription=false;
+        this.moduloService.desativarValidadores(this.formulario?.controls["FormNewDocuments"] as FormGroup);   
       }
     
     }
+    else {
+      this.moduloService.ativarvalidadores(this.formulario?.controls["FormNewDocuments"] as FormGroup);     
+    }
   }
 
-  gravar() {      
+  gravar() {  
+    
+    const formNewDocuments=this.formulario?.controls["FormNewDocuments"] as FormGroup
+    this.moduloService.desabilitaCamposFormGroup(formNewDocuments);     
     
       if (this.formulario?.invalid) {
         this.formulario.markAllAsTouched();
         return;
       }
       
+      
+      this.moduloService.habilitaCamposFormGroup(formNewDocuments,['codDocument','description'])
+
       const formValues=this.formulario?.value;
       const objGravar: { 
         id?:string |null;

@@ -2,8 +2,6 @@
 
 <app-modal-documents
 
-
-
 >
     
 </app-modal-documents>
@@ -31,9 +29,9 @@
             
 
             <div class="col-lg-4 col-md-4 col-sm-6 col-12">
-              <div class="form-group">
+              <div class="form-group" style="display: none;">
                 <label for="document">Centro custo sub:</label>
-                <select id="document" [(ngModel)]="searchDocuments"  class="form-control" multiple>                 
+                <select id="document" [(ngModel)]="searchCostCenterSub"  class="form-control" multiple>                 
                   <option *ngFor="let ccs of costCentersSub" [value]="ccs.codDocument">{{ccs.codCostCenterSub + ' - '  + ccs.description }}</option>
                 </select>
               </div>
@@ -54,9 +52,9 @@
                </th>                         
               </tr>              
               <tr>
-                <th> Cod. Diário </th>              
+                <th> Cod. Centro de custo </th>              
                 <th> Descrição </th>            
-                <th> Documentos </th>                                  
+                <th> Centro de custos </th>                                  
                 <th> Status </th>   
                 <th>  </th> 
               </tr>

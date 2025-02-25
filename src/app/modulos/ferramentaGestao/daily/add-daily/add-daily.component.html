@@ -56,11 +56,15 @@
                       <div class="form-group row"> 
                         <div class="col-sm-9">                            
                           <div style="width: 100%;" style="margin-bottom: 10px;">Cód Documento</div>
-                          <input type="text" formControlName="codDocument" class="form-control" maxlength="10" />
-                          <div style="color:red;; font-size:12px" *ngIf="!isVisibleValidationCodDocumento">
+                          <input type="text" 
+                          formControlName="codDocument" 
+                          class="form-control" maxlength="10" 
+                          (keydown.space)="$event.preventDefault()"
+                          [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.codDocument')?.invalid && formulario.get('FormNewDocuments.codDocument')?.touched}"   
+                          />                          
+                          <div class="invalid-feedback" *ngIf="moduloService.isFieldInvalid('codDocument',formulario.get('FormNewDocuments'))">
                             O código do documento é obrigatório
-                           </div>
-                         
+                          </div>                         
                         </div>                          
                       </div>
                     </div>
@@ -68,10 +72,18 @@
                       <div class="form-group row">  
                         <div class="col-sm-9">
                           <div style="width: 100%;" style="margin-bottom: 10px;"> Descrição</div>
-                          <input type="text"  formControlName="description" class="form-control" maxlength="100" />
-                          <div style="color:red;; font-size:12px" *ngIf="!isVisibleValidationDescription">
+                          <input 
+                          type="text"  
+                          formControlName="description" 
+                          class="form-control" 
+                          maxlength="100" 
+                          [ngClass]="{'is-invalid': formulario.get('FormNewDocuments.description')?.invalid && formulario.get('FormNewDocuments.description')?.touched}"   
+                          />
+
+                          <div class="invalid-feedback" *ngIf="moduloService.isFieldInvalid('description',formulario.get('FormNewDocuments'))">
                             A descrição documento é obrigatório
-                           </div>
+                            </div>
+
                         </div>
                       </div>
                     </div>
@@ -118,11 +130,6 @@
       </div>
     </div>
   </div>
-  
-  <!-- <div class="row d-flex"> -->
-
-          
-  
 
     <div class="col-md-12 grid-margin stretch-card">
       <div class="card">
@@ -134,6 +141,4 @@
         </div>
       </div>
     </div>
-             
-            <!-- </div> -->
 </form>
