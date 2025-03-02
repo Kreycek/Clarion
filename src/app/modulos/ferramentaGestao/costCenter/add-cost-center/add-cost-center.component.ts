@@ -23,8 +23,8 @@ export class AddCostCenterComponent {
        idCostCenter:string |null = null 
        formulario: FormGroup| null = null;
     
-      get costCenterSubForm() {
-         return (this.formulario?.get('costCenterSub') as FormArray);
+      get costCenterSecondaryForm() {
+         return (this.formulario?.get('costCenterSecondary') as FormArray);
        }
        constructor(     
            private fb: FormBuilder,
@@ -47,10 +47,10 @@ export class AddCostCenterComponent {
               this.idCostCenter=id;    
               this.createForm(response);  
   
-              if(response.CostCenterSub && response.CostCenterSub.length>0) {
-                response.CostCenterSub.forEach((element:any) => {
+              if(response.CostCenterSecondary && response.CostCenterSecondary.length>0) {
+                response.CostCenterSecondary.forEach((element:any) => {
                   console.log('element',element);
-                  this.costCenterSubForm.push(this.createCostCenterSubForm(element.codCostCenterSub,element.description));
+                  this.costCenterSecondaryForm.push(this.createCostCenterSecondaryForm(element.codCostCenterSecondary,element.description));
                 });
               }
             })
@@ -67,27 +67,27 @@ export class AddCostCenterComponent {
             active: [obj.Active, Validators.required],
             codCostCenter: [obj.CodCostCenter, Validators.required],
             description: [obj.Description, Validators.required],
-            costCenterSub: this.fb.array([] ),
-            FormNewCostCenterSub: new FormGroup({  // Subformulário dentro do formulário principal
-              codCostCenterSub:new FormControl('',[Validators.required]),
+            costCenterSecondary: this.fb.array([] ),
+            FormNewCostCenterSecondary: new FormGroup({  // Subformulário dentro do formulário principal
+              codCostCenterSecondary:new FormControl('',[Validators.required]),
               description: new FormControl('',[Validators.required])
             })
           }); 
       }
           
-    createCostCenterSubForm(codDocument:string, description:string): FormGroup {
+    createCostCenterSecondaryForm(codDocument:string, description:string): FormGroup {
         return this.fb.group({  
-          codCostCenterSub: [codDocument],
+          codCostCenterSecondary: [codDocument],
           description: [description]    
         });
     }
   
     async addCostCenter() { 
-      if(this.formulario?.controls["FormNewCostCenterSub"].valid) {
-        const form = this.formulario?.controls["FormNewCostCenterSub"] as FormGroup;
-        const result = this.costCenterSubForm.controls.filter((element:any)=>{
-            const valor=(element as FormGroup).controls["codCostCenterSub"].value;
-            return valor==form.controls["codCostCenterSub"].value
+      if(this.formulario?.controls["FormNewCostCenterSecondary"].valid) {
+        const form = this.formulario?.controls["FormNewCostCenterSecondary"] as FormGroup;
+        const result = this.costCenterSecondaryForm.controls.filter((element:any)=>{
+            const valor=(element as FormGroup).controls["codCostCenterSecondary"].value;
+            return valor==form.controls["codCostCenterSecondary"].value
         })[0];
         if(result) {
           const resultado = await this.modal.openModal("Esse centro de custo já está cadastrado",true); 
@@ -96,27 +96,27 @@ export class AddCostCenterComponent {
             }            
         }
         else {
-          this.costCenterSubForm.push(this.createCostCenterSubForm(form.controls["codCostCenterSub"].value,form.controls["description"].value));
-          form.controls["codCostCenterSub"].setValue('',{ emitEvent: false })
+          this.costCenterSecondaryForm.push(this.createCostCenterSecondaryForm(form.controls["codCostCenterSecondary"].value,form.controls["description"].value));
+          form.controls["codCostCenterSecondary"].setValue('',{ emitEvent: false })
           form.controls["description"].setValue('',{ emitEvent: false })    
-          this.moduloService.desativarValidadores(this.formulario?.controls["FormNewCostCenterSub"] as FormGroup);       
+          this.moduloService.desativarValidadores(this.formulario?.controls["FormNewCostCenterSecondary"] as FormGroup);       
         }
       }    else {
-        this.moduloService.ativarvalidadores(this.formulario?.controls["FormNewCostCenterSub"] as FormGroup);      
+        this.moduloService.ativarvalidadores(this.formulario?.controls["FormNewCostCenterSecondary"] as FormGroup);      
       } 
     }
   
     gravar() {      
 
-      const formNewCostCenterSub=this.formulario?.controls["FormNewCostCenterSub"] as FormGroup
-      this.moduloService.desabilitaCamposFormGroup(formNewCostCenterSub);     
+      const formNewCostCenterSecondary=this.formulario?.controls["FormNewCostCenterSecondary"] as FormGroup
+      this.moduloService.desabilitaCamposFormGroup(formNewCostCenterSecondary);     
       
         if (this.formulario?.invalid) {
           this.formulario.markAllAsTouched();
           return;
         }
 
-      this.moduloService.habilitaCamposFormGroup(formNewCostCenterSub,['codCostCenterSub','description'])
+      this.moduloService.habilitaCamposFormGroup(formNewCostCenterSecondary,['codCostCenterSecondary','description'])
         
         const formValues=this.formulario?.value;
         const objGravar: { 
@@ -124,19 +124,19 @@ export class AddCostCenterComponent {
           codCostCenter: string;
           description: string;
           active:boolean;
-          costCenterSub: any[]; // Definindo o tipo correto para o array 'perfil'    
+          costCenterSecondary: any[]; // Definindo o tipo correto para o array 'perfil'    
           
         } ={
           id:null,
           codCostCenter:formValues.codCostCenter,
           description:formValues.description??'',       
           active:formValues.active,
-          costCenterSub:[],           
+          costCenterSecondary:[],           
         }     
         
-        if(formValues.costCenterSub && formValues.costCenterSub.length) {       
-          formValues.costCenterSub.forEach((element:any) => {       
-            objGravar.costCenterSub.push({codCostCenterSub:element.codCostCenterSub, description:element.description})  
+        if(formValues.costCenterSecondary && formValues.costCenterSecondary.length) {       
+          formValues.costCenterSecondary.forEach((element:any) => {       
+            objGravar.costCenterSecondary.push({codCostCenterSecondary:element.codCostCenterSecondary, description:element.description})  
           });              
         }   
     
@@ -209,7 +209,7 @@ export class AddCostCenterComponent {
         this.router.navigate(['/aplicacao/costCenter']);
       }
   
-      deleteCostCenterSub(index:number) {
-        this.costCenterSubForm.removeAt(index);
+      deleteCostCenterSecondary(index:number) {
+        this.costCenterSecondaryForm.removeAt(index);
       }
 }

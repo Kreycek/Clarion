@@ -47,7 +47,7 @@
                A descrição do centro de custo é obrigatória.
               </div>
           </div>
-          <div class="col-12 grid-margin" formGroupName="FormNewCostCenterSub" style="border-style: solid; border-width: 1px;">
+          <div class="col-12 grid-margin" formGroupName="FormNewCostCenterSecondary" style="border-style: solid; border-width: 1px;">
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Centro de custo</h4>                     
@@ -57,13 +57,13 @@
                         <div class="col-sm-9">                            
                           <div style="width: 100%;" style="margin-bottom: 10px;">Cód Centro de custo</div>
                           <input type="text" 
-                          formControlName="codCostCenterSub" 
+                          formControlName="codCostCenterSecondary" 
                           class="form-control" maxlength="10" 
                           (keydown.space)="$event.preventDefault()"
-                          [ngClass]="{'is-invalid': formulario.get('FormNewCostCenterSub.codCostCenterSub')?.invalid && formulario.get('FormNewCostCenterSub.codCostCenterSub')?.touched}"   
+                          [ngClass]="{'is-invalid': formulario.get('FormNewCostCenterSecondary.codCostCenterSecondary')?.invalid && formulario.get('FormNewCostCenterSecondary.codCostCenterSecondary')?.touched}"   
                           />
 
-                          <div class="invalid-feedback" *ngIf="moduloService.isFieldInvalid('codCostCenterSub',formulario.get('FormNewCostCenterSub'))">
+                          <div class="invalid-feedback" *ngIf="moduloService.isFieldInvalid('codCostCenterSecondary',formulario.get('FormNewCostCenterSecondary'))">
                             O código do centro de custo é obrigatório
                             </div>
 
@@ -80,10 +80,10 @@
                           formControlName="description" 
                           class="form-control" 
                           maxlength="100" 
-                          [ngClass]="{'is-invalid': formulario.get('FormNewCostCenterSub.description')?.invalid && formulario.get('FormNewCostCenterSub.description')?.touched}"   
+                          [ngClass]="{'is-invalid': formulario.get('FormNewCostCenterSecondary.description')?.invalid && formulario.get('FormNewCostCenterSecondary.description')?.touched}"   
                           />
                           
-                          <div class="invalid-feedback" *ngIf="formulario.get('FormNewCostCenterSub.description')?.invalid && formulario.get('FormNewCostCenterSub.description')?.touched">
+                          <div class="invalid-feedback" *ngIf="formulario.get('FormNewCostCenterSecondary.description')?.invalid && formulario.get('FormNewCostCenterSecondary.description')?.touched">
                             A descriçao do centro de custo é obrigatório
                             </div>
 
@@ -111,12 +111,12 @@
                                           <th> </th> 
                                         </tr>
                                       </thead>
-                                      <tbody *ngIf="costCenterSubForm">
-                                        <tr *ngFor="let costCenterSubForm of costCenterSubForm.controls; let i = index;let isLast = last ">                                                         
-                                          <td> {{costCenterSubForm.get('codCostCenterSub')?.value}} </td>
-                                          <td> {{costCenterSubForm.get('description')?.value}} </td>                                      
+                                      <tbody *ngIf="costCenterSecondaryForm">
+                                        <tr *ngFor="let costCenterSecondaryForm of costCenterSecondaryForm.controls; let i = index;let isLast = last ">                                                         
+                                          <td> {{costCenterSecondaryForm.get('codCostCenterSecondary')?.value}} </td>
+                                          <td> {{costCenterSecondaryForm.get('description')?.value}} </td>                                      
                                           <td style="text-align: right;">                                        
-                                            <i  style="font-size: 20px; cursor: pointer; " (click)="deleteCostCenterSub(i)" title="Editar plano de conta" class="mdi mdi-delete-forever"></i>                                          
+                                            <i  style="font-size: 20px; cursor: pointer; " (click)="deleteCostCenterSecondary(i)" title="Editar plano de conta" class="mdi mdi-delete-forever"></i>                                          
                                           </td>                                                         
                                         </tr>             
                                       </tbody>

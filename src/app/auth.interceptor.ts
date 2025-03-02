@@ -32,7 +32,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
 
 
   return next(req).pipe(
-   tap(() => console.log('Interceptando requisição:', req.url)),
+   tap(),
     catchError((error: HttpErrorResponse) => {
       
         if (error.status === 401) {

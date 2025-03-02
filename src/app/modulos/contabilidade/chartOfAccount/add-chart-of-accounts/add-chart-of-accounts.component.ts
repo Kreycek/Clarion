@@ -7,6 +7,7 @@ import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component'
 import { ChartOfAccountService } from '../chartOfAccount.service';
 import { ConfigService } from '../../../../services/config.service';
 import { CostCenterService } from '../../../ferramentaGestao/costCenter/costCenter.service';
+import { ModuloService } from '../../../modulo.service';
 
 @Component({
   selector: 'app-add-chart-of-accounts',
@@ -33,6 +34,7 @@ export class AddChartOfAccountsComponent {
       private router: Router, 
       public configService:ConfigService,
       private costCenterService: CostCenterService,
+      public moduloService:ModuloService
   ) {} 
 
   @ViewChild(ModalOkComponent) modal!: ModalOkComponent;
@@ -45,6 +47,10 @@ export class AddChartOfAccountsComponent {
     return null;
   };
   
+
+  trackByFn(index: number, item: any): string {
+    return item.codCostCenterSecondary; // Garante que cada item tem uma chave única
+  }
   
   get yearForm() {
     return (this.formulario?.get('year') as FormArray);
@@ -60,23 +66,70 @@ export class AddChartOfAccountsComponent {
 
   ngOnInit() {
 
-    this.costCenterService.getAllOnlyCostCenter().subscribe((response:any)=>{     
-      this.costCenters=response;
-
-      console.log('costCenters',this.costCenters);
-     
-    })   
-
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
       if(id) {
         this.isEdit=true;
-        this.coaService.getChartOfAccountById(id??'0').subscribe((response)=>{       
-          console.log('chartOfAccount',response);
+        this.coaService.getChartOfAccountById(id??'0').subscribe((COA:any)=>{   
+
+           this.costCenterService.getAllOnlyCostCenter().subscribe((response:any)=>{     
+            this.costCenters=response;    
+
+
+            if(COA.CostCentersCOA && COA.CostCentersCOA.length>0) {
+
+                COA.CostCentersCOA.forEach((element:any) => {
+
+                    let dados:any={ 
+                      id:'',
+                      codCostCenter:'',
+                      description:'',
+                      expanded:false,
+                      costCentersSecondary:[]
+                    }              
+                
+
+                    const _costCenterFind=this.costCenters.filter((elementCC:any)=>{
+                      return elementCC.ID==element.idCostCenter
+                    })[0];
+                    
+                    if(_costCenterFind) {
+
+                      dados.id=_costCenterFind.ID  
+                      dados.description=_costCenterFind.description;
+                      dados.codCostCenter=_costCenterFind.codCostCenter
+                    
+                      const _costCenterFindSecundario=structuredClone(element.costCentersSecondary);              
+
+                      if(_costCenterFindSecundario && _costCenterFindSecundario.length>0) {
+
+                          _costCenterFindSecundario.forEach((elementCCS:any) => {  
+                          
+                              const _costCenterSecundarioFind= structuredClone(_costCenterFind.costCenterSecondary.filter((elementCC:any)=>{
+                                return elementCC.codCostCenterSecondary==elementCCS
+                              })[0]);
+
+                              dados.costCentersSecondary.push({
+                                  codCostCenterSecondary:_costCenterSecundarioFind.codCostCenterSecondary,
+                                  description:_costCenterSecundarioFind.description
+                              })
+                          
+                          });
+                      }                   
+
+                      this.listCostCenters.push(dados)            
+                        
+                    }
+                
+                });
+              }
+
+        }) 
+          
           this.idUser=id;    
-          this.createForm(response);     
-          this.loadYear(response.Year)    
+          this.createForm(COA);     
+          this.loadYear(COA.Year)    
         })
       }
       else {
@@ -109,10 +162,8 @@ export class AddChartOfAccountsComponent {
           type: [!obj.Type? '' : obj.Type, Validators.required],        
           year: this.fb.array([], [Validators.required, this.validaYearSelecionado] ),  // Array para perfis selecionados          
           FormNewCostCenter: new FormGroup({  // Subformulário dentro do formulário principal
-                  codCostCenter:new FormControl('',[Validators.required]),
-                  codCostCenterName:new FormControl(''),
-                  codCostCenterSub: new FormControl('',[Validators.required]),
-                  codCostCenterSubName: new FormControl('')
+                  codCostCenter:new FormControl('0',[Validators.required]),
+                  codCostCenterSecondary: new FormControl('',[Validators.required]),                
                 })
         }); 
   }
@@ -124,17 +175,23 @@ export class AddChartOfAccountsComponent {
     if (resultado) {
      
     } else {
-      console.log("Usuário cancelou.");
+      
+      
     }
   }
 
-  gravar() {
-   
-    console.log('this.formulario',this.formulario);
+  gravar() {   
+    
+    const formNewCostCenter=this.formulario?.controls["FormNewCostCenter"] as FormGroup
+    this.moduloService.desabilitaCamposFormGroup(formNewCostCenter);     
+
     if (this.formulario?.invalid) {
       this.formulario.markAllAsTouched();
       return;
-    }
+    }    
+
+    this.moduloService.habilitaCamposFormGroup(formNewCostCenter,['codCostCenter','codCostCenterSecondary'])
+
     const formValues=this.formulario?.value;
     const objGravar: { 
       id?:string |null;
@@ -142,7 +199,8 @@ export class AddChartOfAccountsComponent {
       description: string;
       type: string;      
       active:boolean;
-      year: number[]; // Definindo o tipo correto para o array 'perfil'    
+      year: number[]; // Definindo o tipo correto para o array 'perfil'  
+      costCentersCOA: any[]
       
     } ={
       id:null,
@@ -150,7 +208,8 @@ export class AddChartOfAccountsComponent {
       description:formValues.description??'',
       type:formValues.type,   
       active:formValues.active,
-      year:[],           
+      year:[],
+      costCentersCOA:[]           
     }
    
    
@@ -161,7 +220,23 @@ export class AddChartOfAccountsComponent {
       });              
     }   
 
-    console.log('objGravar',objGravar);
+    if(this.listCostCenters && this.listCostCenters.length>0) {
+      this.listCostCenters.forEach((element:any)=>{
+
+        let cc:{idCostCenter:number, costCentersSecondary:string[]}={idCostCenter:element.id,costCentersSecondary:[]}
+       
+          if(element.costCentersSecondary && element.costCentersSecondary.length>0) {
+            element.costCentersSecondary.forEach((elementSecondary:any)=>{
+            cc.costCentersSecondary.push(elementSecondary.codCostCenterSecondary)
+            })
+          }
+        
+        objGravar.costCentersCOA.push(cc)
+
+      })
+      
+    }
+  
     if(this.idUser) {
 
       objGravar.id=this.idUser
@@ -188,16 +263,14 @@ export class AddChartOfAccountsComponent {
                   // router.navigate(['/login']); // Redireciona para a página de login
               }
               return throwError(() => error);
-          })
-        
-        ).subscribe(()=>{})
+
+          })).subscribe(()=>{})
     }
 
     else {
 
       this.coaService.verifyExistsChartOfAccounts({codAccount:objGravar.codAccount}).subscribe((async (response:any)=>{
-        if(response.message) {
-           
+        if(response.message) {           
             const resultado = await this.modal.openModal("Essa conta já está cadastrada tente outra",true); 
             if (resultado) {
 
@@ -233,51 +306,120 @@ export class AddChartOfAccountsComponent {
     this.router.navigate(['/aplicacao/chartOfAccount']);
   }
 
-  addCostCenter() {
+  async addCostCenter() {
 
-    const formNewCostCenter = this.formulario?.controls["FormNewCostCenter"] as FormGroup; 
-    const cadastrado = this.listCostCenters.filter((response:any)=>{
-      return response.codCostCenter===formNewCostCenter.controls['codCostCenter'].value
-    } )[0]
+    const formNewCostCenter = this.formulario?.controls["FormNewCostCenter"] as FormGroup;    
+    const codCostCenterInsert=formNewCostCenter.controls['codCostCenter'].value;
+    let existeRepetido=0;
 
+    if(codCostCenterInsert!=0) {
 
-    const _costCenters = this.costCenters.filter((response:any)=>{
-      return response.codCostCenter===formNewCostCenter.controls['codCostCenter'].value
-    } )[0]
+          const cadastrado = this.listCostCenters.filter((response:any)=>{
+            return response.codCostCenter===codCostCenterInsert
+          } )[0]
 
-    let _costCentersSecondary:any[]=[]
+          const _costCenters = this.costCenters.filter((response:any)=>{
+            return response.codCostCenter===codCostCenterInsert
+          } )[0]
 
-    if(!cadastrado) {   
+          let _costCentersSecondary:any[]=[]
+          const codCostCenterSecundario=formNewCostCenter.controls['codCostCenterSecondary'].value;
+       
+          if(!cadastrado) {              
+              if(_costCenters) {           
+                    if(_costCenters.costCenterSecondary && _costCenters.costCenterSecondary.length>0) {
+                      _costCentersSecondary=_costCenters.costCenterSecondary?.filter((response:any)=>{
+                        return codCostCenterSecundario!=0 ? response.codCostCenterSecondary===codCostCenterSecundario : 1==1
+                      })
+                    }
 
-        if(_costCenters) {             
-              if(_costCenters.costCenterSub && _costCenters.costCenterSub.length>0) {
-                _costCentersSecondary=_costCenters.costCenterSub?.filter((response:any)=>{
-                  return response.codCostCenterSub===formNewCostCenter.controls['codCostCenterSub'].value
-                } )
+                    this.listCostCenters.push(
+                      { 
+                        id:_costCenters.ID, 
+                        codCostCenter:_costCenters.codCostCenter,
+                        description:_costCenters.description,
+                        expanded:false,
+                        costCentersSecondary:_costCentersSecondary
+                      })
+                }
+          } else {
+                _costCentersSecondary=_costCenters.costCenterSecondary?.filter((response:any)=>{
+                    return codCostCenterSecundario!=0 ? response.codCostCenterSecondary===codCostCenterSecundario : 1==1
+                } );             
+
+                if(_costCentersSecondary && _costCentersSecondary.length>0) {
+                    _costCentersSecondary.forEach(async (costCenterSecundario:any)=>{
+                      const ccSecundarioJaExsite=cadastrado.costCentersSecondary.some((element:any)=>element.codCostCenterSecondary==costCenterSecundario.codCostCenterSecondary)
+                      if(!ccSecundarioJaExsite) {                       
+                        cadastrado.costCentersSecondary.push(costCenterSecundario)
+                      }else {
+                       
+                        if(codCostCenterSecundario!=0) {
+                           const resultado = await this.modal.openModal("Centro de custo secundário já cadastrado para essa conta",true);                           
+                        if (resultado) {          
+                        
+                        }
+                       } else {
+                        existeRepetido++;
+                       }
+                      }
+                  })
+
+                  if(existeRepetido>0) {
+                    const resultado = await this.modal.openModal("Todos os centros de custo já foram atribuidos para essa conta",true); 
+                          
+                    if (resultado) {          
+                    
+                    }
+                  }          
               }
-
-              this.listCostCenters.push(
-                { 
-                  id:_costCenters.ID, 
-                  codCostCenter:_costCenters.codCostCenter,
-                  description:_costCenters.description,
-                  expanded:false,
-                  costCentersSecondary:_costCentersSecondary
-                })
-
           }
-    } else {
-      _costCentersSecondary=_costCenters.costCenterSub?.filter((response:any)=>{
-        return response.codCostCenterSub===formNewCostCenter.controls['codCostCenterSub'].value
-      } )[0];
+    }  else {
+      existeRepetido=0;
 
-      cadastrado.costCentersSecondary.push(_costCentersSecondary)
+     this.costCenters.forEach((element:any)=>{
+            const cadastrado = this.listCostCenters.filter((response:any)=>{
+              return response.codCostCenter===element.codCostCenter
+            } )[0];
+
+           
+         
+                if(!cadastrado) {
+                    this.listCostCenters.push({ 
+                        id:element.ID, 
+                        codCostCenter:element.codCostCenter,
+                        description:element.description,
+                        expanded:false,
+                        costCentersSecondary:element.costCenterSecondary
+                      })
+                }
+                else {
+                  element.costCenterSecondary.forEach((element:any) => {
+                      const existSecondary=cadastrado.costCentersSecondary.some((ccs:any)=>ccs.codCostCenterSecondary==element.codCostCenterSecondary)
+                      if(!existSecondary) {
+                        cadastrado.costCentersSecondary.push(element)
+                      }
+                  });
+
+                  existeRepetido++
+                }
+      } );
+
+      if(existeRepetido>0) {
+
+          const resultado = await this.modal.openModal("Todos os centros de custo já foram atribuidos para essa conta",true); 
+                              
+          if (resultado) {          
+          
+          }
+      }
     }
+  
   }
   
-  filterCostCenterSub(codCostCenter:any) {
+  filterCostCenterSecondary(codCostCenter:any) {
 
-    console.log('codCostCenter',codCostCenter);
+  
     let _costCenters=[]
     _costCenters=this.costCenters.filter((response:any)=>{
       return response.codCostCenter===codCostCenter
@@ -287,13 +429,17 @@ export class AddChartOfAccountsComponent {
     if(_costCenters) {
       this.costCentersSub=[];
 
-      if(_costCenters.costCenterSub && _costCenters.costCenterSub.length>0)    {       
-        this.costCentersSub= [..._costCenters.costCenterSub];
+      if(_costCenters.costCenterSecondary && _costCenters.costCenterSecondary.length>0)    {       
+        this.costCentersSub= [..._costCenters.costCenterSecondary];
         this.costCentersSub.unshift({
-          "codCostCenterSub": "",
+          "codCostCenterSecondary": "0",
           "description": "Todos",
           "dtAdd": ""
         } )
+
+        const formNewCostCenter = this.formulario?.controls["FormNewCostCenter"] as FormGroup;  
+        formNewCostCenter.controls["codCostCenterSecondary"].setValue('0')
+
       }
       else 
         this.costCentersSub=[]    
@@ -311,9 +457,16 @@ export class AddChartOfAccountsComponent {
   }
 
   deleteItem(codCostCenter: string, itemId: string) {   
+
     const cc = this.listCostCenters.find(cat => cat.codCostCenter === codCostCenter);     
     if (cc) {
-      cc.costCentersSecondary = cc.costCentersSecondary.filter((item:any) => item.codCostCenterSub !== itemId);
+      cc.costCentersSecondary = cc.costCentersSecondary.filter((item:any) => item.codCostCenterSecondary !== itemId);
     }   
+  }
+
+  deleteCostCenter(codCostCenter: string) {      
+   
+    this.listCostCenters =this.listCostCenters.filter(cat => cat.codCostCenter != codCostCenter);     
+
   }
 }
