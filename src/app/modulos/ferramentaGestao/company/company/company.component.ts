@@ -28,7 +28,7 @@ export class CompanyComponent {
     totalRegistros: number = 0;
     totalPages: number = 1;
     currentPage: number = 1;
-    limit: number = this.configService.limitPaginator;  
+    limit: number = 0;  
     dados:any    
     documentModalList:any[]=[]
     
@@ -42,6 +42,7 @@ export class CompanyComponent {
     ) {} 
         
   ngOnInit() {       
+    this.limit=this.configService.limitPaginator;
       this.companyService.getAllCompanys(this.currentPage,this.limit).subscribe((response:any)=>{     
         console.log('response',response);
           this.dados=response.companys;  

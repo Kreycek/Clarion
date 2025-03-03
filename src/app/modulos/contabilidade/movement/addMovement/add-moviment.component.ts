@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { ModalConfirmationComponent } from '../../../../modal/modal-confirmation/modal-confirmation.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,24 +10,50 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap, throwError } from 'rxjs';
 import { DailyService } from '../../../ferramentaGestao/daily/daily.service';
 
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-add-moviment',
   standalone: true,
   imports: [
+    
     ModalOkComponent, 
     CommonModule, 
     FormsModule, 
     ReactiveFormsModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatButtonModule,
+    MatNativeDateModule,
+    MatSlideToggleModule
  
   ],
   templateUrl: './add-moviment.component.html',
   styleUrl: './add-moviment.component.css',
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
+  animations: [
+    trigger('transformPanel', [
+      transition('void => *', [
+        style({ transform: 'scale(0)' }),
+        animate('300ms ease-in', style({ transform: 'scale(1)' }))
+      ])
+    ])
+  ]
 
 })
 export class AddMovimentComponent {
   @ViewChild(ModalOkComponent) modal!: ModalOkComponent; 
   
+  calendarOpen = false;
+
+  toggleCalendar() {
+    this.calendarOpen = !this.calendarOpen;
+  }
       documentMiniFormCod:string=''
       documentMiniFormDescription:string=''
       isVisibleValidationCodDocumento=false;

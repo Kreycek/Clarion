@@ -37,7 +37,7 @@ export class MovimentComponent {
   totalRegistros: number = 0;
   totalPages: number = 1;
   currentPage: number = 1;
-  limit: number = this.configService.limitPaginator;
+  limit: number = 0;
   currentYear: number = new Date().getFullYear();
   dados: any;
   documentModalList: any[] = [];
@@ -51,6 +51,8 @@ export class MovimentComponent {
   ) {}
 
   ngOnInit() {
+
+    this.limit=this.configService.limitPaginator;
     this.dailyService.getAllOnlyDaily().subscribe((response: any) => {
       this.dailys = response;
       console.log('getAllOnlyDaily', response);

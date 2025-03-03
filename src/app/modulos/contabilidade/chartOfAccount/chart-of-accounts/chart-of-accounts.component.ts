@@ -37,7 +37,7 @@ export class ChartOfAccountsComponent {
   totalRegistros: number = 0;
   totalPages: number = 1;
   currentPage: number = 1;
-  limit: number = this.configService.limitPaginator;
+  limit: number = 0;
   currentYear: number = new Date().getFullYear();
   filteredChartOfAccount = []; // Inicialmente, exibe todos os usuários  
   dados:any
@@ -47,6 +47,7 @@ export class ChartOfAccountsComponent {
   
   ngOnInit() {
 
+    this.limit=this.configService.limitPaginator;
       for(let year=2023;year<=this.currentYear;year++) {
           this.years.push(year)
       }

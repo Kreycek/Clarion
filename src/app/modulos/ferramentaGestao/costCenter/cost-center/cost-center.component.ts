@@ -29,7 +29,7 @@ export class CostCenterComponent {
     totalRegistros: number = 0;
     totalPages: number = 1;
     currentPage: number = 1;
-    limit: number = this.configService.limitPaginator;  
+    limit: number = 0;  
     currentYear: number = new Date().getFullYear();
     dados:any
     costCenterSubModalList:any[]=[]
@@ -46,6 +46,7 @@ export class CostCenterComponent {
 
     ngOnInit() {
  
+      this.limit=this.configService.limitPaginator;
       this.costCenterService.getAllOnlyCostCenter().subscribe((response:any)=>{     
         this.costCenters=response;
         console.log('getAllOnlyDaily',response);

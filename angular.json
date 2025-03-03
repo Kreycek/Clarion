@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Clarion": {
+    "web": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,10 +13,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/clarion",
+            "outputPath": "dist/web",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "baseHref": "/",
             "polyfills": [
               "zone.js"
             ],
@@ -25,8 +24,10 @@
               "src/favicon.ico",
               "src/assets"
             ],
+
             "styles": [
-             
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles.css",
               "src/assets/vendors/feather/feather.css",
               "src/assets/vendors/ti-icons/css/themify-icons.css",
               "src/assets/vendors/css/vendor.bundle.base.css",
@@ -38,8 +39,7 @@
               "src/assets/vendors/select2/select2.min.css",              
               "src/assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css",
                "src/assets/css/maps/_checkbox-radio.scss"
-             
-              
+
             ],
             "scripts": [
               "src/assets/vendors/js/vendor.bundle.base.js",
@@ -50,6 +50,7 @@
               "src/assets/js/todolist.js",
               "src/assets/js/jquery.cookie.js"
 
+
             ]
           },
           "configurations": {
@@ -57,13 +58,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
                 }
               ],
               "outputHashing": "all"
@@ -80,19 +81,16 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Clarion:build:production"
+              "buildTarget": "web:build:production"
             },
             "development": {
-              "buildTarget": "Clarion:build:development"
+              "buildTarget": "web:build:development"
             }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "buildTarget": "Clarion:build"
-          }
+          "builder": "@angular-devkit/build-angular:extract-i18n"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -103,10 +101,13 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -116,6 +117,6 @@
     }
   },
   "cli": {
-    "analytics": "ceb17061-f2ab-4921-b507-18259adc6c3d"
+    "analytics": "e7dea7b4-889b-4466-80b3-41bfd068a4f8"
   }
 }

@@ -37,8 +37,7 @@ export class UsuarioComponent {
   totalUsers: number = 0;
   totalPages: number = 1;
   currentPage: number = 1;
-  limit: number = this.configService.limitPaginator;
-
+  limit: number = 0
   filteredUsers = []; // Inicialmente, exibe todos os usuários
   dados:any
   perfis:any
@@ -49,6 +48,9 @@ export class UsuarioComponent {
       this.perfis=response;
         console.log('perfis',response);
     })
+
+    this.limit=this.configService.limitPaginator;
+
 
     this.usuarioService.getUsers(this.currentPage,this.limit).subscribe((response:any)=>{
       this.dados=response.users;
