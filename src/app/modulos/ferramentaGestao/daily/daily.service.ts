@@ -33,7 +33,7 @@ export class DailyService {
 
    //Carregar todos os diários sem documentos
    getAllOnlyDailyActive(): Observable<any> {
-    return this.http.get(this.configService.apiUrl + "/getAllOnlyDailyActive" , {
+    return this.http.get(this.configService.apiUrl + "/GetAllOnlyDailyActive" , {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
