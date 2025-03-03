@@ -10,21 +10,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 
-import {ChangeDetectionStrategy} from '@angular/core';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {provideNativeDateAdapter} from '@angular/material/core';
-
 @Component({
   selector: 'app-moviment',
   standalone: true,
-  providers: [provideNativeDateAdapter()],
+
   imports: [
     CommonModule, FormsModule,
     ModalDocumentsComponent,
     PaginatorComponent,
-    MatFormFieldModule, MatInputModule, MatDatepickerModule,
+   
     
   
 ],
