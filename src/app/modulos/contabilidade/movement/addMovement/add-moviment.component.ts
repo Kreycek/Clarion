@@ -26,8 +26,7 @@ import { DailyService } from '../../../ferramentaGestao/daily/daily.service';
 
 })
 export class AddMovimentComponent {
-  @ViewChild(ModalOkComponent) modal!: ModalOkComponent;  
-
+  @ViewChild(ModalOkComponent) modal!: ModalOkComponent; 
   
       documentMiniFormCod:string=''
       documentMiniFormDescription:string=''
@@ -59,7 +58,7 @@ export class AddMovimentComponent {
   ngOnInit() {
 
     
-    this.dailyService.getAllOnlyDaily().subscribe((response:any)=>{     
+    this.dailyService.getAllOnlyDailyActive().subscribe((response:any)=>{     
       this.dailys=response;
       console.log('getAllOnlyDaily',response);
 

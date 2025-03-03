@@ -31,6 +31,15 @@ export class DailyService {
     });
   }
 
+   //Carregar todos os diários sem documentos
+   getAllOnlyDailyActive(): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/getAllOnlyDailyActive" , {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
+
   getDailyById(id:string): Observable<any> {
     return this.http.get(this.configService.apiUrl + "/getDailyById?id="+id, {
       headers: new HttpHeaders({
