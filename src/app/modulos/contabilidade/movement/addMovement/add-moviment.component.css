@@ -1,5 +1,86 @@
-.calendar-container {
-    display: inline-block;
-    position: relative;
-    margin-top: 20px;
+.required {
+  color: red;
+  margin-left: 5px;
+}
+
+.is-invalid {
+border: 1px solid red !important;
+}
+
+.invalid-feedback {
+color: red;
+font-size: 0.9rem;
+}
+
+
+
+  .alinhamento {
+    vertical-align:center;
+    text-align: center;
   }
+
+  .center {
+    text-align: center;
+  }
+
+  /* Estilização geral da tabela */
+.tabela-customizada {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  font-family: Arial, sans-serif;
+}
+
+/* Cabeçalho da tabela */
+.cabecalho-tabela {
+  background-color: #f4f4f4;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Células da tabela */
+.celula-tabela {
+  text-align: center;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Estilização para os inputs dentro da tabela */
+.input-tabela {
+  width: 100%;
+  padding: 8px; /* Adiciona espaçamento interno */
+  margin: 1px;  /* Adiciona espaçamento externo */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Alinhamento dos itens da tabela */
+.alinhamento-centro {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Ícone de adicionar */
+.icone-adicionar {
+  cursor: pointer;
+  color: #28a745;
+  font-size: 20px;
+}
+.icone-adicionar:hover {
+  color: #218838;
+}
+
+/* tr:nth-child(odd) {
+  background-color: #0d97a6;
+} */
+/* Cor para linhas pares */
+/* tr:nth-child(even) {
+  background-color: #ad7979;
+} */
+tr:nth-child(odd) {
+  background-color: rgb(225, 230, 228);
+}
+tr:nth-child(even) {
+  background-color: rgb(255, 255, 255);
+}

@@ -2,13 +2,13 @@ import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { AuthInterceptor } from './auth.interceptor';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatNativeDateModule } from '@angular/material/core';
+
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
@@ -30,7 +30,6 @@ export const MY_DATE_FORMATS = {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),  // Fornece o HttpClient para a aplicação
-    HttpClientModule,
     ReactiveFormsModule,
     BrowserModule,
     BrowserAnimationsModule,

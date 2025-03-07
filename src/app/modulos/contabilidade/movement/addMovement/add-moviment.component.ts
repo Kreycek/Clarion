@@ -1,7 +1,6 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
-import { ModalConfirmationComponent } from '../../../../modal/modal-confirmation/modal-confirmation.component';
-import { CommonModule, registerLocaleData } from '@angular/common';
-import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfigService } from '../../../../services/config.service';
@@ -9,19 +8,18 @@ import { MovementService } from '../movement.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap, throwError } from 'rxjs';
 import { DailyService } from '../../../ferramentaGestao/daily/daily.service';
-
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { ChartOfAccountService } from '../../chartOfAccount/chartOfAccount.service';
 
 @Component({
   selector: 'app-add-moviment',
   standalone: true,
-  imports: [
-    
+  imports: [    
     ModalOkComponent, 
     CommonModule, 
     FormsModule, 
@@ -30,8 +28,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MatInputModule,
     MatButtonModule,
     MatNativeDateModule,
-    MatSlideToggleModule
- 
+    MatSlideToggleModule 
   ],
   templateUrl: './add-moviment.component.html',
   styleUrl: './add-moviment.component.css',
@@ -51,45 +48,46 @@ export class AddMovimentComponent {
   
   calendarOpen = false;
 
-  toggleCalendar() {
-    this.calendarOpen = !this.calendarOpen;
-  }
+    toggleCalendar() {
+      this.calendarOpen = !this.calendarOpen;
+    }
       documentMiniFormCod:string=''
       documentMiniFormDescription:string=''
       isVisibleValidationCodDocumento=false;
-      isVisibleValidationDescription=false;
-     
-     isEdit=false;
-     idDaily:string |null = null 
-     formulario: FormGroup| null = null;
-     years:number[]=[]
-     currentYear: number = new Date().getFullYear();
-     dailys:any[]=[] 
-     documents:any[]=[] 
+      isVisibleValidationDescription=false;     
+      isEdit=false;
+      idDaily:string |null = null 
+      formulario: FormGroup| null = null;
+      years:number[]=[]
+      currentYear: number = new Date().getFullYear();
+      dailys:any[]=[] 
+      documents:any[]=[];
+      movements:any[]=[]
 
-    get documentForm() {
-       return (this.formulario?.get('documents') as FormArray);
-     }
-     constructor(     
-         private fb: FormBuilder,
-         private movimentService:MovementService,
-         private route: ActivatedRoute,
-         private router: Router, 
-         public configService:ConfigService,
-         private cdr: ChangeDetectorRef,
-         private dailyService: DailyService,
-     ) {} 
+      get documentForm() {
+        return (this.formulario?.get('documents') as FormArray);
+      }
+
+      get formMovements(): FormArray {
+        return this.formulario?.get('movements') as FormArray;
+      }
+
+      constructor(     
+          private fb: FormBuilder,
+          private movimentService:MovementService,
+          private route: ActivatedRoute,
+          private router: Router, 
+          public configService:ConfigService,
+          private coaService:ChartOfAccountService,
+          private dailyService: DailyService,
+      ) {} 
 
 
   ngOnInit() {
-
     
-    this.dailyService.getAllOnlyDailyActive().subscribe((response:any)=>{     
-      this.dailys=response;
-      console.log('getAllOnlyDaily',response);
-
-    })  
-
+      this.dailyService.getAllOnlyDailyActive().subscribe((response:any)=>{     
+        this.dailys=response;        
+      })
 
       this.route.paramMap.subscribe(params => {
         const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
@@ -97,13 +95,13 @@ export class AddMovimentComponent {
         if(id) {
           this.isEdit=true;
           this.movimentService.getMovementById(id??'0').subscribe((response)=>{       
-            console.log('dailys',response);
+           
             this.idDaily=id;    
             this.createForm(response);  
 
             if(response.Documents && response.Documents.length>0) {
               response.Documents.forEach((element:any) => {
-                console.log('element',element);
+              
                 this.documentForm.push(this.createDocumentForm(element.codDocument,element.description));
               });
             }
@@ -111,79 +109,113 @@ export class AddMovimentComponent {
         }
         else {
           this.isEdit=false;
-          this.createForm({Active:true});   
+          this.createForm({active:true});   
+          if(this.formMovements.controls.length==0) {
+
+            this.addMovimento('','',(this.formMovements.controls.length+1).toString(),[]);
+            this.addNewItemMoviment();
+          }
         }
-        console.log('this.formulario',this.formulario);
+      
       });    
   }
 
-  filterComponents(codDaily:any) {
+  filterDocuments(codDaily:any) {
 
-    let _documents=[]
-    _documents=this.dailys.filter((response:any)=>{
-      return response.codDaily===codDaily
+      let _documents=[]
+      _documents=this.dailys.filter((response:any)=>{
+        return response.codDaily===codDaily
 
-    } )[0]
+      } )[0]
 
-    if(_documents) {
-      this.documents=[];
-      
-      if(_documents.documents && _documents.documents.length>0)    {
-       
-         this.documents= [..._documents.documents];
-        this.documents.unshift({
-          "codDocument": "",
-          "description": "Todos",
-          "dtAdd": ""
-        } )
+      if(_documents) {
+        this.documents=[];
+        
+        if(_documents.documents && _documents.documents.length>0) {        
+          this.documents= [..._documents.documents];
+          this.documents.unshift({
+            "codDocument": "",
+            "description": "Todos",
+            "dtAdd": ""
+          } )
+        }
+        else 
+          this.documents=[]    
       }
-      else 
-        this.documents=[]    
-    }
-    else {
-      this.documents=[]
-    }
+      else {
+        this.documents=[]
+      }
   }
-
     
   createForm(obj:any) {
         this.formulario = this.fb.group({
-          active: [obj.Active, Validators.required],
-          codDaily: [obj.CodDaily, Validators.required],
+          active: [obj.active, Validators.required],
+          display:[obj.display],
+          codDaily: [obj.codDaily, Validators.required],
           codDocument: [obj.codDocument, Validators.required],
-          description: [obj.Description, Validators.required],
-          documents: this.fb.array([] ),
-          FormNewDocuments: new FormGroup({  // Subformulário dentro do formulário principal
-            codDocument: new FormControl(''),
-            description: new FormControl('')
-          })
-        }); 
+          description: [obj.description, Validators.required],
+          movements: this.fb.array([]),
+          newRegister: [obj.newRegister??true],
+        });      
+  }
 
-        this.formulario.get('FormNewDocuments.codDocument')?.valueChanges.subscribe(value => {
-          console.log('Novo valor de codDocument:', value);
-          if(value) {
-            this.isVisibleValidationCodDocumento=true;
-          }
-          else {
-            this.isVisibleValidationCodDocumento=false;
-          }
-        });
-    
-        // Para monitorar todos os campos dentro de FormNewDocuments
-        this.formulario.get('FormNewDocuments.description')?.valueChanges.subscribe(value => {
 
-          if(value) {
-            this.isVisibleValidationDescription=true;
-          }
-          else {
-            this.isVisibleValidationDescription=false;
-          }
-          
-          console.log('Valores do FormNewDocuments:', value);
-        });
+  verifyExistAccoun(field:any, index:number) {
+        const fieldValue=(field as FormGroup).controls['account']
+        if(fieldValue.value) {
+          this.coaService.verifyExistsChartOfAccounts({codAccount:fieldValue.value}).subscribe(async (response:any)=>{
+            if(!response.message) {           
+                const resultado = await this.modal.openModal("Existe uma conta na linha " + (index).toString() + " cadastrada no plano de contas tente outra",true); 
+                if (resultado) {
+                  fieldValue.setValue(null,{ emitEvent: false });
+                }
+              }
+            })
+        }
+  }
 
+  addMovimento(description: string, date: string, order:string, movement: any[]) {
+    const dds= this.fb.group({
+      order:order,
+      description: [description, Validators.required],
+      date: [date, Validators.required] ,
+      active:true,
+      display:true,
+      selected:true,
+      movementsItens: this.fb.array([])
+    });
+    this.formMovements.insert(0,dds);      
+  }
+
+  itemNewMovement(account: string, debit: string, credit: string, iva:string, newRegister:boolean): FormGroup {
+    return this.fb.group({
+      account: [account, Validators.required],
+      debit: [debit, Validators.required],
+      credit: [credit, Validators.required],
+      iva:[iva],
+      active:true,
+      display:true,
+      newRegister: [newRegister??true],
+    });
+  }
+
+
+  addNewItemMoviment() {
+  
+    const movement = this.formMovements.controls.filter((element:any)=>{
+      return (element as FormGroup).controls['display'].value && (element as FormGroup).controls['selected'].value;
+    })[0];
+
+    if(movement) {
+      const movements=(movement as FormGroup).controls['movementsItens'] as FormArray;
+      movements.push(this.itemNewMovement('','','','',true));
     }
-        
+  }
+
+  convertToFormArray(obj: any) {
+    return obj as FormArray
+  }
+
   createDocumentForm(codDocument:string, description:string): FormGroup {
       return this.fb.group({  
         codDocument: [codDocument],
@@ -191,32 +223,87 @@ export class AddMovimentComponent {
       });
   }
 
-  async addDocument() {    
-    if(this.isVisibleValidationDescription && this.isVisibleValidationDescription) {
-     
-      const form = this.formulario?.controls["FormNewDocuments"] as FormGroup;
-      const result = this.documentForm.controls.filter((element:any)=>{
-          const valor=(element as FormGroup).controls["codDocument"].value;
-          return valor==form.controls["codDocument"].value
-      })[0];
-      if(result) {
-        const resultado = await this.modal.openModal("Essa documento já está cadastrado para esse diário",true); 
-          if (resultado) {          
-            this.cdr.detectChanges();
-          }
+  async gravarMovimento() {
+
+    let linhas:number[]=[]
+
+    let invalidCount=0
+    this.formMovements.controls.forEach((elementFAM:any, indexLinha:number)=>{
+      const fm=elementFAM as FormGroup
+      if(elementFAM.invalid) {
+        invalidCount++
+        linhas.push(+fm.controls['order'].value)
       }
-      else {
-        this.documentForm.push(this.createDocumentForm(form.controls["codDocument"].value,form.controls["description"].value));
-        form.controls["codDocument"].setValue('',{ emitEvent: false })
-        form.controls["description"].setValue('',{ emitEvent: false })
-        this.isVisibleValidationCodDocumento=false; 
-        this.isVisibleValidationDescription=false;
-      }
-    
+
+    })
+
+    if(invalidCount>0) {
+      this.formMovements.markAllAsTouched();
+        const resultado = await this.modal.openModal("Existem dados de movimento inválidos" + (linhas.length>1 ? ' nas linhas ' : ' na linha ') + linhas.sort().join(',') + ' corriga antes de avançar.',true); 
+          if (resultado) {            
+          }       
     }
+    else {
+
+    console.log('invalidCount',invalidCount);
+
+    // if (this.formulario?.invalid) {
+    //   this.formulario.markAllAsTouched();
+    //   return;
+    // }   
+
+    this.formMovements.controls.forEach((element:any) => {
+        const movement=element as FormGroup;
+        movement.controls['display'].setValue(false,{ emitEvent: false });
+
+        const fa=movement.controls['movementsItens'] as FormArray;
+        fa.controls.forEach((element:any) => {
+            const line=element as FormGroup
+            line.controls['display'].setValue(false,{ emitEvent: false });
+
+        });
+    });
+
+    this.addMovimento('','',(this.formMovements.controls.length+1).toString(),[]);
+    this.addNewItemMoviment()
+
+    console.log('objGravar',this.formulario);
+    console.log('this.formMovements qtd',(this.formMovements.controls.length+1));
+  }
   }
 
-  gravar() {      
+  lineDisableOutIndex(index:number) {
+
+    this.formMovements.controls.forEach((elementFAM:any, indexLinha:number)=>{
+        const faMovementsItens=(elementFAM as FormGroup)
+        if(indexLinha==index) {
+          faMovementsItens.controls['display'].setValue(true,{ emitEvent: false });
+          faMovementsItens.controls['selected'].setValue(true,{ emitEvent: false });
+        }
+        else {
+          faMovementsItens.controls['selected'].setValue(false,{ emitEvent: false });
+        }
+          const faMovements=faMovementsItens.controls['movementsItens'] as FormArray
+        faMovements.controls.forEach((element:any) => {           
+          const line=element as FormGroup
+          line.controls['display'].setValue(indexLinha==index ? true : false,{ emitEvent: false });
+        })
+    } )    
+  }
+
+  viewAllMovements() {
+    
+    this.formMovements.controls.forEach((element:any) => {
+      const movement=element as FormGroup;
+      movement.controls['display'].setValue(true,{ emitEvent: false });        
+  });
+
+  return 0
+
+  }
+
+
+  gravar() {
     
       if (this.formulario?.invalid) {
         this.formulario.markAllAsTouched();
@@ -245,7 +332,7 @@ export class AddMovimentComponent {
         });              
       }   
   
-      console.log('objGravar',objGravar);
+      
       if(this.idDaily) {
   
         objGravar.id=this.idDaily
@@ -324,5 +411,28 @@ export class AddMovimentComponent {
       this.documentForm.removeAt(index);
     }
 
+
+    getControl(index: number, fieldName:string) {     
+      return this.formMovements.at(index).get(fieldName);
+    }   
+
+
+    getMovementsItens(index: number): FormArray {
+      return this.formMovements.at(index).get('movementsItens') as FormArray;
+    }
     
+    getAccountControl(movementIndex: number, itemIndex: number ,fieldName:string) {
+      // console.log(this.getMovementsItens(movementIndex).at(itemIndex));
+      return this.getMovementsItens(movementIndex).at(itemIndex).get(fieldName);
+    }
+
+    deleteMovement(movementIndex: number, itemIndex: number) {
+      const linha=this.getMovementsItens(movementIndex).at(itemIndex);
+      if(linha?.get('newRegister')?.value)
+        this.getMovementsItens(movementIndex).removeAt(itemIndex)
+      else {
+        linha?.get('active')?.setValue(false,{ emitEvent: false })
+        linha?.get('display')?.setValue(false,{ emitEvent: false })
+      }
+    }
 }
