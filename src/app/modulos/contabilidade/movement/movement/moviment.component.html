@@ -30,14 +30,39 @@
             </div>
             
 
-            <div class="col-lg-4 col-md-4 col-sm-6 col-12">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-3">
               <div class="form-group">
              
                 <label for="document">Documentos:</label>
-                <select id="document" [(ngModel)]="searchCodDocument"  class="form-control" multiple>                 
+                <select id="document" class="form-select" [(ngModel)]="searchCodDocument" >                 
                   <option *ngFor="let document of documents" [value]="document.codDocument">{{document.codDocument + ' - '  + document.description }}</option>
                 </select>
               </div>
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-sm-3 col-3">
+              <div class="form-group">
+             
+                <div class="form-group">
+             
+                  <label for="document">Tipo pesquisa por data</label>
+                  <select id="document" class="form-select" [(ngModel)]="searchTpSearch" >                 
+                    <option *ngFor="let tpSearch of tpSearchData" [value]="tpSearch.type">{{tpSearch.description }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-3 col-3 " *ngIf="searchTpSearch">
+              <mat-form-field style="margin-top:20px">
+                <mat-label>Choose a date</mat-label>
+                <input matInput 
+                [matDatepicker]="picker" 
+                (dateChange)="selectDate(DataSearch)" [(ngModel)]="DataSearch">
+              
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
             </div>
         
             <div class="col-lg-2 col-md-2 text-md-right text-center" style="margin-top: 30px;">
@@ -51,30 +76,26 @@
             <thead>              
               <tr>
                 <th colspan="5" style="text-align: right;" >                   
-                    <i class="mdi mdi-account-plus" (click)="addMovement()" title="Adicionar plano de contas" style="font-size: 24px; cursor: pointer;"></i>                   
+                    <i class="mdi mdi-plus-circle" (click)="addMovement()" title="Adicionar novo movimento" style="font-size: 24px; cursor: pointer;"></i>                   
                </th>                         
               </tr>              
               <tr>
-                <th> Cod. Diário </th>              
-                <th> Descrição </th>            
-                <th> Documentos </th>                                  
+                <th> Diário </th>  
+                <th> Documento </th>       
+                <th> Data </th>                             
                 <th> Status </th>   
                 <th>  </th> 
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of dados">              
-                <td> {{item.CodDaily}} </td>
-                <td> {{item.Description}} </td>
-                <td> 
-               
-                 
-                </td>
-               
+                <td> {{item.CodDaily}} - {{item.descriptionDaily}} </td>
+                <td> {{item.CodDocument}} -  {{item.descriptionDocument}}   </td>
+                <td> {{item.Date | date:'dd/MM/yyyy'}}   </td>
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
                 <td style="text-align: right;">                                        
                   <i (click)="updateMovement(item.ID)" style="font-size: 20px; cursor: pointer; " 
-                  title="Editar plano de conta" 
+                  title="Editar movimento" 
                   class="mdi mdi-table-edit"></i>
                 
              </td>               

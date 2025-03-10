@@ -8,7 +8,7 @@ border: 1px solid red !important;
 }
 
 .invalid-feedback {
-color: red;
+color: red !important;;
 font-size: 0.9rem;
 }
 

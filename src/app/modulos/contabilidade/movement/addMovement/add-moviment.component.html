@@ -7,27 +7,8 @@
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title">{{idDaily ? 'Editar' : 'Novo'}} Movimento</h4>
-        <p class="card-description" style="display: none;"> Basic form elements </p>
-        
-        <br>
-          <div class="form-group">
-        
-            
-          </div>          
-
-          <div class="form-group" style="display: flex; align-items: center;">
-          
-          </div>
-
-          <div class="form-group">
-           
-          </div>
-  
-          <div class="form-group">
-           
-          </div>
-
+        <h4 class="card-title">{{idMovement ? 'Editar' : 'Novo'}} Movimento</h4>
+             
 
           <div class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;">
             <div class="card">
@@ -45,34 +26,52 @@
 
                     <label for="nome" style="margin-right: 10px;">Data <span class="required">*</span></label>
                     <div style="display: flex; align-items: center; width: 100%;">
-                    <input 
-                    class="form-control w-100"
-                    matInput [matDatepicker]="picker" 
-                    placeholder="Escolha uma data" 
-                    style="flex-grow: 1;" 
-                    (click)="picker.open()">
-          
-                    <mat-datepicker-toggle [for]="picker" matButton></mat-datepicker-toggle>
-                    
-                    <mat-datepicker #picker></mat-datepicker>
+                      <div style="display: flex; flex-direction: column; flex-grow: 1;">
+                        <input 
+                          class="form-control w-100"
+                          matInput [matDatepicker]="picker" 
+                          placeholder="Escolha uma data" 
+                          formControlName="date" 
+                          [ngClass]="{'is-invalid': getControlMainForm('date')?.invalid && getControlMainForm('date')?.touched}"
+                          (click)="picker.open()">  
+                        <div class="invalid-feedback" *ngIf="formulario.get('date')?.invalid">
+                          Selecione uma data
+                        </div>
+                      </div>
+                      <div style="display: flex; align-items: center; padding-left: 2px; margin-top: 2; vertical-align: top;">
+                        <mat-datepicker-toggle [for]="picker" matButton></mat-datepicker-toggle> 
+                      </div>                 
+                      <mat-datepicker #picker></mat-datepicker>
                     </div>
+                     
+                    
                   </div>
                   <div class="col">
                     <label for="nome">Cód. do diário <span class="required">*</span></label>
 
-                    <select id="codDaily"  formControlName="codDaily" (change)="filterDocuments(formulario.get('codDaily')?.value)" class="form-select">
+                    <select id="codDaily"  
+                    formControlName="codDaily" 
+                    (change)="this.documents = this.moduloService.filterDocuments(formulario.get('codDaily')?.value,this.dailys,false)" 
+                    class="form-select"
+                    [ngClass]="{'is-invalid': getControlMainForm('codDaily')?.invalid && getControlMainForm('codDaily')?.touched}"
+                    >
                         <option value="">Todos</option>
                         <option *ngFor="let daily of dailys" [value]="daily.codDaily">{{ daily.codDaily + " - " +  daily.description }}</option>
                       </select>
                   
                     <div class="invalid-feedback" *ngIf="formulario.get('codDaily')?.invalid && formulario.get('codDaily')?.touched">
-                      O código do diário.
+                      O código do diário obrigatório.
                     </div>
 
                   </div>
                   <div class="col">
                     <label for="description">Cód. do documento<span class="required">*</span></label>
-                    <select id="codDocument" formControlName="codDocument"  class="form-select">                 
+                    <select 
+                    id="codDocument" 
+                    formControlName="codDocument"  
+                    [ngClass]="{'is-invalid': getControlMainForm('codDocument')?.invalid && getControlMainForm('codDocument')?.touched}"
+                    class="form-select"
+                    >                 
                         <option *ngFor="let document of documents" [value]="document.codDocument">{{document.codDocument + ' - '  + document.description }}</option>
                       </select>
         
@@ -115,7 +114,7 @@
                                             <th class="alinhamento-centro" style="width: 25%;">Débito <span class="required">*</span></th>
                                             <th class="alinhamento-centro" style="width: 25%;">Crédito <span class="required">*</span></th>
                                             <th class="alinhamento-centro" style="width: 25%;">IVA</th>
-                                            <th style="font-size: 25px;"><i title="Adicionar novo movimento"  class="mdi mdi-plus-circle" (click)="addNewItemMoviment()"></i></th>
+                                            <th style="font-size: 20px;"><i title="Adicionar novo movimento" style="cursor: pointer;" class="mdi mdi-plus-circle" (click)="addNewItemMoviment()"></i></th>
                                           </tr>
                                         </thead>
                                       </table>
@@ -127,7 +126,18 @@
                                   <ng-container *ngFor="let movement of formMovements.controls; let i = index; let isLast = last">
                                     <ng-container [formGroupName]="i">
                                       <tr *ngIf="movement.get('display')?.value" (click)="lineDisableOutIndex(i)">
-                                        <td class="alinhamento-centro" style="vertical-align: top;  padding-top: 10px; padding-bottom: 13px">{{movement.get('order')?.value}}</td>
+                                        <td 
+                                        class="alinhamento-centro" 
+                                        style="vertical-align: top;  padding-top: 10px; padding-bottom: 13px ;font-size: 20px;">
+                                        <div style="padding-top: 10px;;">
+                                       <i 
+                                       class="mdi mdi-delete-forever"
+                                        title="Excluir essa linha e todas as suas dependências?" 
+                                        style="cursor: pointer;"
+                                        (click)="deleteMovement(i)"></i> {{movement.get('order')?.value}}
+                                      </div>
+                                      
+                                      </td>
                                         <td class="alinhamento-centro" style="vertical-align: top; padding-top: 12px; padding-bottom: 13px; padding-right: 10px;">
                                           <input 
                                           class="form-control" 
@@ -162,7 +172,7 @@
                                                       <input 
                                                       class="form-control" 
                                                       style="text-align: center;" 
-                                                      (blur)="verifyExistAccoun(movementItens, movement.get('order')?.value)" 
+                                                      (blur)="verifyExistAccount(movementItens, movement.get('order')?.value)" 
                                                       type="text" maxlength="9"
                                                        formControlName="account" 
                                                        placeholder=""
@@ -174,7 +184,9 @@
                                                       class="form-control" 
                                                       style="text-align: center;" 
                                                       type="text" 
+                                                      (keyup)="aplicarMascaraPreco($event)"
                                                       formControlName="debit"
+                                                      maxlength="10"
                                                       [ngClass]="{'is-invalid': getAccountControl(i,j,'debit')?.invalid && getAccountControl(i,j,'debit')?.touched}" 
                                                       placeholder="">
                                                     </td>
@@ -184,14 +196,27 @@
                                                       style="text-align: center;" 
                                                       type="text" 
                                                       formControlName="credit" 
+                                                      maxlength="10"
+                                                      (keyup)="aplicarMascaraPreco($event)"
                                                       [ngClass]="{'is-invalid': getAccountControl(i,j,'credit')?.invalid && getAccountControl(i,j,'credit')?.touched}" 
                                                       placeholder="">
                                                     </td>
                                                     <td class="alinhamento-centro" style="padding-top: 10px; padding-bottom: 2px; padding-right: 15px;">
-                                                      <input class="form-control" style="text-align: center;" type="text" maxlength="9" formControlName="iva" placeholder="">
+                                                      <input 
+                                                      class="form-control" 
+                                                      style="text-align: center;" 
+                                                      type="text" 
+                                                      maxlength="9" 
+                                                      formControlName="accountIva" 
+                                                      placeholder="">
                                                       
                                                     </td>
-                                                    <td style="font-size: 25px; padding-top: 10px;;"><i *ngIf="convertToFormArray(movement.get('movementsItens')).controls.length>1 && j>0" title="excluir esse movimento" (click)="deleteMovement(i,j)" class="mdi mdi-delete-forever"></i></td>
+                                                    <td style="font-size: 20px; padding-top: 10px;;">
+                                                      <i *ngIf="convertToFormArray(movement.get('movementsItens')).controls.length>1 && j>0" 
+                                                        title="excluir essa linha?" 
+                                                        style="cursor: pointer;"
+                                                        (click)="deleteMovementItens(i,j)" class="mdi mdi-delete-forever"></i>
+                                                    </td>
                                                   </tr>
                                                 </ng-container>
                                               </ng-container>
@@ -205,7 +230,8 @@
                                   </ng-container>
                                   <tr>
                                     <td style="text-align: right; width:100%; padding-top: 10px; padding-bottom: 10px;;"  colspan="4">
-                                      <button type="submit" (click)="gravarMovimento()" class="btn btn-primary me-2" >Gravar e criar novo</button>
+                                      <button type="submit" (click)="gravarMovimento()" class="btn btn-primary me-2" >Gravar</button>
+                                      <button type="submit" (click)="createNewMovement()" class="btn btn-primary me-2" >Criar novo</button>
                                     </td>
                                     
                                   </tr>
@@ -214,17 +240,9 @@
                             </td>
                           </tr>
                         </tbody>
-                      </table>
-                      
+                      </table>                      
                     </div>
-
-
-
-                  
                   </div>
-
-                
-                  
                 </div>
               </div>
             </div>
@@ -235,15 +253,11 @@
   </div>
   
   <!-- <div class="row d-flex"> -->
-
-          
-  
-
     <div class="col-md-12 grid-margin stretch-card">
       <div class="card">
         <div class="card-body">
           <div style="float: none;">
-            <button type="submit" class="btn btn-primary me-2" (click)="gravar()">Gravar</button>
+            <button type="submit" class="btn btn-primary me-2" (click)="gravar()">Finalizar gravação</button>
             <button class="btn btn-light" (click)="cancel()">Cancelar</button>
           </div> 
         </div>

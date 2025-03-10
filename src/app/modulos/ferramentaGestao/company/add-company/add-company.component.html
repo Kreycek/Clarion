@@ -160,12 +160,12 @@
           <div class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Capital</h4>
+                <h4 class="card-title"></h4>
                 <p class="card-description" style="display: none;"> A simple suggestion engine </p>
                 
                 <div class="form-group row">
                   <div class="col">
-                    <label>Social</label>
+                    <label>Capital social</label>
                     <input
                     type="text"
                     class="form-control"
@@ -181,7 +181,7 @@
                   </div>
 
                   <div class="col">
-                    <label> Nacional</label>
+                    <label> Participação nacional</label>
                     <input
                     type="text"
                     class="form-control"
@@ -192,12 +192,12 @@
                     [ngClass]="{'is-invalid': formulario.get('nationalCapital')?.invalid && formulario.get('nationalCapital')?.touched}"          
                   />
                   <div class="invalid-feedback" *ngIf="formulario.get('nationalCapital')?.invalid && formulario.get('nationalCapital')?.touched">
-                      capital nacional é obrigatório.
+                    Participação nacional é obrigatória.
                     </div>
                   </div>
 
                   <div class="col">
-                        <label> Extra</label>
+                        <label> Participação Estrangeira</label>
                         <input
                         type="text"
                         class="form-control"
@@ -208,11 +208,11 @@
                         [ngClass]="{'is-invalid': formulario.get('extraCapital')?.invalid && formulario.get('extraCapital')?.touched}"          
                       />
                       <div class="invalid-feedback" *ngIf="formulario.get('extraCapital')?.invalid && formulario.get('extraCapital')?.touched">
-                        capital extra é obrigatório.
+                        Participação Estrangeira é obrigatória.
                       </div>
                     </div>
                     <div class="col">
-                      <label> Público</label>
+                      <label> Participação Púbica</label>
                       <input
                       type="text"
                       class="form-control"
@@ -223,7 +223,7 @@
                       [ngClass]="{'is-invalid': formulario.get('publicCapital')?.invalid && formulario.get('publicCapital')?.touched}"          
                     />
                     <div class="invalid-feedback" *ngIf="formulario.get('publicCapital')?.invalid && formulario.get('publicCapital')?.touched">
-                        capital público é obrigatório.
+                      Participação Púbica é obrigatória.
                       </div>
                   </div>
                   </div>              

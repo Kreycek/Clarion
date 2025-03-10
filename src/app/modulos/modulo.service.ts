@@ -74,7 +74,37 @@ import { FormGroup, Validators } from '@angular/forms';
         });
     }
 
-
+    filterDocuments(codDaily:any, dailys:any[], addOptionAll:boolean) {
+        
+        let retorno:any[]=[]
+          let _documents=[]
+          _documents=dailys.filter((response:any)=>{
+            return response.codDaily===codDaily
+    
+          } )[0]
+    
+          if(_documents) {
+            retorno=[];
+            
+            if(_documents.documents && _documents.documents.length>0) {        
+              retorno= [..._documents.documents];
+              if(addOptionAll) {
+              retorno.unshift({
+                "codDocument": "",
+                "description": "Todos",
+                "dtAdd": ""
+              } )
+            }
+            }
+            else 
+            retorno=[]    
+          }
+          else {
+            retorno=[]
+          }
+    
+          return retorno;
+      }
 
 
 }

@@ -8,7 +8,26 @@ import { PaginatorComponent } from '../../../../paginator/paginator.component';
 import { ModalDocumentsComponent } from '../../../ferramentaGestao/daily/modal-documents/modal-documents.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as _moment from 'moment';
+import {default as _rollupMoment, Moment} from 'moment';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field'
+import {MatDatepickerModule} from '@angular/material/datepicker';
+// See the Moment.js docs for the meaning of these formats:
+// https://momentjs.com/docs/#/displaying/format/
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'MM/YYYY',
+  },
+  display: {
+    dateInput: 'MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
+const moment = _rollupMoment || _moment;
 
 @Component({
   selector: 'app-moviment',
@@ -18,9 +37,9 @@ import { FormsModule } from '@angular/forms';
     CommonModule, FormsModule,
     ModalDocumentsComponent,
     PaginatorComponent,
-   
-    
-  
+    MatInputModule,
+    MatFormFieldModule,
+    MatDatepickerModule
 ],
   templateUrl: './moviment.component.html',
   styleUrls: ['./moviment.component.css'],  // Corrigido para styleUrls
@@ -30,9 +49,12 @@ export class MovimentComponent {
   @ViewChild(ModalConfirmationComponent) modal!: ModalConfirmationComponent;
   @ViewChild(ModalDocumentsComponent) modalDocuments!: ModalDocumentsComponent;
 
+
   documents: any[] = [];
   searchCodDaily: any = '';
   searchCodDocument: string = '';
+  searchTpSearch: string = '2';
+  DataSearch: string = '';
   searchDocuments: any[] = [];
   totalRegistros: number = 0;
   totalPages: number = 1;
@@ -42,8 +64,16 @@ export class MovimentComponent {
   dados: any;
   documentModalList: any[] = [];
   dailys: any[] = [];
+  tpSearchData:any[]=[{type:2,description:' MM/AAAA '},{type:1,description:' DD/MM/AAAA '}]
 
-  constructor(
+  
+selectDate(tt:any){
+
+  
+  console.log(tt);
+
+}
+   constructor(
     private router: Router,
     private movementService: MovementService,
     public configService: ConfigService,
@@ -55,13 +85,20 @@ export class MovimentComponent {
     this.limit=this.configService.limitPaginator;
     this.dailyService.getAllOnlyDaily().subscribe((response: any) => {
       this.dailys = response;
-      console.log('getAllOnlyDaily', response);
-    });
+      
 
-    this.movementService.getAllMovement(this.currentPage, this.limit).subscribe((response: any) => {
-      this.dados = response.movements;
+    this.movementService.getAllMovement(this.currentPage, this.limit).subscribe((response: any) => {    
+      this.dados = response.movements; 
+
+      this.prepareGridData(this.dados)
+
+      
       this.totalRegistros = response.total;
       this.totalPages = response.pages;
+  
+  });
+
+      console.log('Diários', response);
     });
   }
 
@@ -96,7 +133,9 @@ export class MovimentComponent {
   searchMovement(currentPage: number) {
     let objPesquisar: {
       codDaily: string;
-      codDocument: string;    
+      codDocument: string;  
+      TypeSearchDate:number,  
+      DateMovement:string,
       page: number;
       limit: number;
     };
@@ -104,15 +143,18 @@ export class MovimentComponent {
     objPesquisar = {
       codDaily: this.searchCodDaily,
       codDocument: this.searchCodDocument,     
-     
+      TypeSearchDate:this.searchTpSearch ? + this.searchTpSearch : 2,
+      DateMovement:this.DataSearch ? moment(this.DataSearch).format('YYYY-MM-DD') : '',
       page: currentPage,
       limit: this.limit
     };
 
-    console.log('objPesquisar', objPesquisar);
 
     this.movementService.searchMovement(objPesquisar).subscribe((response: any) => {
-      this.dados = response.dailys;
+      console.log('response',response);
+      this.dados = response.movements;
+      this.prepareGridData( this.dados)    
+      
       this.totalRegistros = response.total;
       this.totalPages = response.pages;
     });
@@ -125,4 +167,37 @@ export class MovimentComponent {
   updateMovement(id: string) {
     this.router.navigate(['/aplicacao/addMovement', id]);
   }
+
+  prepareGridData(dados:[]) {
+
+    if(dados &&  dados.length>0) {
+
+      dados.forEach((element:any) => {
+
+        const dailyGrid=this.dailys.filter((dailyElement:any)=>{        
+          return dailyElement.codDaily===element.CodDaily                   
+        })[0];
+
+        if(dailyGrid) {
+          element.descriptionDaily=dailyGrid.description
+          if(dailyGrid.documents &&   dailyGrid.documents.length>0) {
+            const document=dailyGrid.documents.filter((document:any)=>{
+              return document.codDocument==element.CodDocument
+            })[0];
+            element.descriptionDocument=document.description;
+          }
+         
+        }
+        else {
+          element.descriptionDaily=''
+          element.descriptionDocument=''
+        }
+        // console.log('dailyGrid',dailyGrid);
+    })
 }
+
+  }
+}
+
+
+

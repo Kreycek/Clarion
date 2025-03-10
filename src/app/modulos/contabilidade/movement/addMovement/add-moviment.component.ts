@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
@@ -15,6 +15,7 @@ import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ChartOfAccountService } from '../../chartOfAccount/chartOfAccount.service';
+import { ModuloService } from '../../../modulo.service';
 
 @Component({
   selector: 'app-add-moviment',
@@ -56,12 +57,12 @@ export class AddMovimentComponent {
       isVisibleValidationCodDocumento=false;
       isVisibleValidationDescription=false;     
       isEdit=false;
-      idDaily:string |null = null 
+      idMovement:string |null = null 
       formulario: FormGroup| null = null;
       years:number[]=[]
       currentYear: number = new Date().getFullYear();
       dailys:any[]=[] 
-      documents:any[]=[];
+      public documents:any[]=[];
       movements:any[]=[]
 
       get documentForm() {
@@ -80,6 +81,7 @@ export class AddMovimentComponent {
           public configService:ConfigService,
           private coaService:ChartOfAccountService,
           private dailyService: DailyService,
+          public moduloService:ModuloService
       ) {} 
 
 
@@ -87,85 +89,63 @@ export class AddMovimentComponent {
     
       this.dailyService.getAllOnlyDailyActive().subscribe((response:any)=>{     
         this.dailys=response;        
-      })
+      
 
       this.route.paramMap.subscribe(params => {
         const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
-        if(id) {
+        if(id) {          
           this.isEdit=true;
-          this.movimentService.getMovementById(id??'0').subscribe((response)=>{       
-           
-            this.idDaily=id;    
+          this.movimentService.getMovementById(id??'0').subscribe((response)=>{              
+           this.documents = this.moduloService.filterDocuments(response.CodDaily, this.dailys, false)
+            this.idMovement=id;    
+            response.NewRegister=false;           
             this.createForm(response);  
 
-            if(response.Documents && response.Documents.length>0) {
-              response.Documents.forEach((element:any) => {
-              
-                this.documentForm.push(this.createDocumentForm(element.codDocument,element.description));
-              });
-            }
           })
         }
         else {
           this.isEdit=false;
-          this.createForm({active:true});   
+          this.createForm({Active:true, NewRegister:true});   
           if(this.formMovements.controls.length==0) {
 
-            this.addMovimento('','',(this.formMovements.controls.length+1).toString(),[]);
+            this.addMovimento('','',(this.formMovements.controls.length+1).toString(),true,true,[]);
             this.addNewItemMoviment();
           }
         }
       
       });    
+
+    })
   }
 
-  filterDocuments(codDaily:any) {
 
-      let _documents=[]
-      _documents=this.dailys.filter((response:any)=>{
-        return response.codDaily===codDaily
-
-      } )[0]
-
-      if(_documents) {
-        this.documents=[];
-        
-        if(_documents.documents && _documents.documents.length>0) {        
-          this.documents= [..._documents.documents];
-          this.documents.unshift({
-            "codDocument": "",
-            "description": "Todos",
-            "dtAdd": ""
-          } )
-        }
-        else 
-          this.documents=[]    
-      }
-      else {
-        this.documents=[]
-      }
-  }
     
   createForm(obj:any) {
         this.formulario = this.fb.group({
-          active: [obj.active, Validators.required],
-          display:[obj.display],
-          codDaily: [obj.codDaily, Validators.required],
-          codDocument: [obj.codDocument, Validators.required],
-          description: [obj.description, Validators.required],
+          active: [obj.Active],
+          display:[obj.Active],
+          date:[obj.Date, Validators.required],
+          codDaily: [obj.CodDaily, Validators.required],
+          codDocument: [obj.CodDocument, Validators.required],        
           movements: this.fb.array([]),
-          newRegister: [obj.newRegister??true],
+          newRegister: [obj.NewRegister],
         });      
+
+        if(obj.Movements && obj.Movements.length>0) {
+          obj.Movements.forEach((element:any) => {
+            this.addMovimento(element.description,element.date,element.order,element.active,element.active, element.movementsItens)            
+          });   
+        }
   }
 
 
-  verifyExistAccoun(field:any, index:number) {
+  verifyExistAccount(field:any, index:number) {
         const fieldValue=(field as FormGroup).controls['account']
         if(fieldValue.value) {
           this.coaService.verifyExistsChartOfAccounts({codAccount:fieldValue.value}).subscribe(async (response:any)=>{
             if(!response.message) {           
-                const resultado = await this.modal.openModal("Existe uma conta na linha " + (index).toString() + " cadastrada no plano de contas tente outra",true); 
+                const resultado = await this.modal.openModal("A Conta cadastrada na linha " + (index).toString() + " não está cadastrada no plano de contas, tente outra!",true); 
                 if (resultado) {
                   fieldValue.setValue(null,{ emitEvent: false });
                 }
@@ -174,30 +154,41 @@ export class AddMovimentComponent {
         }
   }
 
-  addMovimento(description: string, date: string, order:string, movement: any[]) {
+  addMovimento(description: string, date: string, order:string, active:boolean, display:boolean, movementItens:any[]) {
     const dds= this.fb.group({
       order:order,
       description: [description, Validators.required],
       date: [date, Validators.required] ,
-      active:true,
-      display:true,
+      active:active,
+      display:display,
       selected:true,
       movementsItens: this.fb.array([])
     });
+
+    if(movementItens && movementItens.length>0) {
+
+      movementItens.forEach((elementMovementItens:any)=>{
+
+        let faMI=dds.controls['movementsItens'] as FormArray
+
+        faMI.push(this.itemNewMovement(
+
+          elementMovementItens.codAccount,
+          elementMovementItens.debitValue,
+          elementMovementItens.creditValue,
+          elementMovementItens.codAccountIva,
+          false,
+          elementMovementItens.date,
+          elementMovementItens.active,
+          false
+        ))
+
+      })
+
+    }
     this.formMovements.insert(0,dds);      
   }
 
-  itemNewMovement(account: string, debit: string, credit: string, iva:string, newRegister:boolean): FormGroup {
-    return this.fb.group({
-      account: [account, Validators.required],
-      debit: [debit, Validators.required],
-      credit: [credit, Validators.required],
-      iva:[iva],
-      active:true,
-      display:true,
-      newRegister: [newRegister??true],
-    });
-  }
 
 
   addNewItemMoviment() {
@@ -208,8 +199,22 @@ export class AddMovimentComponent {
 
     if(movement) {
       const movements=(movement as FormGroup).controls['movementsItens'] as FormArray;
-      movements.push(this.itemNewMovement('','','','',true));
+      movements.push(this.itemNewMovement('','','','',true,new Date(),true,true));
     }
+  }
+
+  
+  itemNewMovement(account: string, debit: string, credit: string, accountIva:string, newRegister:boolean,  date:Date, active:boolean,display:boolean): FormGroup {
+    return this.fb.group({
+      account: [account, Validators.required],
+      debit: [debit, Validators.required],
+      credit: [credit, Validators.required],
+      accountIva:[accountIva],
+      date:[date],
+      active:active,
+      display:display,
+      newRegister: [newRegister],
+    });
   }
 
   convertToFormArray(obj: any) {
@@ -223,55 +228,78 @@ export class AddMovimentComponent {
       });
   }
 
-  async gravarMovimento() {
+  async verifyErrorsMovement(formGeral:boolean,formMovements:boolean) : Promise<boolean> {
 
     let linhas:number[]=[]
-
     let invalidCount=0
-    this.formMovements.controls.forEach((elementFAM:any, indexLinha:number)=>{
-      const fm=elementFAM as FormGroup
-      if(elementFAM.invalid) {
-        invalidCount++
-        linhas.push(+fm.controls['order'].value)
+   
+  
+    if(formGeral) {
+      if(this.formulario?.invalid ) {
+          this.formulario.markAllAsTouched();
+          const resultado = await this.modal.openModal("Existem dados preenchidos incorretamente, volte e corrija antes de avançar.",true); 
+          if (resultado) {    
+            return await  true;            
+          }     
+
       }
-
-    })
-
-    if(invalidCount>0) {
-      this.formMovements.markAllAsTouched();
-        const resultado = await this.modal.openModal("Existem dados de movimento inválidos" + (linhas.length>1 ? ' nas linhas ' : ' na linha ') + linhas.sort().join(',') + ' corriga antes de avançar.',true); 
-          if (resultado) {            
-          }       
+      
     }
-    else {
 
-    console.log('invalidCount',invalidCount);
+    if(formMovements) {
 
-    // if (this.formulario?.invalid) {
-    //   this.formulario.markAllAsTouched();
-    //   return;
-    // }   
+        this.formMovements.controls.forEach((elementFAM:any, indexLinha:number)=>{
+          const fm=elementFAM as FormGroup
+          if(elementFAM.invalid) {
+            invalidCount++
+            linhas.push(+fm.controls['order'].value)
+          }
 
-    this.formMovements.controls.forEach((element:any) => {
-        const movement=element as FormGroup;
-        movement.controls['display'].setValue(false,{ emitEvent: false });
+        })
 
-        const fa=movement.controls['movementsItens'] as FormArray;
-        fa.controls.forEach((element:any) => {
-            const line=element as FormGroup
-            line.controls['display'].setValue(false,{ emitEvent: false });
+        if(linhas.length>0) {
+          this.formMovements.markAllAsTouched();
+            const resultado = await this.modal.openModal("Existem dados de movimento inválidos" + (linhas.length>1 ? ' nas linhas ' : ' na linha ') + linhas.sort().join(',') + ' corrija antes de avançar.',true); 
+              if (resultado) {    
+                return await  true;        
+              }       
+        }
 
+      }
+    
+    
+  
+      return await  false
+    
+  }
+
+  async gravarMovimento() {
+
+   const hasErrors = await this.verifyErrorsMovement(false,true);
+    if (!hasErrors) {         
+        this.formMovements.controls.forEach((element:any) => {
+            const movement=element as FormGroup;
+            movement.controls['display'].setValue(false,{ emitEvent: false });
+
+            const fa=movement.controls['movementsItens'] as FormArray;
+            fa.controls.forEach((element:any) => {
+                const line=element as FormGroup
+                line.controls['display'].setValue(false,{ emitEvent: false });
+
+            });
         });
-    });
 
-    this.addMovimento('','',(this.formMovements.controls.length+1).toString(),[]);
-    this.addNewItemMoviment()
-
-    console.log('objGravar',this.formulario);
-    console.log('this.formMovements qtd',(this.formMovements.controls.length+1));
-  }
+        }
   }
 
+
+  async createNewMovement() {
+    const hasErrors = await this.verifyErrorsMovement(false,true);
+    if (!hasErrors) {      
+      this.addMovimento('','',(this.formMovements.controls.length+1).toString(), true,true,[]);
+      this.addNewItemMoviment()
+    }
+  }
   lineDisableOutIndex(index:number) {
 
     this.formMovements.controls.forEach((elementFAM:any, indexLinha:number)=>{
@@ -295,6 +323,8 @@ export class AddMovimentComponent {
     
     this.formMovements.controls.forEach((element:any) => {
       const movement=element as FormGroup;
+
+      if(movement.controls['active'].value)
       movement.controls['display'].setValue(true,{ emitEvent: false });        
   });
 
@@ -302,40 +332,99 @@ export class AddMovimentComponent {
 
   }
 
+  
 
-  gravar() {
+  async gravar() {
     
-      if (this.formulario?.invalid) {
-        this.formulario.markAllAsTouched();
-        return;
-      }
+    const hasErrors = await this.verifyErrorsMovement(true,true);
+    if (hasErrors) {  
+      return
+    }
+      
       
       const formValues=this.formulario?.value;
       const objGravar: { 
         id?:string |null;
         codDaily: string;
         description: string;
+        date:string;
+        codDocument:string;
         active:boolean;
-        documents: any[]; // Definindo o tipo correto para o array 'perfil'    
+        movements: any[]; // Definindo o tipo correto para o array 'perfil'    
         
       } ={
         id:null,
         codDaily:formValues.codDaily,
         description:formValues.description??'',       
+        date:formValues.date,
+        codDocument:formValues.codDocument,       
         active:formValues.active,
-        documents:[],           
+        movements:[],           
       }     
       
-      if(formValues.documents && formValues.documents.length) {       
-        formValues.documents.forEach((element:any) => {       
-          objGravar.documents.push({codDocument:element.codDocument, description:element.description})  
-        });              
+      if(formValues.movements && formValues.movements.length) {   
+        
+        interface ElementMovement {
+          order: number;
+          active: boolean;
+          date: string;
+          description: string;
+          movementsItens: ElementMovementsItens[]; // Especificando o tipo correto para o array
+        }
+
+              interface  ElementMovementsItens {
+                date:String,
+                codAccount:String,
+                debitValue:String,
+                creditValue:String,
+                codAccountIva:String,
+                active:Boolean
+              };
+              
+        
+                formValues.movements.forEach((element:any) => {       
+
+                         let elementMovement: ElementMovement = { 
+                              order:+element.order,                         
+                              active:element.active, 
+                              date:element.date,
+                              description:element.description,
+                              movementsItens:[]
+                          }
+
+                            if(element.movementsItens && element.movementsItens.length>0) {
+
+                              element.movementsItens.forEach((elementItens:any) => {                             
+                                let elementMovementsItens: ElementMovementsItens = {
+                                  date: elementItens.date,
+                                  codAccount: elementItens.account,
+                                  debitValue: elementItens.debit,
+                                  creditValue: elementItens.credit,
+                                  codAccountIva: elementItens.accountIva,
+                                  active: elementItens.active,
+                                };
+
+
+                                elementMovement.movementsItens.push(
+                                  elementMovementsItens
+                                 
+                                )
+
+                              })
+
+                            }
+
+
+                     objGravar.movements.push(elementMovement)  
+               });     
+               
+               console.log('objGravar',objGravar);
       }   
   
       
-      if(this.idDaily) {
+      if(this.idMovement) {
   
-        objGravar.id=this.idDaily
+        objGravar.id=this.idMovement
           this.movimentService.updateMovement(objGravar).pipe(
           tap(async (response:any) =>    {    
           
@@ -368,15 +457,7 @@ export class AddMovimentComponent {
       }  
       else {
   
-        this.movimentService.verifyExistsMovement({codDaily:objGravar.codDaily}).subscribe((async (response:any)=>{
-          if(response.message) {              
-              const resultado = await this.modal.openModal("Esse código de diário já está cadastrado tente outro",true); 
-              if (resultado) {
-              
-              }
-          }
-          else {
-            
+    
             this.movimentService.addMovement(objGravar).pipe(
               catchError((error: HttpErrorResponse) => {   
                 if (error.status === 401) {
@@ -396,37 +477,56 @@ export class AddMovimentComponent {
               }
             });
             
-            }
-        }))
+            
+  
   
       
-        }       
+         }       
     }         
          
     cancel() {
-      this.router.navigate(['/aplicacao/daily']);
+      this.router.navigate(['/aplicacao/movement']);
     }
 
     deleteDocument(index:number) {
       this.documentForm.removeAt(index);
     }
 
+    getControlMainForm(fieldName:string) {
+      return this.formulario?.get(fieldName)
+    }
 
     getControl(index: number, fieldName:string) {     
       return this.formMovements.at(index).get(fieldName);
-    }   
-
+    }  
 
     getMovementsItens(index: number): FormArray {
       return this.formMovements.at(index).get('movementsItens') as FormArray;
     }
+
     
     getAccountControl(movementIndex: number, itemIndex: number ,fieldName:string) {
       // console.log(this.getMovementsItens(movementIndex).at(itemIndex));
       return this.getMovementsItens(movementIndex).at(itemIndex).get(fieldName);
     }
 
-    deleteMovement(movementIndex: number, itemIndex: number) {
+
+    
+    deleteMovement(index: number): FormArray {
+
+      const linha = this.formMovements.at(index)
+      if(linha?.get('newRegister')?.value) {
+        this.formMovements.removeAt(index)
+      }
+      else {
+        linha?.get('active')?.setValue(false,{ emitEvent: false })
+        linha?.get('display')?.setValue(false,{ emitEvent: false })
+      }
+
+      return this.formMovements.at(index).get('movementsItens') as FormArray;
+    }
+
+    deleteMovementItens(movementIndex: number, itemIndex: number) {
       const linha=this.getMovementsItens(movementIndex).at(itemIndex);
       if(linha?.get('newRegister')?.value)
         this.getMovementsItens(movementIndex).removeAt(itemIndex)
@@ -435,4 +535,44 @@ export class AddMovimentComponent {
         linha?.get('display')?.setValue(false,{ emitEvent: false })
       }
     }
+ 
+    // aplicarMascaraPreco(event: Event): void {
+    //   const input = event.target as HTMLInputElement;
+    //   let valor = input.value;
+  
+    //   // Remove tudo o que não for número ou vírgula
+    //   valor = valor.replace(/[^0-9,]/g, '');
+  
+    //   // Adiciona o ponto como separador de milhar
+    //   valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  
+    //   // Coloca a vírgula como separador decimal (se houver)
+    //   if (valor.indexOf(',') !== -1) {
+    //     let partes = valor.split(',');
+    //     partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Aplica ponto aos milhares
+    //     valor = partes.join(',');
+    //   } else {
+    //     valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    //   }
+  
+    //   // Atualiza o valor no campo de entrada
+    //   input.value = valor;
+    // }
+    aplicarMascaraPreco(event: Event): void {
+
+      const input = event.target as HTMLInputElement;
+
+    let value = input.value;
+
+    // Remove todos os caracteres não numéricos, exceto o ponto
+    value = value.replace(/[^0-9.]/g, '');
+  
+    // Adiciona os pontos de milhar
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '');
+  
+    // Atualiza o valor do campo de entrada
+    input.value = value;
+
+  }
+
 }
