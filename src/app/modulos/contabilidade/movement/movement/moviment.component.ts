@@ -84,21 +84,13 @@ selectDate(tt:any){
 
     this.limit=this.configService.limitPaginator;
     this.dailyService.getAllOnlyDaily().subscribe((response: any) => {
-      this.dailys = response;
-      
-
-    this.movementService.getAllMovement(this.currentPage, this.limit).subscribe((response: any) => {    
-      this.dados = response.movements; 
-
-      this.prepareGridData(this.dados)
-
-      
-      this.totalRegistros = response.total;
-      this.totalPages = response.pages;
-  
-  });
-
-      console.log('Diários', response);
+        this.dailys = response;   
+          this.movementService.getAllMovement(this.currentPage, this.limit).subscribe((response: any) => {    
+            this.dados = response.movements;
+            this.prepareGridData(this.dados)            
+            this.totalRegistros = response.total;
+            this.totalPages = response.pages;        
+          });
     });
   }
 
@@ -171,6 +163,8 @@ selectDate(tt:any){
   prepareGridData(dados:[]) {
 
     if(dados &&  dados.length>0) {
+
+      console.log('dados',dados);
 
       dados.forEach((element:any) => {
 

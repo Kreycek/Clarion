@@ -388,7 +388,9 @@ export class AddCompanyComponent {
         return;
       }
 
-    this.moduloService.habilitaCamposFormGroup(formDocumentsInsert,['codDocument','description','cae'])
+
+
+    this.moduloService.habilitaCamposFormGroup(formDocumentsInsert,['documentNumber','nameDocument','address'])
     this.moduloService.habilitaCamposFormGroup(formPonesInsert,['codCountry','codState','phoneNumber'])
     this.moduloService.habilitaCamposFormGroup(formExercideInsert,['codDocument','description','address'])
 

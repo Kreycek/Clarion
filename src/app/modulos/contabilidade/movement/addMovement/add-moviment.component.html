@@ -18,9 +18,28 @@
 
 
                 <div class="form-group row" >
-                  <div class="col col-md-1">
+                  <div class="col col-md-1"  style="padding-bottom: 20px;" >
                     <label for="nome">Ativo? <span class="required">*</span></label>
-                    <input  type="checkbox"  class="form-control  form-check-input"  formControlName="active">
+                    <input type="checkbox"  class="form-control  form-check-input"  formControlName="active">
+                  </div>
+
+                  <div class="col col-md-12">
+                    <label for="nome" style="margin-right: 10px;">Empresa <span class="required">*</span></label>
+                    <mat-form-field style="width: 100%;">
+                      <mat-label> </mat-label>
+                      <input
+                       type="text" 
+                       class="form-control" 
+                       matInput  
+                       formControlName="companyFullData"  
+                       [ngClass]="{'is-invalid': getControlMainForm('companyFullData')?.invalid && getControlMainForm('companyFullData')?.touched}"
+                       [matAutocomplete]="auto">
+                      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onOptionSelected($event)">
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                          {{ option.Name }}
+                        </mat-option>
+                      </mat-autocomplete>
+                    </mat-form-field>
                   </div>
                   <div class="col">
 

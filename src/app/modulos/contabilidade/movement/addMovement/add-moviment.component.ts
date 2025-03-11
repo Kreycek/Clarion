@@ -1,12 +1,12 @@
 import { booleanAttribute, Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfigService } from '../../../../services/config.service';
 import { MovementService } from '../movement.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, tap, throwError } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, Observable, of, startWith, switchMap, tap, throwError } from 'rxjs';
 import { DailyService } from '../../../ferramentaGestao/daily/daily.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -16,6 +16,12 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ChartOfAccountService } from '../../chartOfAccount/chartOfAccount.service';
 import { ModuloService } from '../../../modulo.service';
+import { CompanyService } from '../../../ferramentaGestao/company/company.service';
+import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+
+export interface User {
+  name: string;
+}
 
 @Component({
   selector: 'app-add-moviment',
@@ -29,7 +35,8 @@ import { ModuloService } from '../../../modulo.service';
     MatInputModule,
     MatButtonModule,
     MatNativeDateModule,
-    MatSlideToggleModule 
+    MatSlideToggleModule,
+    MatAutocompleteModule
   ],
   templateUrl: './add-moviment.component.html',
   styleUrl: './add-moviment.component.css',
@@ -78,30 +85,100 @@ export class AddMovimentComponent {
           private movimentService:MovementService,
           private route: ActivatedRoute,
           private router: Router, 
-          public configService:ConfigService,
           private coaService:ChartOfAccountService,
           private dailyService: DailyService,
-          public moduloService:ModuloService
+          public moduloService:ModuloService,
+          private companyService: CompanyService,
       ) {} 
 
+      myControl = new FormControl<string | any>('');
+  options: any[] = [];
+  filteredOptions: Observable<any[]>;
+  hearFieldCompanyData() {
+    const companyFullDataControl = this.formulario?.controls['companyFullData'] as FormControl;
+
+    if (companyFullDataControl) {
+      companyFullDataControl.valueChanges.pipe(
+        startWith(''), // Inicia com um valor vazio
+        debounceTime(300), // Evita muitas requisições em pouco tempo
+        distinctUntilChanged(), // Evita chamadas repetidas com o mesmo valor
+        switchMap(value => {
+          const name = typeof value === 'string' ? value : value?.name;         
+          // Retorna um array vazio se o nome não for suficiente
+          if (!name || name.length <= 2) {
+            return of([]); // Retorna um array vazio
+          }
+
+          // Chama a API para buscar as opções
+          return this.companyService.getAllAutoCompleteCompanys(name || '').pipe(
+            map((response: any) => {
+              const companies = response.companys || [];
+
+              // Expandindo os resultados para incluir cada documento separadamente
+              return companies.flatMap((company: any) =>
+                company.Documents.map((doc: any) => ({
+                  Name: `${company.Name} - ${doc.country} - ${doc.nameDocument} - ${doc.documentNumber}`,
+                  rawData: company // Mantém o objeto original, se necessário
+                }))
+              );
+            }),
+            catchError(() => of([])) // Em caso de erro, retorna um array vazio
+          );
+        })
+      ).subscribe((options: any[]) => {
+        // Atualiza as opções filtradas após a pesquisa
+        this.filteredOptions = of(options);
+      });
+    }
+  }
+  onOptionSelected(event: MatAutocompleteSelectedEvent) {
+    const selectedOption = event.option.value; // Pega o valor da opção selecionada
+   
+    if(selectedOption) { 
+
+      console.log('selectedOption',selectedOption);
+    
+      const companyIdControl = this.formulario?.controls['companyId'];
+      const companyDocumentControl = this.formulario?.controls['companyDocument'];
+     
+      let palavras = selectedOption?.Name.split(" ");
+
+
+      
+      if (companyIdControl instanceof FormControl) {
+        companyIdControl.setValue(selectedOption?.rawData?.ID, { emitEvent: false });
+      }
+      
+      if (companyDocumentControl instanceof FormControl) {
+        companyDocumentControl.setValue(palavras[palavras.length-1], { emitEvent: false });
+      }
+    }
+    // Aqui você pode fazer o que for necessário com a opção selecionada
+    // Por exemplo, pode armazená-la em um campo ou realizar outras ações
+  }
 
   ngOnInit() {
     
-      this.dailyService.getAllOnlyDailyActive().subscribe((response:any)=>{     
-        this.dailys=response;        
-      
+    // this.companyService.getAllAutoCompleteCompanys('').subscribe((response:any)=>{     
+    //   console.log('response',response);
+    //     response.companys;       
+    // });
+
+    this.dailyService.getAllOnlyDailyActive().subscribe((response:any)=>{     
+        this.dailys=response;  
 
       this.route.paramMap.subscribe(params => {
+
         const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
         if(id) {          
           this.isEdit=true;
-          this.movimentService.getMovementById(id??'0').subscribe((response)=>{              
+          this.movimentService.getMovementById(id??'0').subscribe((response)=>{      
+            console.log('Edição documento ',response);        
            this.documents = this.moduloService.filterDocuments(response.CodDaily, this.dailys, false)
             this.idMovement=id;    
             response.NewRegister=false;           
             this.createForm(response);  
-
           })
         }
         else {
@@ -112,25 +189,29 @@ export class AddMovimentComponent {
             this.addMovimento('','',(this.formMovements.controls.length+1).toString(),true,true,[]);
             this.addNewItemMoviment();
           }
-        }
-      
-      });    
-
+        }      
+       
+      });
     })
   }
 
-
+ 
     
   createForm(obj:any) {
         this.formulario = this.fb.group({
           active: [obj.Active],
           display:[obj.Active],
           date:[obj.Date, Validators.required],
+          companyFullData: [obj.CompanyFullData? {Name:obj.CompanyFullData} : '', Validators.required],
+          companyId:[obj.CompanyId],
+          companyDocument:[obj.CompanyDocument],
           codDaily: [obj.CodDaily, Validators.required],
           codDocument: [obj.CodDocument, Validators.required],        
           movements: this.fb.array([]),
           newRegister: [obj.NewRegister],
         });      
+
+        this.hearFieldCompanyData()
 
         if(obj.Movements && obj.Movements.length>0) {
           obj.Movements.forEach((element:any) => {
@@ -138,7 +219,6 @@ export class AddMovimentComponent {
           });   
         }
   }
-
 
   verifyExistAccount(field:any, index:number) {
         const fieldValue=(field as FormGroup).controls['account']
@@ -189,8 +269,6 @@ export class AddMovimentComponent {
     this.formMovements.insert(0,dds);      
   }
 
-
-
   addNewItemMoviment() {
   
     const movement = this.formMovements.controls.filter((element:any)=>{
@@ -230,9 +308,8 @@ export class AddMovimentComponent {
 
   async verifyErrorsMovement(formGeral:boolean,formMovements:boolean) : Promise<boolean> {
 
-    let linhas:number[]=[]
-    let invalidCount=0
-   
+    let linhas:number[]=[];
+    let invalidCount=0;   
   
     if(formGeral) {
       if(this.formulario?.invalid ) {
@@ -241,9 +318,7 @@ export class AddMovimentComponent {
           if (resultado) {    
             return await  true;            
           }     
-
-      }
-      
+      }      
     }
 
     if(formMovements) {
@@ -264,13 +339,9 @@ export class AddMovimentComponent {
                 return await  true;        
               }       
         }
-
       }
-    
-    
-  
-      return await  false
-    
+
+      return await  false    
   }
 
   async gravarMovimento() {
@@ -288,8 +359,7 @@ export class AddMovimentComponent {
 
             });
         });
-
-        }
+      }
   }
 
 
@@ -325,30 +395,36 @@ export class AddMovimentComponent {
       const movement=element as FormGroup;
 
       if(movement.controls['active'].value)
-      movement.controls['display'].setValue(true,{ emitEvent: false });        
-  });
+         movement.controls['display'].setValue(true,{ emitEvent: false });        
+    });
 
-  return 0
+    return 0
 
-  }
-
-  
+  }  
 
   async gravar() {
+
+    
     
     const hasErrors = await this.verifyErrorsMovement(true,true);
     if (hasErrors) {  
       return
-    }
-      
+    }     
       
       const formValues=this.formulario?.value;
+
+      console.log('const formValues',formValues)
+
+
       const objGravar: { 
         id?:string |null;
         codDaily: string;
         description: string;
         date:string;
         codDocument:string;
+        companyDocument:string;
+        companyFullData:string;
+        companyId:string;
         active:boolean;
         movements: any[]; // Definindo o tipo correto para o array 'perfil'    
         
@@ -358,6 +434,9 @@ export class AddMovimentComponent {
         description:formValues.description??'',       
         date:formValues.date,
         codDocument:formValues.codDocument,       
+        companyDocument:formValues.companyDocument,
+        companyFullData:formValues.companyFullData.Name,    
+        companyId:formValues.companyId,    
         active:formValues.active,
         movements:[],           
       }     
@@ -475,12 +554,7 @@ export class AddMovimentComponent {
               } else {
                 console.log("Usuário cancelou.");
               }
-            });
-            
-            
-  
-  
-      
+            });      
          }       
     }         
          
@@ -509,8 +583,6 @@ export class AddMovimentComponent {
       // console.log(this.getMovementsItens(movementIndex).at(itemIndex));
       return this.getMovementsItens(movementIndex).at(itemIndex).get(fieldName);
     }
-
-
     
     deleteMovement(index: number): FormArray {
 
@@ -573,6 +645,16 @@ export class AddMovimentComponent {
     // Atualiza o valor do campo de entrada
     input.value = value;
 
+  }
+
+  displayFn(company: any): string {
+    return company ? company.Name : '';
+  }
+
+  private _filter(name: string): User[] {
+    const filterValue = name.toLowerCase();
+
+    return this.options.filter(option => option.name.toLowerCase().includes(filterValue));
   }
 
 }
