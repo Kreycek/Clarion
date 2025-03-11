@@ -1,6 +1,9 @@
 
-  import { Injectable } from '@angular/core';
+  import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { ConfigService } from '../services/config.service';
   
   
   
@@ -10,6 +13,10 @@ import { FormGroup, Validators } from '@angular/forms';
   })
   export class ModuloService {
   
+      constructor(
+        private http: HttpClient,
+        private configService:ConfigService
+      ) {}
   
     desabilitaCamposFormGroup(form:FormGroup) {
         Object.keys(form.controls).forEach(controlName => {
@@ -104,6 +111,14 @@ import { FormGroup, Validators } from '@angular/forms';
           }
     
           return retorno;
+      }
+      
+      getLastDataCoin(daily:any): Observable<any> {
+        return this.http.get("https://economia.awesomeapi.com.br/json/last/"+ daily, {
+          headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+          }),
+        });
       }
 
 

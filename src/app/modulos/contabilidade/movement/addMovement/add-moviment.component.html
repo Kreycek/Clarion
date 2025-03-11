@@ -41,6 +41,10 @@
                       </mat-autocomplete>
                     </mat-form-field>
                   </div>
+
+               
+
+
                   <div class="col">
 
                     <label for="nome" style="margin-right: 10px;">Data <span class="required">*</span></label>
@@ -108,12 +112,10 @@
           <div class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;" >
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Movimentos <a href="javascript:void(0)" (click)="viewAllMovements()">ver todos</a> </h4>
+                <h4 class="card-title">Movimentos &nbsp;<button type="submit" (click)="viewAllMovements()" class="btn btn-primary me-2" >{{textBtnViewAll}}</button>   &nbsp;  <button type="submit" (click)="createNewMovement()" class="btn btn-primary me-2" >Criar novo movimento</button>  </h4>
                 <p class="card-description" style="display: none;"> A simple suggestion engine </p>
-                <div class="form-group row g-1">         
-
+                <div class="form-group row g-1">   
                   <div style="width: 100%;" formGroupName="movements">
-
                     <div class="table-responsive">
                       <table class="tabela-customizada" style="border-spacing: 10px; width: 100%;">
                         <tbody>
@@ -133,7 +135,13 @@
                                             <th class="alinhamento-centro" style="width: 25%;">Débito <span class="required">*</span></th>
                                             <th class="alinhamento-centro" style="width: 25%;">Crédito <span class="required">*</span></th>
                                             <th class="alinhamento-centro" style="width: 25%;">IVA</th>
-                                            <th style="font-size: 20px;"><i title="Adicionar novo movimento" style="cursor: pointer;" class="mdi mdi-plus-circle" (click)="addNewItemMoviment()"></i></th>
+                                            <th style="font-size: 20px;">
+                                              <i 
+                                                title="Adicionar novo movimento" 
+                                                style="cursor: pointer;" 
+                                                class="mdi mdi-plus-circle" 
+                                                (click)="addNewItemMoviment()"                                                
+                                                ></i></th>
                                           </tr>
                                         </thead>
                                       </table>
@@ -174,8 +182,7 @@
                                           (click)="picker2.open()"
                                           formControlName="date"
                                           class="form-control w-100"
-                                          [ngClass]="{'is-invalid': getControl(i,'date')?.invalid && getControl(i,'date')?.touched}"
-                                               
+                                          [ngClass]="{'is-invalid': getControl(i,'date')?.invalid && getControl(i,'date')?.touched}"                                               
                                           >                        
                                           <mat-datepicker #picker2></mat-datepicker>
                                         </div>
@@ -249,8 +256,8 @@
                                   </ng-container>
                                   <tr>
                                     <td style="text-align: right; width:100%; padding-top: 10px; padding-bottom: 10px;;"  colspan="4">
-                                      <button type="submit" (click)="gravarMovimento()" class="btn btn-primary me-2" >Gravar</button>
-                                      <button type="submit" (click)="createNewMovement()" class="btn btn-primary me-2" >Criar novo</button>
+                                      <button type="submit" *ngIf="viewBtnGravarItensMovement" (click)="gravarMovimento()" class="btn btn-primary me-2" >Gravar</button>
+                                      
                                     </td>
                                     
                                   </tr>

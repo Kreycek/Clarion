@@ -63,7 +63,4 @@ export class MovementService {
     });
   }
 
- 
-
-
 }

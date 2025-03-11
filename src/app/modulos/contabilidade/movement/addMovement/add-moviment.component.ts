@@ -56,9 +56,6 @@ export class AddMovimentComponent {
   
   calendarOpen = false;
 
-    toggleCalendar() {
-      this.calendarOpen = !this.calendarOpen;
-    }
       documentMiniFormCod:string=''
       documentMiniFormDescription:string=''
       isVisibleValidationCodDocumento=false;
@@ -70,7 +67,11 @@ export class AddMovimentComponent {
       currentYear: number = new Date().getFullYear();
       dailys:any[]=[] 
       public documents:any[]=[];
-      movements:any[]=[]
+      movements:any[]=[];
+      filteredOptions: Observable<any[]>;
+      viewBtnGravarItensMovement=false;
+      view: boolean = true;
+      textBtnViewAll='Ocultar todos'
 
       get documentForm() {
         return (this.formulario?.get('documents') as FormArray);
@@ -91,71 +92,8 @@ export class AddMovimentComponent {
           private companyService: CompanyService,
       ) {} 
 
-      myControl = new FormControl<string | any>('');
-  options: any[] = [];
-  filteredOptions: Observable<any[]>;
-  hearFieldCompanyData() {
-    const companyFullDataControl = this.formulario?.controls['companyFullData'] as FormControl;
 
-    if (companyFullDataControl) {
-      companyFullDataControl.valueChanges.pipe(
-        startWith(''), // Inicia com um valor vazio
-        debounceTime(300), // Evita muitas requisições em pouco tempo
-        distinctUntilChanged(), // Evita chamadas repetidas com o mesmo valor
-        switchMap(value => {
-          const name = typeof value === 'string' ? value : value?.name;         
-          // Retorna um array vazio se o nome não for suficiente
-          if (!name || name.length <= 2) {
-            return of([]); // Retorna um array vazio
-          }
-
-          // Chama a API para buscar as opções
-          return this.companyService.getAllAutoCompleteCompanys(name || '').pipe(
-            map((response: any) => {
-              const companies = response.companys || [];
-
-              // Expandindo os resultados para incluir cada documento separadamente
-              return companies.flatMap((company: any) =>
-                company.Documents.map((doc: any) => ({
-                  Name: `${company.Name} - ${doc.country} - ${doc.nameDocument} - ${doc.documentNumber}`,
-                  rawData: company // Mantém o objeto original, se necessário
-                }))
-              );
-            }),
-            catchError(() => of([])) // Em caso de erro, retorna um array vazio
-          );
-        })
-      ).subscribe((options: any[]) => {
-        // Atualiza as opções filtradas após a pesquisa
-        this.filteredOptions = of(options);
-      });
-    }
-  }
-  onOptionSelected(event: MatAutocompleteSelectedEvent) {
-    const selectedOption = event.option.value; // Pega o valor da opção selecionada
-   
-    if(selectedOption) { 
-
-      console.log('selectedOption',selectedOption);
-    
-      const companyIdControl = this.formulario?.controls['companyId'];
-      const companyDocumentControl = this.formulario?.controls['companyDocument'];
-     
-      let palavras = selectedOption?.Name.split(" ");
-
-
-      
-      if (companyIdControl instanceof FormControl) {
-        companyIdControl.setValue(selectedOption?.rawData?.ID, { emitEvent: false });
-      }
-      
-      if (companyDocumentControl instanceof FormControl) {
-        companyDocumentControl.setValue(palavras[palavras.length-1], { emitEvent: false });
-      }
-    }
-    // Aqui você pode fazer o que for necessário com a opção selecionada
-    // Por exemplo, pode armazená-la em um campo ou realizar outras ações
-  }
+ 
 
   ngOnInit() {
     
@@ -185,9 +123,9 @@ export class AddMovimentComponent {
           this.isEdit=false;
           this.createForm({Active:true, NewRegister:true});   
           if(this.formMovements.controls.length==0) {
-
             this.addMovimento('','',(this.formMovements.controls.length+1).toString(),true,true,[]);
             this.addNewItemMoviment();
+            this.viewBtnGravarItensMovement=true;
           }
         }      
        
@@ -278,6 +216,7 @@ export class AddMovimentComponent {
     if(movement) {
       const movements=(movement as FormGroup).controls['movementsItens'] as FormArray;
       movements.push(this.itemNewMovement('','','','',true,new Date(),true,true));
+      this.viewBtnGravarItensMovement=true;
     }
   }
 
@@ -367,7 +306,8 @@ export class AddMovimentComponent {
     const hasErrors = await this.verifyErrorsMovement(false,true);
     if (!hasErrors) {      
       this.addMovimento('','',(this.formMovements.controls.length+1).toString(), true,true,[]);
-      this.addNewItemMoviment()
+      this.addNewItemMoviment();
+      this.viewBtnGravarItensMovement=true;
     }
   }
   lineDisableOutIndex(index:number) {
@@ -390,21 +330,26 @@ export class AddMovimentComponent {
   }
 
   viewAllMovements() {
-    
-    this.formMovements.controls.forEach((element:any) => {
-      const movement=element as FormGroup;
+    // Alterna o valor da propriedade view
+    this.view = !this.view;
 
-      if(movement.controls['active'].value)
-         movement.controls['display'].setValue(true,{ emitEvent: false });        
+    if(!this.view)
+      this.textBtnViewAll='Exibir todos'
+    else 
+     this.textBtnViewAll='Ocultar todos'
+    
+    console.log('this.view',this.view);
+    // Percorre os controles do formulário e atualiza o campo 'display'
+    this.formMovements.controls.forEach((element: any) => {
+      const movement = element as FormGroup;
+      if (movement.controls['active'].value) {
+        // Aqui, setamos o valor de 'display' para o valor atual de this.view
+        movement.controls['display'].setValue(this.view, { emitEvent: false });
+      }
     });
+  }
 
-    return 0
-
-  }  
-
-  async gravar() {
-
-    
+  async gravar() {   
     
     const hasErrors = await this.verifyErrorsMovement(true,true);
     if (hasErrors) {  
@@ -647,14 +592,66 @@ export class AddMovimentComponent {
 
   }
 
+  
+  hearFieldCompanyData() {
+    const companyFullDataControl = this.formulario?.controls['companyFullData'] as FormControl;
+
+    if (companyFullDataControl) {
+      companyFullDataControl.valueChanges.pipe(
+        startWith(''), // Inicia com um valor vazio
+        debounceTime(300), // Evita muitas requisições em pouco tempo
+        distinctUntilChanged(), // Evita chamadas repetidas com o mesmo valor
+        switchMap(value => {
+          const name = typeof value === 'string' ? value : value?.name;         
+          // Retorna um array vazio se o nome não for suficiente
+          if (!name || name.length <= 2) {
+            return of([]); // Retorna um array vazio
+          }
+
+          // Chama a API para buscar as opções
+          return this.companyService.getAllAutoCompleteCompanys(name || '').pipe(
+            map((response: any) => {
+              const companies = response.companys || [];
+
+              // Expandindo os resultados para incluir cada documento separadamente
+              return companies.flatMap((company: any) =>
+                company.Documents.map((doc: any) => ({
+                  Name: `${company.Name} - ${doc.country} - ${doc.nameDocument} - ${doc.documentNumber}`,
+                  rawData: company // Mantém o objeto original, se necessário
+                }))
+              );
+            }),
+            catchError(() => of([])) // Em caso de erro, retorna um array vazio
+          );
+        })
+      ).subscribe((options: any[]) => {
+        // Atualiza as opções filtradas após a pesquisa
+        this.filteredOptions = of(options);
+      });
+    }
+  }
+  onOptionSelected(event: MatAutocompleteSelectedEvent) {
+    const selectedOption = event.option.value; // Pega o valor da opção selecionada
+   
+    if(selectedOption) { 
+    
+      const companyIdControl = this.formulario?.controls['companyId'];
+      const companyDocumentControl = this.formulario?.controls['companyDocument'];     
+      let palavras = selectedOption?.Name.split(" ");
+      
+      if (companyIdControl instanceof FormControl) {
+        companyIdControl.setValue(selectedOption?.rawData?.ID, { emitEvent: false });
+      }
+      
+      if (companyDocumentControl instanceof FormControl) {
+        companyDocumentControl.setValue(palavras[palavras.length-1], { emitEvent: false });
+      }
+    }
+    // Aqui você pode fazer o que for necessário com a opção selecionada
+    // Por exemplo, pode armazená-la em um campo ou realizar outras ações
+  }
+
   displayFn(company: any): string {
     return company ? company.Name : '';
-  }
-
-  private _filter(name: string): User[] {
-    const filterValue = name.toLowerCase();
-
-    return this.options.filter(option => option.name.toLowerCase().includes(filterValue));
-  }
-
+  } 
 }
