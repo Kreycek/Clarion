@@ -65,7 +65,7 @@ export class CompanyService {
   }
 
   getAllAutoCompleteCompanys(name:string): Observable<any> {
-    return this.http.get(this.configService.apiUrl + "/GetAllAutoComplete?name="+name, {
+    return this.http.get(this.configService.apiUrl + "/GetAllCompanyAutoComple?name="+name, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),

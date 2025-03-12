@@ -147,7 +147,7 @@ export class CompanyComponent {
 
   async viewCompanyExercises(item:any) { 
 
-    if(item.Exercise  && item.Phone.length>0) {
+    if(item.Exercise  && item.Exercise.length>0) {
        let ExerciseModalList:any[]=[];         
  
        item.Exercise.forEach(async (element:any)=>{

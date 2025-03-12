@@ -1,13 +1,6 @@
 
 
-<app-modal-documents
-
-
-
->
-    
-</app-modal-documents>
-
+<app-modal-documents></app-modal-documents>
 
 <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
@@ -66,8 +59,8 @@
                 <td> {{item.CodDaily}} </td>
                 <td> {{item.Description}} </td>
                 <td> 
-                  <span style="font-size: 15px; cursor: pointer;" (click)="viewDailyDocuments(item)">Visualizar</span>
-                 
+                  <span *ngIf="item.Documents && item.Documents.length>0" style="font-size: 15px; cursor: pointer;" (click)="viewDailyDocuments(item)">Visualizar</span>
+                 <span *ngIf="item.Documents && item.Documents.length==0">Não cadastrado</span>
                 </td>
                
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>

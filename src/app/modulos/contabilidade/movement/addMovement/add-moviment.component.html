@@ -1,103 +1,94 @@
-<app-modal-ok
- 
-
-  ></app-modal-ok>
+<app-modal-ok></app-modal-ok>
   
 <form [formGroup]="formulario" *ngIf="formulario">
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">{{idMovement ? 'Editar' : 'Novo'}} Movimento</h4>
-             
-
           <div class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;">
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Dados principais</h4>
                 <p class="card-description" style="display: none;"> A simple suggestion engine </p>
-
-
                 <div class="form-group row" >
                   <div class="col col-md-1"  style="padding-bottom: 20px;" >
                     <label for="nome">Ativo? <span class="required">*</span></label>
                     <input type="checkbox"  class="form-control  form-check-input"  formControlName="active">
                   </div>
 
-                  <div class="col col-md-12">
+                  <div class="col col-md-12" style="padding-bottom: 15px;;">
                     <label for="nome" style="margin-right: 10px;">Empresa <span class="required">*</span></label>
-                    <mat-form-field style="width: 100%;">
-                      <mat-label> </mat-label>
-                      <input
-                       type="text" 
-                       class="form-control" 
-                       matInput  
-                       formControlName="companyFullData"  
-                       [ngClass]="{'is-invalid': getControlMainForm('companyFullData')?.invalid && getControlMainForm('companyFullData')?.touched}"
-                       [matAutocomplete]="auto">
-                      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onOptionSelected($event)">
-                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                          {{ option.Name }}
-                        </mat-option>
-                      </mat-autocomplete>
-                    </mat-form-field>
+                    <input type="text"
+                    class="form-control" 
+                    placeholder="Procurar empresa"
+                    formControlName="companyFullData"
+                    [matAutocomplete]="auto"
+                    [ngClass]="{'is-invalid': getControlMainForm('companyFullData')?.invalid && getControlMainForm('companyFullData')?.touched}"
+                  >
+                    <mat-autocomplete class="mat-autocomplete" (optionSelected)="onOptionSelected($event)"  #auto="matAutocomplete" [displayWith]="displayFn">
+                      @for (option of filteredOptions | async; track option) {                
+                        <mat-option style="background-color: white;" [value]="option">{{ option.Name }}</mat-option>
+                      }
+                    </mat-autocomplete>                   
                   </div>
-
-               
-
-
-                  <div class="col">
-
-                    <label for="nome" style="margin-right: 10px;">Data <span class="required">*</span></label>
-                    <div style="display: flex; align-items: center; width: 100%;">
-                      <div style="display: flex; flex-direction: column; flex-grow: 1;">
-                        <input 
-                          class="form-control w-100"
-                          matInput [matDatepicker]="picker" 
-                          placeholder="Escolha uma data" 
-                          formControlName="date" 
-                          [ngClass]="{'is-invalid': getControlMainForm('date')?.invalid && getControlMainForm('date')?.touched}"
-                          (click)="picker.open()">  
-                        <div class="invalid-feedback" *ngIf="formulario.get('date')?.invalid">
-                          Selecione uma data
+                  <div class="col">                   
+                    <div class="form-group row" >                    
+                      <div class="col col-md-6">
+                        <label for="nome"> Mês<span class="required">*</span></label>
+                        <select 
+                          id="month" 
+                          formControlName="month"                         
+                          class="form-select"
+                          [ngClass]="{'is-invalid': formulario.get('month')?.invalid && formulario.get('month')?.touched}">              
+                          <option *ngFor="let month of configService.months" [value]="month.value">
+                            {{month.name}}
+                          </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formulario.get('month')?.invalid && formulario.get('month')?.touched">
+                          O Mês é obrigatório.
                         </div>
                       </div>
-                      <div style="display: flex; align-items: center; padding-left: 2px; margin-top: 2; vertical-align: top;">
-                        <mat-datepicker-toggle [for]="picker" matButton></mat-datepicker-toggle> 
-                      </div>                 
-                      <mat-datepicker #picker></mat-datepicker>
+                      <div class="col col-md-6">
+                        <label for="nome">Ano<span class="required">*</span></label>
+                        <select 
+                        id="year" 
+                        formControlName="year"  
+                        class="form-select"
+                        [ngClass]="{'is-invalid': formulario.get('year')?.invalid && formulario.get('year')?.touched}"          
+                        >              
+                          <option *ngFor="let item of years" [value]="item.year">{{item.year}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formulario.get('year')?.invalid && formulario.get('year')?.touched">
+                          O Ano é obrigatório.
+                        </div>                      
+                      </div>                   
                     </div>
-                     
-                    
                   </div>
                   <div class="col">
                     <label for="nome">Cód. do diário <span class="required">*</span></label>
-
                     <select id="codDaily"  
-                    formControlName="codDaily" 
-                    (change)="this.documents = this.moduloService.filterDocuments(formulario.get('codDaily')?.value,this.dailys,false)" 
-                    class="form-select"
-                    [ngClass]="{'is-invalid': getControlMainForm('codDaily')?.invalid && getControlMainForm('codDaily')?.touched}"
-                    >
+                      formControlName="codDaily" 
+                      (change)="this.documents = this.moduloService.filterDocuments(formulario.get('codDaily')?.value,this.dailys,false)" 
+                      class="form-select"
+                      [ngClass]="{'is-invalid': getControlMainForm('codDaily')?.invalid && getControlMainForm('codDaily')?.touched}">
                         <option value="">Todos</option>
                         <option *ngFor="let daily of dailys" [value]="daily.codDaily">{{ daily.codDaily + " - " +  daily.description }}</option>
-                      </select>
-                  
+                      </select>                  
                     <div class="invalid-feedback" *ngIf="formulario.get('codDaily')?.invalid && formulario.get('codDaily')?.touched">
                       O código do diário obrigatório.
                     </div>
-
                   </div>
                   <div class="col">
                     <label for="description">Cód. do documento<span class="required">*</span></label>
                     <select 
-                    id="codDocument" 
-                    formControlName="codDocument"  
-                    [ngClass]="{'is-invalid': getControlMainForm('codDocument')?.invalid && getControlMainForm('codDocument')?.touched}"
-                    class="form-select"
-                    >                 
-                        <option *ngFor="let document of documents" [value]="document.codDocument">{{document.codDocument + ' - '  + document.description }}</option>
-                      </select>
-        
+                      id="codDocument" 
+                      formControlName="codDocument"  
+                      [ngClass]="{'is-invalid': getControlMainForm('codDocument')?.invalid && getControlMainForm('codDocument')?.touched}"
+                      class="form-select">                 
+                        <option *ngFor="let document of documents" [value]="document.codDocument">
+                          {{document.codDocument + ' - '  + document.description }}
+                        </option>
+                    </select>        
                     <div class="invalid-feedback" *ngIf="formulario.get('codDocument')?.invalid && formulario.get('codDocument')?.touched">
                        A descrição do diário é obrigatória.
                       </div>
@@ -107,12 +98,12 @@
               </div>
             </div>
           </div>
-          
-
           <div class="col-md-12 grid-margin stretch-card" style="border-style: solid; border-width: 1px;" >
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Movimentos &nbsp;<button type="submit" (click)="viewAllMovements()" class="btn btn-primary me-2" >{{textBtnViewAll}}</button>   &nbsp;  <button type="submit" (click)="createNewMovement()" class="btn btn-primary me-2" >Criar novo movimento</button>  </h4>
+                <h4 class="card-title">Movimentos &nbsp;
+                  <button type="submit" style="transform: scale(0.9); display: none;" (click)="viewAllMovements()" class="btn btn-primary me-2" >{{textBtnViewAll}}</button>
+                  <button type="submit" (click)="createNewMovement()" style="transform: scale(0.9); display: none;" class="btn btn-primary me-2" >Criar novo movimento</button>  </h4>
                 <p class="card-description" style="display: none;"> A simple suggestion engine </p>
                 <div class="form-group row g-1">   
                   <div style="width: 100%;" formGroupName="movements">
@@ -126,7 +117,7 @@
                                   <tr>
                                     <th class="alinhamento-centro">Ordem</th>
                                     <th class="alinhamento-centro">Descrição <span class="required">*</span></th>
-                                    <th class="alinhamento-centro">Data <span class="required">*</span></th>
+                                    <th class="alinhamento-centro">Data do documento <span class="required">*</span></th>
                                     <th style="vertical-align: center;">
                                       <table class="tabela-customizada" style="border-spacing: 10px; width: 100%;">
                                         <thead>
@@ -145,8 +136,7 @@
                                           </tr>
                                         </thead>
                                       </table>
-                                    </th>
-                                   
+                                    </th>                                   
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -156,15 +146,14 @@
                                         <td 
                                         class="alinhamento-centro" 
                                         style="vertical-align: top;  padding-top: 10px; padding-bottom: 13px ;font-size: 20px;">
-                                        <div style="padding-top: 10px;;">
-                                       <i 
-                                       class="mdi mdi-delete-forever"
-                                        title="Excluir essa linha e todas as suas dependências?" 
-                                        style="cursor: pointer;"
-                                        (click)="deleteMovement(i)"></i> {{movement.get('order')?.value}}
-                                      </div>
-                                      
-                                      </td>
+                                          <div style="padding-top: 10px;;">
+                                          <i 
+                                          class="mdi mdi-delete-forever"
+                                            title="Excluir essa linha e todas as suas dependências?" 
+                                            style="cursor: pointer;"
+                                            (click)="deleteMovement(i)"></i> {{movement.get('order')?.value}}
+                                          </div>                                      
+                                        </td>
                                         <td class="alinhamento-centro" style="vertical-align: top; padding-top: 12px; padding-bottom: 13px; padding-right: 10px;">
                                           <input 
                                           class="form-control" 
@@ -176,17 +165,15 @@
                                         </td>
                                         <td class="alinhamento-centro" style="vertical-align: top; border-spacing: 10px; padding-top: 13px; padding-bottom: 10px; padding-right: 10px;">
                                           <div id="bloodhound"> 
-                                          <input 
-                                          matInput [matDatepicker]="picker2" 
-                                          placeholder="Escolha uma data"
-                                          (click)="picker2.open()"
-                                          formControlName="date"
-                                          class="form-control w-100"
-                                          [ngClass]="{'is-invalid': getControl(i,'date')?.invalid && getControl(i,'date')?.touched}"                                               
-                                          >                        
-                                          <mat-datepicker #picker2></mat-datepicker>
-                                        </div>
-                                      
+                                            <input 
+                                            matInput [matDatepicker]="picker2" 
+                                            placeholder="Escolha uma data"
+                                            (click)="picker2.open()"
+                                            formControlName="date"
+                                            class="form-control w-100"
+                                            [ngClass]="{'is-invalid': getControl(i,'date')?.invalid && getControl(i,'date')?.touched}">                        
+                                            <mat-datepicker #picker2></mat-datepicker>
+                                          </div>                                      
                                         </td>
                                         <td colspan="2">
                                           <table class="tabela-customizada" style="border-spacing: 10px; width: 100%;">
@@ -194,16 +181,20 @@
                                               <ng-container *ngFor="let movementItens of convertToFormArray(movement.get('movementsItens')).controls; let j = index; let isLast = last">
                                                 <ng-container [formGroupName]="j">
                                                   <tr *ngIf="movementItens.get('display')?.value">
-                                                    <td class="alinhamento-centro" style="padding-top: 10px; padding-bottom: 2px; padding-right: 15px;">
-                                                      <input 
+                                                    <td class="alinhamento-centro"  style="padding-top: 10px; padding-bottom: 2px; padding-right: 15px;">
+                                                      <input type="text"
                                                       class="form-control" 
-                                                      style="text-align: center;" 
+                                                      placeholder="Procurar conta"
+                                                      formControlName="account"        
                                                       (blur)="verifyExistAccount(movementItens, movement.get('order')?.value)" 
-                                                      type="text" maxlength="9"
-                                                       formControlName="account" 
-                                                       placeholder=""
-                                                       [ngClass]="{'is-invalid': getAccountControl(i,j,'account')?.invalid && getAccountControl(i,j,'account')?.touched}"
-                                                       >
+                                                      [matAutocomplete]="auto"
+                                                      [ngClass]="{'is-invalid': getAccountControl(i,j,'account')?.invalid && getAccountControl(i,j,'account')?.touched}" 
+                                                      >
+                                                      <mat-autocomplete class="mat-autocomplete" (optionSelected)="onOptionAccountSelected($event,i,j)"  #auto="matAutocomplete" [displayWith]="displayAccountFn">
+                                                        @for (option of filteredAccountOptions | async; track option) {
+                                                          <mat-option style="background-color: white;" [value]="option">    {{option.CodAccount + ' - ' + option.Description}}</mat-option>
+                                                        }
+                                                      </mat-autocomplete>
                                                     </td>
                                                     <td class="alinhamento-centro" style="padding-top: 10px; padding-bottom: 2px; padding-right: 15px;">
                                                       <input 
@@ -249,17 +240,13 @@
                                             </tbody>
                                           </table>
                                         </td>
-                                      </tr>
-                                      
-                                    </ng-container>
-                                   
+                                      </tr>                                      
+                                    </ng-container>                                   
                                   </ng-container>
-                                  <tr>
+                                  <tr  *ngIf="viewBtnGravarItensMovement">
                                     <td style="text-align: right; width:100%; padding-top: 10px; padding-bottom: 10px;;"  colspan="4">
-                                      <button type="submit" *ngIf="viewBtnGravarItensMovement" (click)="gravarMovimento()" class="btn btn-primary me-2" >Gravar</button>
-                                      
-                                    </td>
-                                    
+                                      <button type="submit" style="display: none;"  (click)="gravarMovimento()" class="btn btn-primary me-2" >Gravar</button>                                      
+                                    </td>                                    
                                   </tr>
                                 </tbody>
                               </table>
@@ -270,25 +257,14 @@
                     </div>
                   </div>
                 </div>
+                <div>
+                  <button style="transform: scale(0.9);" type="submit" class="btn btn-primary me-2" (click)="gravar()">Finalizar gravação</button>
+                  <button style="transform: scale(0.9);" class="btn btn-light" (click)="cancel()">Cancelar</button>
+                </div>
               </div>
             </div>
-          </div>
-      
+          </div>      
       </div>
     </div>
   </div>
-  
-  <!-- <div class="row d-flex"> -->
-    <div class="col-md-12 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body">
-          <div style="float: none;">
-            <button type="submit" class="btn btn-primary me-2" (click)="gravar()">Finalizar gravação</button>
-            <button class="btn btn-light" (click)="cancel()">Cancelar</button>
-          </div> 
-        </div>
-      </div>
-    </div>
-             
-            <!-- </div> -->
 </form>

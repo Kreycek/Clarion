@@ -66,10 +66,19 @@
               <tr *ngFor="let item of dados">              
                 <td> {{item.CodCompany}} </td>
                 <td> {{item.Name}} </td>
-                <td> <span style="font-size: 15px; cursor: pointer;" (click)="viewCompanyExercises(item)">Visualizar</span>   </td>
-                <td>  <span style="font-size: 15px; cursor: pointer;" (click)="viewCompanyPhones(item)">Visualizar</span>   </td>
-                <td> 
-                  <span style="font-size: 15px; cursor: pointer;" (click)="viewCompanyDocuments(item)">Visualizar</span>                 
+                <td > 
+                  <span *ngIf="item.Exercise  && item.Exercise.length>0" style="font-size: 15px; cursor: pointer;" (click)="viewCompanyExercises(item)">Visualizar</span>   
+                  <span *ngIf="item.Exercise && item.Exercise.length==0">Não cadastrado</span>
+                
+                </td>
+                <td >  
+                  <span *ngIf="item.Phone && item.Phone.length>0" style="font-size: 15px; cursor: pointer;" (click)="viewCompanyPhones(item)">Visualizar</span>   
+                  <span *ngIf="item.Phone && item.Phone.length==0">Não cadastrado</span>
+                
+                </td>
+                <td > 
+                  <span *ngIf="item.Documents && item.Documents.length>0" style="font-size: 15px; cursor: pointer;" (click)="viewCompanyDocuments(item)">Visualizar</span>                 
+                  <span *ngIf="item.Documents && item.Documents.length==0">Não cadastrado</span>
                 </td>               
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
                 <td style="text-align: right;">                                        

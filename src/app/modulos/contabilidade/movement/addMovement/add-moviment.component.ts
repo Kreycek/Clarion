@@ -52,10 +52,9 @@ export interface User {
 
 })
 export class AddMovimentComponent {
-  @ViewChild(ModalOkComponent) modal!: ModalOkComponent; 
-  
-  calendarOpen = false;
 
+
+      @ViewChild(ModalOkComponent) modal!: ModalOkComponent; 
       documentMiniFormCod:string=''
       documentMiniFormDescription:string=''
       isVisibleValidationCodDocumento=false;
@@ -63,7 +62,7 @@ export class AddMovimentComponent {
       isEdit=false;
       idMovement:string |null = null 
       formulario: FormGroup| null = null;
-      years:number[]=[]
+      years:any[]=[]
       currentYear: number = new Date().getFullYear();
       dailys:any[]=[] 
       public documents:any[]=[];
@@ -72,6 +71,9 @@ export class AddMovimentComponent {
       viewBtnGravarItensMovement=false;
       view: boolean = true;
       textBtnViewAll='Ocultar todos'
+      filteredAccountOptions: Observable<any[]>;
+      
+     
 
       get documentForm() {
         return (this.formulario?.get('documents') as FormArray);
@@ -90,6 +92,7 @@ export class AddMovimentComponent {
           private dailyService: DailyService,
           public moduloService:ModuloService,
           private companyService: CompanyService,
+          public configService: ConfigService,
       ) {} 
 
 
@@ -109,14 +112,20 @@ export class AddMovimentComponent {
 
         const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
-        if(id) {          
+        if(id) {            
           this.isEdit=true;
           this.movimentService.getMovementById(id??'0').subscribe((response)=>{      
-            console.log('Edição documento ',response);        
-           this.documents = this.moduloService.filterDocuments(response.CodDaily, this.dailys, false)
-            this.idMovement=id;    
-            response.NewRegister=false;           
-            this.createForm(response);  
+              console.log('Edição documento ',response);
+              this.companyService.getCompanyById(response.CompanyId).subscribe((response)=>{
+                console.log('AAAAA',response);
+                this.years=response.Exercise;
+              })
+
+              this.documents = this.moduloService.filterDocuments(response.CodDaily, this.dailys, false);
+              this.idMovement=id;    
+              response.NewRegister=false;           
+              this.createForm(response); 
+              this.viewBtnGravarItensMovement=true; 
           })
         }
         else {
@@ -131,15 +140,17 @@ export class AddMovimentComponent {
        
       });
     })
-  }
-
- 
+  } 
     
   createForm(obj:any) {
+
+    obj.Month=obj.Month==0 ? null : obj.Month
         this.formulario = this.fb.group({
           active: [obj.Active],
           display:[obj.Active],
-          date:[obj.Date, Validators.required],
+          date:[obj.Date ?? new Date()],
+          year:[obj.Year, Validators.required],
+          month:[obj.Month, Validators.required],
           companyFullData: [obj.CompanyFullData? {Name:obj.CompanyFullData} : '', Validators.required],
           companyId:[obj.CompanyId],
           companyDocument:[obj.CompanyDocument],
@@ -148,6 +159,9 @@ export class AddMovimentComponent {
           movements: this.fb.array([]),
           newRegister: [obj.NewRegister],
         });      
+
+        this.formulario?.controls['year'].setValue(!obj.Year ? '' :  obj.Year, { emitEvent: false });
+        console.log('ASSA',this.formulario);
 
         this.hearFieldCompanyData()
 
@@ -160,6 +174,7 @@ export class AddMovimentComponent {
 
   verifyExistAccount(field:any, index:number) {
         const fieldValue=(field as FormGroup).controls['account']
+        console.log('fieldValue ',fieldValue);
         if(fieldValue.value) {
           this.coaService.verifyExistsChartOfAccounts({codAccount:fieldValue.value}).subscribe(async (response:any)=>{
             if(!response.message) {           
@@ -170,6 +185,46 @@ export class AddMovimentComponent {
               }
             })
         }
+  }
+
+  prepareAutoCompleteAccount(fg:FormGroup) {
+
+    const  accountField= fg.get('account') as FormControl;
+
+    accountField.valueChanges.pipe(
+   
+      debounceTime(300), // Espera 300ms pra evitar múltiplas chamadas
+      distinctUntilChanged(), // Garante que só muda se o valor for diferente
+      switchMap((value) => {
+        const name =  value         
+        
+        
+     
+        if (!name || name.length <2) {
+          // Se o nome for vazio ou muito curto, retorna array vazio
+          return of([]);
+        }
+    
+        // Faz a chamada ao serviço e retorna os dados
+        return this.coaService.getAllAutoCompleteCOA(name).pipe(
+          map((response: any) => {
+            const coa = response?.chartOfAccounts || [];
+            console.log('COA', coa);
+            return coa; // Retorna os dados processados
+          }),
+          catchError((err) => {
+            console.error('Erro ao buscar contas:', err);
+            return of([]); // Retorna array vazio em caso de erro
+          })
+        );
+      })
+    ).subscribe((response: any) => {
+
+      this.filteredAccountOptions=of(response);
+      console.log('Resultado final:', response);
+    });
+
+
   }
 
   addMovimento(description: string, date: string, order:string, active:boolean, display:boolean, movementItens:any[]) {
@@ -187,23 +242,29 @@ export class AddMovimentComponent {
 
       movementItens.forEach((elementMovementItens:any)=>{
 
-        let faMI=dds.controls['movementsItens'] as FormArray
+          let faMI=dds.controls['movementsItens'] as FormArray;
 
-        faMI.push(this.itemNewMovement(
+            const lineFb=this.itemNewMovement(
+                elementMovementItens.codAccount,
+                elementMovementItens.debitValue,
+                elementMovementItens.creditValue,
+                elementMovementItens.codAccountIva,
+                false,
+                elementMovementItens.date,
+                elementMovementItens.active,
+                true
+            );
 
-          elementMovementItens.codAccount,
-          elementMovementItens.debitValue,
-          elementMovementItens.creditValue,
-          elementMovementItens.codAccountIva,
-          false,
-          elementMovementItens.date,
-          elementMovementItens.active,
-          false
-        ))
+            console.log('asa222');
 
+            this.prepareAutoCompleteAccount(lineFb);
+
+          
+
+          faMI.push(lineFb)
       })
-
     }
+
     this.formMovements.insert(0,dds);      
   }
 
@@ -214,8 +275,10 @@ export class AddMovimentComponent {
     })[0];
 
     if(movement) {
-      const movements=(movement as FormGroup).controls['movementsItens'] as FormArray;
-      movements.push(this.itemNewMovement('','','','',true,new Date(),true,true));
+      const movements=(movement as FormGroup).controls['movementsItens'] as FormArray;     
+      const lineFb=this.itemNewMovement('','0','0','',true,new Date(),true,true);
+      this.prepareAutoCompleteAccount(lineFb);
+      movements.push(lineFb);
       this.viewBtnGravarItensMovement=true;
     }
   }
@@ -283,21 +346,52 @@ export class AddMovimentComponent {
       return await  false    
   }
 
+  async verificarValores(): Promise<number> {
+    let totalCredit = 0, totalDebit = 0;
+  
+    for (const [index, element] of this.formMovements.controls.entries()) {
+      totalDebit = 0;totalCredit = 0
+      const movement = element as FormGroup;
+      const fa = movement.controls['movementsItens'] as FormArray;
+  
+      for (const item of fa.controls) {
+        const line = item as FormGroup;       
+        if(line?.controls['active'].value) {
+          totalCredit += +line?.controls['credit'].value;
+          totalDebit += +line?.controls['debit'].value;
+        }
+      }
+  
+      if (totalDebit !== totalCredit) {
+        return 1
+      }
+      else  if (totalDebit==0 && totalCredit==0) {
+        return 2
+      }
+    }
+  
+    return 0; // Se todas as linhas estiverem corretas, retorna true
+  }
   async gravarMovimento() {
 
    const hasErrors = await this.verifyErrorsMovement(false,true);
-    if (!hasErrors) {         
-        this.formMovements.controls.forEach((element:any) => {
-            const movement=element as FormGroup;
-            movement.controls['display'].setValue(false,{ emitEvent: false });
+    if (!hasErrors) {    
+      
+      this.view=false;
+      this.textBtnViewAll='Exibir todos'
+      
+        this.verificarValores();
+        // this.formMovements.controls.forEach((element:any) => {
+        //     const movement=element as FormGroup;
+        //     movement.controls['display'].setValue(false,{ emitEvent: false });
 
-            const fa=movement.controls['movementsItens'] as FormArray;
-            fa.controls.forEach((element:any) => {
-                const line=element as FormGroup
-                line.controls['display'].setValue(false,{ emitEvent: false });
+        //     const fa=movement.controls['movementsItens'] as FormArray;
+        //     fa.controls.forEach((element:any) => {
+        //         const line=element as FormGroup
+        //         line.controls['display'].setValue(false,{ emitEvent: false });
 
-            });
-        });
+        //     });
+        // });
       }
   }
 
@@ -338,7 +432,7 @@ export class AddMovimentComponent {
     else 
      this.textBtnViewAll='Ocultar todos'
     
-    console.log('this.view',this.view);
+
     // Percorre os controles do formulário e atualiza o campo 'display'
     this.formMovements.controls.forEach((element: any) => {
       const movement = element as FormGroup;
@@ -355,35 +449,54 @@ export class AddMovimentComponent {
     if (hasErrors) {  
       return
     }     
+
+
+    const valoresCorretos = await this.verificarValores();
+  
+    if (valoresCorretos==1) {
+      console.log("Os valores estão corretos! Pode salvar.");
+      // Chamar a função de salvar
+      const resultado = await this.modal.openModal(
+        `Alguns totais de débito e crédito são diferentes e não podem ser diferentes.`,
+        true
+      );
+      return ; // Retorna o resultado diretamente
+    } else if(valoresCorretos==2) {
+      const resultado = await this.modal.openModal(
+        `Todos os valores do movimento estão com zero, corrija.`,
+        true
+      );
+      return ; 
+    }
       
-      const formValues=this.formulario?.value;
-
-      console.log('const formValues',formValues)
-
+      const formValues=this.formulario?.value;      
 
       const objGravar: { 
         id?:string |null;
         codDaily: string;
-        description: string;
+        
         date:string;
         codDocument:string;
         companyDocument:string;
         companyFullData:string;
         companyId:string;
         active:boolean;
+        year:number;
+        month:number;
         movements: any[]; // Definindo o tipo correto para o array 'perfil'    
         
       } ={
         id:null,
-        codDaily:formValues.codDaily,
-        description:formValues.description??'',       
+        codDaily:formValues.codDaily,          
         date:formValues.date,
         codDocument:formValues.codDocument,       
         companyDocument:formValues.companyDocument,
         companyFullData:formValues.companyFullData.Name,    
         companyId:formValues.companyId,    
         active:formValues.active,
-        movements:[],           
+        movements:[],       
+        month:+formValues.month,
+        year:+formValues.year    
       }     
       
       if(formValues.movements && formValues.movements.length) {   
@@ -396,51 +509,49 @@ export class AddMovimentComponent {
           movementsItens: ElementMovementsItens[]; // Especificando o tipo correto para o array
         }
 
-              interface  ElementMovementsItens {
-                date:String,
-                codAccount:String,
-                debitValue:String,
-                creditValue:String,
-                codAccountIva:String,
-                active:Boolean
-              };
+            interface  ElementMovementsItens {
+              date:String,
+              codAccount:String,
+              debitValue:String,
+              creditValue:String,
+              codAccountIva:String,
+              active:Boolean
+            };
               
         
-                formValues.movements.forEach((element:any) => {       
+          formValues.movements.forEach((element:any) => {       
 
-                         let elementMovement: ElementMovement = { 
-                              order:+element.order,                         
-                              active:element.active, 
-                              date:element.date,
-                              description:element.description,
-                              movementsItens:[]
-                          }
+                    let elementMovement: ElementMovement = { 
+                        order:+element.order,                         
+                        active:element.active, 
+                        date:element.date,
+                        description:element.description,
+                        movementsItens:[]
+                    }
 
-                            if(element.movementsItens && element.movementsItens.length>0) {
+                      if(element.movementsItens && element.movementsItens.length>0) {
 
-                              element.movementsItens.forEach((elementItens:any) => {                             
-                                let elementMovementsItens: ElementMovementsItens = {
-                                  date: elementItens.date,
-                                  codAccount: elementItens.account,
-                                  debitValue: elementItens.debit,
-                                  creditValue: elementItens.credit,
-                                  codAccountIva: elementItens.accountIva,
-                                  active: elementItens.active,
-                                };
-
-
-                                elementMovement.movementsItens.push(
-                                  elementMovementsItens
-                                 
-                                )
-
-                              })
-
-                            }
+                        element.movementsItens.forEach((elementItens:any) => {                             
+                          let elementMovementsItens: ElementMovementsItens = {
+                            date: elementItens.date,
+                            codAccount: elementItens.account,
+                            debitValue: elementItens.debit,
+                            creditValue: elementItens.credit,
+                            codAccountIva: elementItens.accountIva,
+                            active: elementItens.active,
+                          };
 
 
-                     objGravar.movements.push(elementMovement)  
-               });     
+                          elementMovement.movementsItens.push(
+                            elementMovementsItens
+                            
+                          )
+
+                        })
+
+                      }
+                objGravar.movements.push(elementMovement)  
+          });     
                
                console.log('objGravar',objGravar);
       }   
@@ -594,6 +705,7 @@ export class AddMovimentComponent {
 
   
   hearFieldCompanyData() {
+
     const companyFullDataControl = this.formulario?.controls['companyFullData'] as FormControl;
 
     if (companyFullDataControl) {
@@ -632,11 +744,15 @@ export class AddMovimentComponent {
   }
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     const selectedOption = event.option.value; // Pega o valor da opção selecionada
+
+    console.log('Auto Complete',selectedOption);
    
     if(selectedOption) { 
-    
+
+      this.years=selectedOption?.rawData?.Exercise;    
       const companyIdControl = this.formulario?.controls['companyId'];
       const companyDocumentControl = this.formulario?.controls['companyDocument'];     
+
       let palavras = selectedOption?.Name.split(" ");
       
       if (companyIdControl instanceof FormControl) {
@@ -646,12 +762,23 @@ export class AddMovimentComponent {
       if (companyDocumentControl instanceof FormControl) {
         companyDocumentControl.setValue(palavras[palavras.length-1], { emitEvent: false });
       }
+
+      this.formulario?.controls['year'].setValue(new Date().getFullYear(), { emitEvent: false });
     }
     // Aqui você pode fazer o que for necessário com a opção selecionada
     // Por exemplo, pode armazená-la em um campo ou realizar outras ações
   }
 
+  onOptionAccountSelected(event: MatAutocompleteSelectedEvent, indexMovementForm:number, indexMovementItens:number) {
+        
+  }
+
   displayFn(company: any): string {
     return company ? company.Name : '';
+  } 
+
+  displayAccountFn(account: any): string {
+    return account ? account.CodAccount : ''
+    //  + ' - ' + account.Description : '';
   } 
 }

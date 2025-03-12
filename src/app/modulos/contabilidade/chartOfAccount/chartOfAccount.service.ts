@@ -70,4 +70,14 @@ export class ChartOfAccountService {
       }),
     });
   }
+
+  
+  getAllAutoCompleteCOA(codAccount:string): Observable<any> {
+    return this.http.get(this.configService.apiUrl + "/GetAllCoaAutoComplete?codAccount="+codAccount, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    });
+  }
+
 }

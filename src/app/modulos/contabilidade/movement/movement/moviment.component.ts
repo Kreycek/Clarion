@@ -52,9 +52,9 @@ export class MovimentComponent {
 
   documents: any[] = [];
   searchCodDaily: any = '';
+  searchMonth: any = '';
+  searchYear: any =  +new Date().getFullYear();
   searchCodDocument: string = '';
-  searchTpSearch: string = '2';
-  DataSearch: string = '';
   searchDocuments: any[] = [];
   totalRegistros: number = 0;
   totalPages: number = 1;
@@ -64,15 +64,9 @@ export class MovimentComponent {
   dados: any;
   documentModalList: any[] = [];
   dailys: any[] = [];
-  tpSearchData:any[]=[{type:2,description:' MM/AAAA '},{type:1,description:' DD/MM/AAAA '}]
-
   
-selectDate(tt:any){
 
-  
-  console.log(tt);
-
-}
+ 
    constructor(
     private router: Router,
     private movementService: MovementService,
@@ -126,8 +120,8 @@ selectDate(tt:any){
     let objPesquisar: {
       codDaily: string;
       codDocument: string;  
-      TypeSearchDate:number,  
-      DateMovement:string,
+      year:number,  
+      month:number,        
       page: number;
       limit: number;
     };
@@ -135,15 +129,15 @@ selectDate(tt:any){
     objPesquisar = {
       codDaily: this.searchCodDaily,
       codDocument: this.searchCodDocument,     
-      TypeSearchDate:this.searchTpSearch ? + this.searchTpSearch : 2,
-      DateMovement:this.DataSearch ? moment(this.DataSearch).format('YYYY-MM-DD') : '',
+      year:+this.searchYear,
+      month:+this.searchMonth,
       page: currentPage,
       limit: this.limit
     };
 
 
     this.movementService.searchMovement(objPesquisar).subscribe((response: any) => {
-      console.log('response',response);
+    
       this.dados = response.movements;
       this.prepareGridData( this.dados)    
       

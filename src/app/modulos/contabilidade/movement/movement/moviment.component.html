@@ -31,25 +31,32 @@
 
             <div class="col-lg-2 col-md-3 col-sm-3 col-3">
               <div class="form-group"> 
-                  <label for="document">Tipo pesquisa por data</label>
-                  <select id="document" class="form-select" [(ngModel)]="searchTpSearch" >                 
-                    <option *ngFor="let tpSearch of tpSearchData" [value]="tpSearch.type">{{tpSearch.description }}</option>
-                  </select>
+                  <label for="document">Mês</label>
+                  <select 
+                  id="month" 
+                  [(ngModel)]="searchMonth"                       
+                  class="form-select"
+                  >              
+                  <option value="">Todos</option>
+                  <option *ngFor="let month of configService.months" [value]="month.value">
+                    {{month.name}}
+                  </option>
+                </select>
               </div>
             </div>
 
-            <div class="col-lg-3 col-md-3 col-sm-3 col-3 " *ngIf="searchTpSearch">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-3 ">
               <div class="form-group"> 
-              <mat-form-field style="margin-top:20px">
-                <mat-label>Choose a date</mat-label>
-                  <input 
-                    matInput 
-                    [matDatepicker]="picker" 
-                    (dateChange)="selectDate(DataSearch)" 
-                    [(ngModel)]="DataSearch">              
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
+                <label for="document">Ano</label>
+                <select 
+                id="year" 
+                searchYear
+                class="form-select"
+                [(ngModel)]="searchYear"                    
+                >              
+                <option value="">Todos</option>
+                  <option *ngFor="let item of configService.years" [value]="item">{{item}}</option>
+                </select>
             </div>
             </div>
         
@@ -71,7 +78,8 @@
                 <th> Empresa </th>  
                 <th> Diário </th>  
                 <th> Documento </th>       
-                <th> Data </th>                             
+                <th> Mês </th>     
+                <th> Ano </th>                              
                 <th> Status </th>   
                 <th>  </th> 
               </tr>
@@ -81,7 +89,9 @@
                 <td> {{item.CompanyFullData}} </td> 
                 <td> {{item.CodDaily}} - {{item.descriptionDaily}} </td>
                 <td> {{item.CodDocument}} -  {{item.descriptionDocument}}   </td>
-                <td> {{item.Date | date:'dd/MM/yyyy'}}   </td>
+                <td> {{item.Month}}   </td>
+                <td> {{item.Year}}   </td>
+                <!-- <td> {{item.Date | date:'dd/MM/yyyy'}}   </td> -->
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
                 <td style="text-align: right;">                                        
                   <i (click)="updateMovement(item.ID)" style="font-size: 20px; cursor: pointer; " 

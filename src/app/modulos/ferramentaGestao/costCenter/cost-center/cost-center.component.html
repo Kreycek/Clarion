@@ -64,8 +64,8 @@
                 <td> {{item.CodCostCenter}} </td>
                 <td> {{item.Description}} </td>
                 <td> 
-                  <span style="font-size: 15px; cursor: pointer;" (click)="viewSubCostCenter(item)">Visualizar</span>
-                 
+                  <span *ngIf="item.CostCenterSecondary && item.CostCenterSecondary.length>0" style="font-size: 15px; cursor: pointer;" (click)="viewSubCostCenter(item)">Visualizar</span>
+                 <span *ngIf="!item.CostCenterSecondary || item.CostCenterSecondary.length==0">Não cadastrado</span>
                 </td>
                
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>

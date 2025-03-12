@@ -84,3 +84,79 @@ tr:nth-child(odd) {
 tr:nth-child(even) {
   background-color: rgb(255, 255, 255);
 }
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+.example-input {
+  max-width: 100%;
+  width: 300px;
+  background-color: #ffffff !important;  /* Fundo branco */
+}
+
+::ng-deep mat-autocomplete .mat-option {
+  background-color: #ffffff !important;  /* Fundo branco para as opções */
+  color: #333 !important;  /* Cor do texto */
+  padding: 12px 16px !important;  /* Aumentar o preenchimento para aumentar a altura */
+  font-size: 18px !important;  /* Aumentar o tamanho da fonte */
+  border: 1px solid #ccc !important;  /* Borda suave */
+  border-radius: 4px !important;  /* Bordas arredondadas */
+  min-height: 48px !important;  /* Definir uma altura mínima maior */
+}
+
+/* Aumentar a largura do painel de opções do mat-autocomplete */
+.mat-autocomplete .mat-autocomplete-panel {
+  background-color: #ffffff !important;  /* Fundo branco para as opções */
+  color: #333 !important;  /* Cor do texto */
+  border: 1px solid #ccc !important;  /* Borda suave */
+  border-radius: 4px !important;  /* Bordas arredondadas */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1) !important;  /* Sombra suave */
+  width: auto !important;  /* Largura automática para acomodar o conteúdo */
+  max-width: 500px !important;  /* Limitar a largura máxima do painel */
+  min-width: 300px !important;  /* Definir uma largura mínima */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estilo do mat-datepicker quando aberto */
+::ng-deep .mat-datepicker-content {
+  background-color: #ffffff !important;  /* Fundo branco */
+  border-radius: 4px !important;  /* Bordas arredondadas */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1) !important;  /* Sombra suave */
+  border: 1px solid #ccc !important;  /* Borda leve */
+}
+
+/* Estilo das opções do mat-datepicker */
+::ng-deep .mat-calendar-body-cell {
+  color: #333 !important;  /* Cor das células */
+  padding: 10px !important;  /* Preenchimento das células */
+}
+
+/* Estilo para as células selecionadas do mat-datepicker */
+::ng-deep .mat-calendar-body-selected {
+  background-color: #007bff !important;  /* Fundo azul para a data selecionada */
+  color: #fff !important;  /* Cor do texto da data selecionada */
+  border-radius: 50% !important;  /* Bordas arredondadas */
+}
+
+/* Alterar o estilo quando o campo for inválido */
+::ng-deep .mat-form-field.mat-form-field-invalid .mat-input-element {
+  border-color: red !important;  /* Borda vermelha em caso de erro */
+}

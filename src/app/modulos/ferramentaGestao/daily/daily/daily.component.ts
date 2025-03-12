@@ -132,8 +132,7 @@ export class DailyComponent {
   
 
   async viewDailyDocuments(item:any) {
-    console.log('list ',item);
-
+  
    if(item.Documents && item.Documents.length>0) {
       this.documentModalList=[];         
 

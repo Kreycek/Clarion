@@ -138,12 +138,12 @@ export class CostCenterComponent {
   async viewSubCostCenter(item:any) {
     console.log('list ',item);
 
-   if(item.CostCenterSub    && item.CostCenterSub.length>0) {
+   if(item.CostCenterSecondary    && item.CostCenterSecondary.length>0) {
       this.costCenterSubModalList=[];         
 
-      item.CostCenterSub.forEach(async (element:any)=>{
+      item.CostCenterSecondary.forEach(async (element:any)=>{
         this.costCenterSubModalList.push({
-                    cod:element.codCostCenterSub, 
+                    cod:element.codCostCenterSecondary, 
                     description:element.description
                   });   
       })
