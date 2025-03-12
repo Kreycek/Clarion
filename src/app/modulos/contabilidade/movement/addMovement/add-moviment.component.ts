@@ -55,11 +55,6 @@ export class AddMovimentComponent {
 
 
       @ViewChild(ModalOkComponent) modal!: ModalOkComponent; 
-      documentMiniFormCod:string=''
-      documentMiniFormDescription:string=''
-      isVisibleValidationCodDocumento=false;
-      isVisibleValidationDescription=false;     
-      isEdit=false;
       idMovement:string |null = null 
       formulario: FormGroup| null = null;
       years:any[]=[]
@@ -71,13 +66,7 @@ export class AddMovimentComponent {
       viewBtnGravarItensMovement=false;
       view: boolean = true;
       textBtnViewAll='Ocultar todos'
-      filteredAccountOptions: Observable<any[]>;
-      
-     
-
-      get documentForm() {
-        return (this.formulario?.get('documents') as FormArray);
-      }
+      filteredAccountOptions: Observable<any[]>;          
 
       get formMovements(): FormArray {
         return this.formulario?.get('movements') as FormArray;
@@ -93,12 +82,9 @@ export class AddMovimentComponent {
           public moduloService:ModuloService,
           private companyService: CompanyService,
           public configService: ConfigService,
-      ) {} 
+      ) {}  
 
-
- 
-
-  ngOnInit() {
+    ngOnInit() {
     
     // this.companyService.getAllAutoCompleteCompanys('').subscribe((response:any)=>{     
     //   console.log('response',response);
@@ -113,11 +99,10 @@ export class AddMovimentComponent {
         const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
         if(id) {            
-          this.isEdit=true;
-          this.movimentService.getMovementById(id??'0').subscribe((response)=>{      
-              console.log('Edição documento ',response);
-              this.companyService.getCompanyById(response.CompanyId).subscribe((response)=>{
-                console.log('AAAAA',response);
+
+          this.movimentService.getMovementById(id??'0').subscribe((response)=>{   
+            
+              this.companyService.getCompanyById(response.CompanyId).subscribe((response)=>{              
                 this.years=response.Exercise;
               })
 
@@ -129,7 +114,7 @@ export class AddMovimentComponent {
           })
         }
         else {
-          this.isEdit=false;
+   
           this.createForm({Active:true, NewRegister:true});   
           if(this.formMovements.controls.length==0) {
             this.addMovimento('','',(this.formMovements.controls.length+1).toString(),true,true,[]);
@@ -158,8 +143,8 @@ export class AddMovimentComponent {
           codDocument: [obj.CodDocument, Validators.required],        
           movements: this.fb.array([]),
           newRegister: [obj.NewRegister],
-        });      
-
+        });
+        
         this.formulario?.controls['year'].setValue(!obj.Year ? '' :  obj.Year, { emitEvent: false });
         console.log('ASSA',this.formulario);
 
@@ -191,14 +176,11 @@ export class AddMovimentComponent {
 
     const  accountField= fg.get('account') as FormControl;
 
-    accountField.valueChanges.pipe(
-   
+    accountField.valueChanges.pipe(   
       debounceTime(300), // Espera 300ms pra evitar múltiplas chamadas
       distinctUntilChanged(), // Garante que só muda se o valor for diferente
       switchMap((value) => {
-        const name =  value         
-        
-        
+        const name =  value;    
      
         if (!name || name.length <2) {
           // Se o nome for vazio ou muito curto, retorna array vazio
@@ -208,8 +190,7 @@ export class AddMovimentComponent {
         // Faz a chamada ao serviço e retorna os dados
         return this.coaService.getAllAutoCompleteCOA(name).pipe(
           map((response: any) => {
-            const coa = response?.chartOfAccounts || [];
-            console.log('COA', coa);
+            const coa = response?.chartOfAccounts || [];          
             return coa; // Retorna os dados processados
           }),
           catchError((err) => {
@@ -220,8 +201,7 @@ export class AddMovimentComponent {
       })
     ).subscribe((response: any) => {
 
-      this.filteredAccountOptions=of(response);
-      console.log('Resultado final:', response);
+      this.filteredAccountOptions=of(response);    
     });
 
 
@@ -245,7 +225,7 @@ export class AddMovimentComponent {
           let faMI=dds.controls['movementsItens'] as FormArray;
 
             const lineFb=this.itemNewMovement(
-                elementMovementItens.codAccount,
+                {CodAccount: elementMovementItens.codAccount},
                 elementMovementItens.debitValue,
                 elementMovementItens.creditValue,
                 elementMovementItens.codAccountIva,
@@ -255,11 +235,7 @@ export class AddMovimentComponent {
                 true
             );
 
-            console.log('asa222');
-
-            this.prepareAutoCompleteAccount(lineFb);
-
-          
+            this.prepareAutoCompleteAccount(lineFb);          
 
           faMI.push(lineFb)
       })
@@ -284,7 +260,7 @@ export class AddMovimentComponent {
   }
 
   
-  itemNewMovement(account: string, debit: string, credit: string, accountIva:string, newRegister:boolean,  date:Date, active:boolean,display:boolean): FormGroup {
+  itemNewMovement(account: any, debit: string, credit: string, accountIva:string, newRegister:boolean,  date:Date, active:boolean,display:boolean): FormGroup {
     return this.fb.group({
       account: [account, Validators.required],
       debit: [debit, Validators.required],
@@ -353,12 +329,23 @@ export class AddMovimentComponent {
       totalDebit = 0;totalCredit = 0
       const movement = element as FormGroup;
       const fa = movement.controls['movementsItens'] as FormArray;
+      let doisZeros=0;
+
   
       for (const item of fa.controls) {
         const line = item as FormGroup;       
         if(line?.controls['active'].value) {
-          totalCredit += +line?.controls['credit'].value;
-          totalDebit += +line?.controls['debit'].value;
+         const _linhaCredit=line?.controls['credit'].value
+         const _linhaDebit=line?.controls['debit'].value
+
+          totalCredit += +_linhaCredit;
+          totalDebit += +_linhaDebit;
+
+          if(_linhaCredit==0 && _linhaDebit==0) {
+            doisZeros=3
+          }
+
+
         }
       }
   
@@ -367,6 +354,9 @@ export class AddMovimentComponent {
       }
       else  if (totalDebit==0 && totalCredit==0) {
         return 2
+      }
+      else if(doisZeros>0) {
+        return doisZeros
       }
     }
   
@@ -444,6 +434,8 @@ export class AddMovimentComponent {
   }
 
   async gravar() {   
+
+    console.log(this.formulario)
     
     const hasErrors = await this.verifyErrorsMovement(true,true);
     if (hasErrors) {  
@@ -454,7 +446,7 @@ export class AddMovimentComponent {
     const valoresCorretos = await this.verificarValores();
   
     if (valoresCorretos==1) {
-      console.log("Os valores estão corretos! Pode salvar.");
+     
       // Chamar a função de salvar
       const resultado = await this.modal.openModal(
         `Alguns totais de débito e crédito são diferentes e não podem ser diferentes.`,
@@ -464,6 +456,12 @@ export class AddMovimentComponent {
     } else if(valoresCorretos==2) {
       const resultado = await this.modal.openModal(
         `Todos os valores do movimento estão com zero, corrija.`,
+        true
+      );
+      return ; 
+    } else if(valoresCorretos==3) {
+      const resultado = await this.modal.openModal(
+        `Em uma das linhas o valor tanto de débito e crédito são iguais a zero, corrija.`,
         true
       );
       return ; 
@@ -531,21 +529,28 @@ export class AddMovimentComponent {
 
                       if(element.movementsItens && element.movementsItens.length>0) {
 
-                        element.movementsItens.forEach((elementItens:any) => {                             
-                          let elementMovementsItens: ElementMovementsItens = {
-                            date: elementItens.date,
-                            codAccount: elementItens.account,
-                            debitValue: elementItens.debit,
-                            creditValue: elementItens.credit,
-                            codAccountIva: elementItens.accountIva,
-                            active: elementItens.active,
-                          };
+                        element.movementsItens.forEach((elementItens:any) => {  
+                          
+                          let _account=''                         
+                          
+                        if (typeof elementItens.account === "object" && elementItens.account !== null && !Array.isArray(elementItens.account)) {
+                            _account=elementItens.account.CodAccount
+                        } else {
+                          _account= elementItens.account
+                        }
 
 
-                          elementMovement.movementsItens.push(
-                            elementMovementsItens
-                            
-                          )
+
+                            let elementMovementsItens: ElementMovementsItens = {
+                              date: elementItens.date,
+                              codAccount: _account,
+                              debitValue: elementItens.debit,
+                              creditValue: elementItens.credit,
+                              codAccountIva: elementItens.accountIva,
+                              active: elementItens.active,
+                            };
+
+                          elementMovement.movementsItens.push(elementMovementsItens);
 
                         })
 
@@ -565,7 +570,7 @@ export class AddMovimentComponent {
           
             const resultado = await this.modal.openModal(response.message,true); 
             if (resultado) {
-  
+              this.cancel();
             }
   
           }),
@@ -590,8 +595,7 @@ export class AddMovimentComponent {
           
           ).subscribe(()=>{})
       }  
-      else {
-  
+      else {  
     
             this.movimentService.addMovement(objGravar).pipe(
               catchError((error: HttpErrorResponse) => {   
@@ -605,6 +609,12 @@ export class AddMovimentComponent {
               // Aguarda o resultado do modal antes de continuar
               const resultado = await this.modal.openModal("Movimento cadastrado com sucesso",true);             
               if (resultado) {
+                while (this.formMovements.length !== 0) {
+                  this.formMovements.removeAt(0);
+                }
+                this.formMovements.reset()
+                this.addMovimento('','',(this.formMovements.controls.length+1).toString(),true,true,[]);
+                this.addNewItemMoviment();
                 console.log("Usuário confirmou!");
                 // Insira aqui a lógica para continuar após a confirmação
               } else {
@@ -618,9 +628,9 @@ export class AddMovimentComponent {
       this.router.navigate(['/aplicacao/movement']);
     }
 
-    deleteDocument(index:number) {
-      this.documentForm.removeAt(index);
-    }
+    // deleteDocument(index:number) {
+    //   this.documentForm.removeAt(index);
+    // }
 
     getControlMainForm(fieldName:string) {
       return this.formulario?.get(fieldName)
