@@ -49,7 +49,7 @@
             <thead>              
               <tr>
                 <th colspan="7" style="text-align: right;" >                   
-                    <i class="mdi mdi-account-plus" (click)="addCompany()" title="Adicionar plano de contas" style="font-size: 24px; cursor: pointer;"></i>                   
+                    <i class="mdi mdi-plus-circle" (click)="addCompany()" title="Adicionar uma nova empresa" style="font-size: 24px; cursor: pointer;"></i>                   
                </th>                         
               </tr>              
               <tr>
@@ -83,7 +83,7 @@
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
                 <td style="text-align: right;">                                        
                   <i (click)="updateCompany(item.ID)" style="font-size: 20px; cursor: pointer; " 
-                  title="Editar plano de conta" 
+                  title="Editar esta empresa" 
                   class="mdi mdi-table-edit"></i>                
              </td>               
               </tr>             

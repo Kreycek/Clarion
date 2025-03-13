@@ -48,7 +48,7 @@ export class ChartOfAccountsComponent {
   ngOnInit() {
 
     this.limit=this.configService.limitPaginator;
-      for(let year=2023;year<=this.currentYear;year++) {
+      for(let year=this.configService.years[0];year<=this.currentYear;year++) {
           this.years.push(year)
       }
       

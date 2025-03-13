@@ -582,8 +582,7 @@ export class AddMovimentComponent {
                   const resultado = await this.modal.openModal(error.message,true); 
                   if (resultado) {
   
-                  }
-                  
+                  }                  
                 }
   
                 if (error.status === 401) {
@@ -609,10 +608,8 @@ export class AddMovimentComponent {
               // Aguarda o resultado do modal antes de continuar
               const resultado = await this.modal.openModal("Movimento cadastrado com sucesso",true);             
               if (resultado) {
-                while (this.formMovements.length !== 0) {
-                  this.formMovements.removeAt(0);
-                }
-                this.formMovements.reset()
+
+                this.moduloService.deleteFormArrayData(this.formMovements);     
                 this.addMovimento('','',(this.formMovements.controls.length+1).toString(),true,true,[]);
                 this.addNewItemMoviment();
                 console.log("Usuário confirmou!");

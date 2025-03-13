@@ -7,7 +7,7 @@
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title">{{idUser ? 'Editar' : 'Novo'}} Plano de contas</h4>
+        <h4 class="card-title">{{idchartOfAccount ? 'Editar' : 'Novo'}} Plano de contas</h4>
         <p class="card-description" style="display: none;"> Basic form elements </p>
         
         <br>
@@ -71,12 +71,20 @@
     <div class="col-md-12 grid-margin stretch-card">
       <div class="card">
         <div class="card-body">
-          <h4 class="card-title">Ano contábeis <span class="required">*</span></h4> 
+          <h4 class="card-title">Anos contábeis <span class="required">*</span></h4> 
           <ngContainer formArrayName="year">
-            <div class="form-group perfis-container">            
-              <div *ngFor="let year of yearForm.controls;  let i = index;let isLast = last ">
-                <ngContainer [formGroupName]="i">
-                    <input  type="checkbox"  formControlName="ativo" [value]="year.get('value')?.value" class="form-check-input">&nbsp;<label class="espacoLabel">{{ year.get('year')?.value}}</label> <span  *ngIf="!isLast">/</span>
+            <div class="form-group row">            
+              <div *ngFor="let year of yearForm.controls;  let i = index;let isLast = last" class="col col-md-1">
+                <ngContainer [formGroupName]="i">                
+                
+
+                 
+                    <input  type="checkbox"  formControlName="ativo" [value]="year.get('value')?.value" class="form-check-input">&nbsp;
+                    <label class="espacoLabel">{{ year.get('year')?.value}}</label> 
+                    <span  *ngIf="!isLast"></span>
+                 
+                  
+                    
                   </ngContainer>
               </div> 
             </div> 

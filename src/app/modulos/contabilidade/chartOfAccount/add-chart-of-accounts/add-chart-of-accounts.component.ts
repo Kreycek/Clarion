@@ -19,7 +19,7 @@ import { ModuloService } from '../../../modulo.service';
 export class AddChartOfAccountsComponent {
   
   isEdit=false;
-  idUser:string |null = null 
+  idchartOfAccount:string |null = null 
   formulario: FormGroup| null = null;
   years:number[]=[]
   currentYear: number = new Date().getFullYear();
@@ -46,16 +46,17 @@ export class AddChartOfAccountsComponent {
     }
     return null;
   };
-  
+
+  get yearForm() {
+    return (this.formulario?.get('year') as FormArray);
+  }
+ 
 
   trackByFn(index: number, item: any): string {
     return item.codCostCenterSecondary; // Garante que cada item tem uma chave única
   }
   
-  get yearForm() {
-    return (this.formulario?.get('year') as FormArray);
-  }
-
+ 
   criarYear(value:number, ativo:boolean): FormGroup {
     return this.fb.group({  
       year: [value],
@@ -69,13 +70,12 @@ export class AddChartOfAccountsComponent {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');  // Substitua 'id' pelo nome do parâmetro
 
+      this.costCenterService.getAllOnlyCostCenter().subscribe((response:any)=>{     
+        this.costCenters=response;    
+
       if(id) {
         this.isEdit=true;
         this.coaService.getChartOfAccountById(id??'0').subscribe((COA:any)=>{   
-
-           this.costCenterService.getAllOnlyCostCenter().subscribe((response:any)=>{     
-            this.costCenters=response;    
-
 
             if(COA.CostCentersCOA && COA.CostCentersCOA.length>0) {
 
@@ -125,26 +125,28 @@ export class AddChartOfAccountsComponent {
                 });
               }
 
-        }) 
+        
           
-          this.idUser=id;    
+          this.idchartOfAccount=id;    
           this.createForm(COA);     
-          this.loadYear(COA.Year)    
+          this.loadYear(COA.Year,false)    
         })
       }
       else {
         this.isEdit=false;
         this. createForm({Active:true});       
-        this.loadYear([])
+        this.loadYear([],true)
       }
+
+    })
       
     });    
   }
 
-  loadYear(years:[]) {    
-    for(let year=2023;year<=this.currentYear+1;year++) {   
+  loadYear(years:[], newRegister:boolean) {    
+    for(let year=this.configService.years[0] ;year<=this.currentYear+1;year++) {   
       const exist:boolean=years.filter((_year:number)=>year==_year)[0]    
-      this.yearForm.push(this.criarYear(year, exist?true:false));
+      this.yearForm.push(this.criarYear(year,newRegister ? true : exist?true:false));
     }   
   }
   
@@ -210,8 +212,7 @@ export class AddChartOfAccountsComponent {
       active:formValues.active,
       year:[],
       costCentersCOA:[]           
-    }
-   
+    }   
    
     if(formValues.year && formValues.year.length) {       
       formValues.year.forEach((element:any) => {
@@ -222,30 +223,26 @@ export class AddChartOfAccountsComponent {
 
     if(this.listCostCenters && this.listCostCenters.length>0) {
       this.listCostCenters.forEach((element:any)=>{
-
         let cc:{idCostCenter:number, costCentersSecondary:string[]}={idCostCenter:element.id,costCentersSecondary:[]}
        
           if(element.costCentersSecondary && element.costCentersSecondary.length>0) {
             element.costCentersSecondary.forEach((elementSecondary:any)=>{
             cc.costCentersSecondary.push(elementSecondary.codCostCenterSecondary)
             })
-          }
-        
-        objGravar.costCentersCOA.push(cc)
-
-      })
-      
+          }        
+        objGravar.costCentersCOA.push(cc);
+      })      
     }
   
-    if(this.idUser) {
+    if(this.idchartOfAccount) {
 
-      objGravar.id=this.idUser
+      objGravar.id=this.idchartOfAccount
         this.coaService.updateChartOfAccounts(objGravar).pipe(
         tap(async (response:any) =>    {    
         
          const resultado = await this.modal.openModal(response.message,true); 
          if (resultado) {
-
+          this.cancel();
          }
         }),
         catchError(async (error: HttpErrorResponse) => {
@@ -266,7 +263,6 @@ export class AddChartOfAccountsComponent {
 
           })).subscribe(()=>{})
     }
-
     else {
 
       this.coaService.verifyExistsChartOfAccounts({codAccount:objGravar.codAccount}).subscribe((async (response:any)=>{
@@ -290,7 +286,10 @@ export class AddChartOfAccountsComponent {
             const resultado = await this.modal.openModal("Plano de contas cadastrado com sucesso",true); 
           
             if (resultado) {
-              console.log("Usuário confirmou!");
+             this.listCostCenters=[];
+             this.moduloService.deleteFormArrayData(this.yearForm);  
+             this.formulario?.reset();
+             this.loadYear([],true)             
               // Insira aqui a lógica para continuar após a confirmação
             } else {
               console.log("Usuário cancelou.");

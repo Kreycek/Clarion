@@ -1,7 +1,7 @@
 
   import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ConfigService } from '../services/config.service';
   
@@ -119,6 +119,14 @@ import { ConfigService } from '../services/config.service';
             'Content-Type': 'application/json',
           }),
         });
+      }
+
+
+      deleteFormArrayData(fa:FormArray) {
+        while (fa.length !== 0) {
+          fa.removeAt(0);
+        }
+        fa.reset();
       }
 
 
