@@ -16,6 +16,8 @@ import { MovimentComponent } from './modulos/contabilidade/movement/movement/mov
 import { AddMovimentComponent } from './modulos/contabilidade/movement/addMovement/add-moviment.component';
 import { CostCenterComponent } from './modulos/ferramentaGestao/costCenter/cost-center/cost-center.component';
 import { AddCostCenterComponent } from './modulos/ferramentaGestao/costCenter/add-cost-center/add-cost-center.component';
+import { BalanceteReportComponent } from './reports/balancete-report/balancete-report.component';
+import { BalanceteComponent } from './modulos/contabilidade/balancete/balancete.component';
 
 export const routes: Routes = [
 
@@ -103,6 +105,10 @@ export const routes: Routes = [
             {
                 path:'addCostCenter',
                 component:AddCostCenterComponent
+            }, 
+            {
+                path:'balancete',
+                component:BalanceteComponent
             }
 
             
@@ -111,6 +117,11 @@ export const routes: Routes = [
     { 
         path:'login',
         component:LoginComponent    
+    }
+    ,   // Redireciona para login por padrão    
+    { 
+        path:'balanceteReport',
+        component:BalanceteReportComponent    
     }
 ];
 

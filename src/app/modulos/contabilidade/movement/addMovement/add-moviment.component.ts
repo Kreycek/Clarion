@@ -172,6 +172,15 @@ export class AddMovimentComponent {
         }
   }
 
+  verifyValueFieldEmpty(field:any, nameField:string) {
+    const fieldValue=(field as FormGroup).controls[nameField]
+
+    if((!fieldValue.value) || fieldValue.value==='0') {
+      fieldValue.setValue('0',{ emitEvent: false });
+
+    }
+  }
+
   prepareAutoCompleteAccount(fg:FormGroup) {
 
     const  accountField= fg.get('account') as FormControl;

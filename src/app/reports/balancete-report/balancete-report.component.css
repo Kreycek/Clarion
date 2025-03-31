@@ -1,0 +1,22 @@
+@media print {
+    @page {
+      size: A4;
+      margin: 1cm; /* Ajuste conforme necessário */
+    }
+  
+  
+    .content {
+        font-size: 12pt;
+        margin: 0;
+        padding: 0;
+      width: 100%;
+      max-width: 21cm; /* Largura da folha A4 */
+      height: auto;
+    }
+  
+    /* Evita quebra de página dentro de elementos importantes */
+    .no-break {
+      page-break-inside: avoid;
+    }
+  }
+  

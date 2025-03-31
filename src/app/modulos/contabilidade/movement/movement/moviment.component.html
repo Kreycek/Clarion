@@ -89,7 +89,7 @@
                 <td> {{item.CompanyFullData}} </td> 
                 <td> {{item.CodDaily}} - {{item.descriptionDaily}} </td>
                 <td> {{item.CodDocument}} -  {{item.descriptionDocument}}   </td>
-                <td> {{this.configService.months[item.Month-1]?.name}}   </td>
+                <td> {{this.configService.months[item.Month-1].name}}   </td>
                 <td> {{ item.Year}}   </td>
                 <!-- <td> {{item.Date | date:'dd/MM/yyyy'}}   </td> -->
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
