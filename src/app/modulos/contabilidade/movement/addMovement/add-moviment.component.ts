@@ -18,6 +18,7 @@ import { ChartOfAccountService } from '../../chartOfAccount/chartOfAccount.servi
 import { ModuloService } from '../../../modulo.service';
 import { CompanyService } from '../../../ferramentaGestao/company/company.service';
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+import {MatTabsModule} from '@angular/material/tabs';
 
 export interface User {
   name: string;
@@ -36,7 +37,8 @@ export interface User {
     MatButtonModule,
     MatNativeDateModule,
     MatSlideToggleModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatTabsModule
   ],
   templateUrl: './add-moviment.component.html',
   styleUrl: './add-moviment.component.css',
@@ -146,16 +148,29 @@ export class AddMovimentComponent {
         });
         
         this.formulario?.controls['year'].setValue(!obj.Year ? '' :  obj.Year, { emitEvent: false });
-        console.log('ASSA',this.formulario);
+        console.log('ASSA',obj);
 
         this.hearFieldCompanyData()
+        
+       const movs:any[]=obj.Movements;
+        if(movs && movs.length>0) {
 
-        if(obj.Movements && obj.Movements.length>0) {
-          obj.Movements.forEach((element:any) => {
-            this.addMovimento(element.description,element.date,element.order,element.active,element.active, element.movementsItens)            
+        
+
+          // this.ascOrderMovements(obj.Movements);
+
+          movs.forEach((element:any) => {
+
+            const movItens:any[]=element.movementsItens;
+
+            movItens.sort((a, b) => {
+              return a.codAccount.localeCompare(b.codAccount);
+            });
+
+            this.addMovimento(element.description,element.date,element.order,element.active,element.active, movItens)            
           });   
         }
-  }
+  } 
 
   verifyExistAccount(field:any, index:number) {
         const fieldValue=(field as FormGroup).controls['account']
@@ -195,6 +210,7 @@ export class AddMovimentComponent {
           // Se o nome for vazio ou muito curto, retorna array vazio
           return of([]);
         }
+        else {
     
         // Faz a chamada ao serviço e retorna os dados
         return this.coaService.getAllAutoCompleteCOA(name).pipe(
@@ -207,7 +223,9 @@ export class AddMovimentComponent {
             return of([]); // Retorna array vazio em caso de erro
           })
         );
+      }
       })
+      
     ).subscribe((response: any) => {
 
       this.filteredAccountOptions=of(response);    
@@ -797,4 +815,11 @@ export class AddMovimentComponent {
     return account ? account.CodAccount : ''
     //  + ' - ' + account.Description : '';
   } 
+
+  ascOrderMovements(movements:any[]) {
+
+    movements.sort((a, b) => {
+      return a.codAccount.localeCompare(b.codAccount);
+    });
+  }
 }

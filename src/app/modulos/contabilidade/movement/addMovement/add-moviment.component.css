@@ -29,6 +29,7 @@ font-size: 0.9rem;
   border-collapse: collapse;
   border: 1px solid #ddd;
   font-family: Arial, sans-serif;
+  font-size: 14px;;
 }
 
 /* Cabeçalho da tabela */
@@ -101,39 +102,6 @@ tr:nth-child(even) {
   background-color: #ffffff !important;  /* Fundo branco */
 }
 
-::ng-deep mat-autocomplete .mat-option {
-  background-color: #ffffff !important;  /* Fundo branco para as opções */
-  color: #333 !important;  /* Cor do texto */
-  padding: 12px 16px !important;  /* Aumentar o preenchimento para aumentar a altura */
-  font-size: 18px !important;  /* Aumentar o tamanho da fonte */
-  border: 1px solid #ccc !important;  /* Borda suave */
-  border-radius: 4px !important;  /* Bordas arredondadas */
-  min-height: 48px !important;  /* Definir uma altura mínima maior */
-}
-
-/* Aumentar a largura do painel de opções do mat-autocomplete */
-.mat-autocomplete .mat-autocomplete-panel {
-  background-color: #ffffff !important;  /* Fundo branco para as opções */
-  color: #333 !important;  /* Cor do texto */
-  border: 1px solid #ccc !important;  /* Borda suave */
-  border-radius: 4px !important;  /* Bordas arredondadas */
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1) !important;  /* Sombra suave */
-  width: auto !important;  /* Largura automática para acomodar o conteúdo */
-  max-width: 500px !important;  /* Limitar a largura máxima do painel */
-  min-width: 300px !important;  /* Definir uma largura mínima */
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* Estilo do mat-datepicker quando aberto */
 ::ng-deep .mat-datepicker-content {
@@ -156,7 +124,9 @@ tr:nth-child(even) {
   border-radius: 50% !important;  /* Bordas arredondadas */
 }
 
-/* Alterar o estilo quando o campo for inválido */
-::ng-deep .mat-form-field.mat-form-field-invalid .mat-input-element {
-  border-color: red !important;  /* Borda vermelha em caso de erro */
+
+mat-tab-group * {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: hidden;
 }

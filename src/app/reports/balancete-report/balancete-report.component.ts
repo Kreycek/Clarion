@@ -41,6 +41,8 @@ export class BalanceteReportComponent {
         let _class=''
         let totalDebit=0
         let totalCredit=0
+        let totalDebitBalance=0
+        let totalCreditBalance=0
         for(let i=0;i<=response.balancete.length; i++) {
           const line=response.balancete[i];
           // console.log('line',line.class);
@@ -50,47 +52,67 @@ export class BalanceteReportComponent {
           }
           else if(_class!=line?.class) {
             _class=line.class
-            this.balacente.push(
-              {
+            this.balacente.push({
                 codAccount:'',
                 description:'Soma Liquida', 
                 debitValue:totalDebit, 
-                creditValue:totalCredit
+                creditValue:totalCredit,
+                creditBalanceValue:totalCreditBalance,
+                debitBalanceValue:totalDebitBalance
               }
             )
 
-            this.balacente.push(
-              {
+            this.balacente.push({
                 codAccount:'',
                 description:'Soma saldos', 
                 debitValue:totalDebit, 
-                creditValue:totalCredit
-              }
-            )
+                creditValue:totalCredit,
+                creditBalanceValue:totalCreditBalance,
+                debitBalanceValue:totalDebitBalance
+              })
 
 
             totalDebit=0;
             totalCredit=0;
+            totalDebitBalance=0;
+            totalCreditBalance=0;
           }
 
           if(line.sum) {
             totalDebit+=line.debitValue
             totalCredit+=line.creditValue
+            totalDebitBalance+=line.balanceDebitValue
+            totalCreditBalance+=line.balanceCredittValue
+
+            console.log('totalDebitBalance',totalDebitBalance);
           }
 
           this.balacente.push(line)
           
            if((response.balancete.length-1)==i) {
-            this.balacente.push(
-              {codAccount:'',description:'Soma Liquida', 
+
+            this.balacente.push({
+                codAccount:'',description:'Soma Liquida', 
                 debitValue:totalDebit, 
-                creditValue:totalCredit})
+                creditValue:totalCredit,
+                creditBalanceValue:totalCreditBalance,
+                debitBalanceValue:totalDebitBalance})
+
+                this.balacente.push({
+                    codAccount:'',
+                    description:'Soma saldos', 
+                    debitValue:totalDebit, 
+                    creditValue:totalCredit,
+                    creditBalanceValue:totalCreditBalance,
+                    debitBalanceValue:totalDebitBalance
+                  })
+
             totalDebit=0;
             totalCredit=0;
+            totalDebitBalance=0;
+            totalCreditBalance=0;
           }
-
         }
-
 
         }
       })
