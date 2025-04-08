@@ -49,13 +49,13 @@ export class CostCenterComponent {
       this.limit=this.configService.limitPaginator;
       this.costCenterService.getAllOnlyCostCenter().subscribe((response:any)=>{     
         this.costCenters=response;
-        console.log('getAllOnlyDaily',response);
+
 
       })   
 
        
       this.costCenterService.getAllCostCenter(this.currentPage,this.limit).subscribe((response:any)=>{     
-        console.log('response',response);
+
           this.dados=response.costCenters;  
           this.totalRegistros = response.total;
           this.totalPages = response.pages;
@@ -116,7 +116,7 @@ export class CostCenterComponent {
       limit:this.limit
     };
 
-    console.log('objPesquisar',objPesquisar);
+
 
     this.costCenterService.searchCostCenter(objPesquisar).subscribe((response:any)=>{
       this.dados=response.costCenters;    
@@ -136,7 +136,7 @@ export class CostCenterComponent {
   
 
   async viewSubCostCenter(item:any) {
-    console.log('list ',item);
+
 
    if(item.CostCenterSecondary    && item.CostCenterSecondary.length>0) {
       this.costCenterSubModalList=[];         
@@ -155,7 +155,7 @@ export class CostCenterComponent {
 
       if (resultado) {      
       } else {
-        console.log("Usuário cancelou.");
+        
       }
     }        
   }

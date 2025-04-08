@@ -43,13 +43,13 @@ export class AddCostCenterComponent {
   
           if(id) {           
             this.costCenterService.getCostCenterById(id??'0').subscribe((response)=>{       
-              console.log('dailys',response);
+
               this.idCostCenter=id;    
               this.createForm(response);  
   
               if(response.CostCenterSecondary && response.CostCenterSecondary.length>0) {
                 response.CostCenterSecondary.forEach((element:any) => {
-                  console.log('element',element);
+     
                   this.costCenterSecondaryForm.push(this.createCostCenterSecondaryForm(element.codCostCenterSecondary,element.description));
                 });
               }
@@ -58,7 +58,7 @@ export class AddCostCenterComponent {
           else {            
             this.createForm({Active:true});   
           }
-          console.log('this.formulario',this.formulario);
+       
         });    
     } 
       
@@ -155,7 +155,7 @@ export class AddCostCenterComponent {
             catchError(async (error: HttpErrorResponse) => {
                 
                   if (error.status === 500) {
-                    console.log('Interceptando requisição:', error)
+                   
                   
                     const resultado = await this.modal.openModal(error.message,true); 
                     if (resultado) {
@@ -163,7 +163,7 @@ export class AddCostCenterComponent {
                     }                    
                   }    
                   if (error.status === 401) {
-                      console.log('Interceptando requisição:', error.status)              
+                                    
                   }
                   return throwError(() => error);
               })
@@ -184,7 +184,7 @@ export class AddCostCenterComponent {
               this.costCenterService.addCostCenter(objGravar).pipe(
                 catchError((error: HttpErrorResponse) => {   
                   if (error.status === 401) {
-                    console.log('Interceptando requisição:', error.status);
+                    ;
                   }
                   return throwError(() => error);
                 })
@@ -193,10 +193,10 @@ export class AddCostCenterComponent {
                 // Aguarda o resultado do modal antes de continuar
                 const resultado = await this.modal.openModal("Centro de custo cadastrado com sucesso",true);             
                 if (resultado) {
-                  console.log("Usuário confirmou!");
+            
                   // Insira aqui a lógica para continuar após a confirmação
                 } else {
-                  console.log("Usuário cancelou.");
+                  
                 }
               });
               

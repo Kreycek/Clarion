@@ -35,7 +35,7 @@ export class BalanceteReportComponent {
       this.endMonth= this.route.snapshot.queryParamMap.get('endMonth');
     
       this.balanceteService.getBalanceteReport(this.initialYear,this.initialMonth,this.endYear,this.endMonth).subscribe((response)=>{
-        console.log(response);
+       
                 
 
         let _class=''
@@ -45,7 +45,7 @@ export class BalanceteReportComponent {
         let totalCreditBalance=0
         for(let i=0;i<=response.balancete.length; i++) {
           const line=response.balancete[i];
-          // console.log('line',line.class);
+     
           if(line) {
           if(!_class) {
             _class=line.class
@@ -84,7 +84,6 @@ export class BalanceteReportComponent {
             totalDebitBalance+=line.balanceDebitValue
             totalCreditBalance+=line.balanceCredittValue
 
-            console.log('totalDebitBalance',totalDebitBalance);
           }
 
           this.balacente.push(line)

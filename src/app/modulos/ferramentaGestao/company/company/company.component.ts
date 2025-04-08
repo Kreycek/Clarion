@@ -44,7 +44,7 @@ export class CompanyComponent {
   ngOnInit() {       
     this.limit=this.configService.limitPaginator;
       this.companyService.getAllCompanys(this.currentPage,this.limit).subscribe((response:any)=>{     
-        console.log('response',response);
+  
           this.dados=response.companys;  
           this.totalRegistros = response.total;
           this.totalPages = response.pages;
@@ -74,7 +74,7 @@ export class CompanyComponent {
       limit:this.limit
     };
 
-    console.log('DS',objPesquisar);
+   
 
     this.companyService.searchCompany(objPesquisar).subscribe((response:any)=>{
       this.dados=response.companys;    
@@ -112,7 +112,7 @@ export class CompanyComponent {
 
       if (resultado) {      
       } else {
-        console.log("Usuário cancelou.");
+        
       }
     }        
   }
@@ -137,7 +137,7 @@ export class CompanyComponent {
  
        if (resultado) {      
        } else {
-         console.log("Usuário cancelou.");
+         
        }
      }        
    }
@@ -164,7 +164,7 @@ export class CompanyComponent {
  
        if (resultado) {      
        } else {
-         console.log("Usuário cancelou.");
+         
        }
      }        
    }

@@ -93,10 +93,7 @@ export class AddMovimentComponent {
 
     ngOnInit() {
     
-    // this.companyService.getAllAutoCompleteCompanys('').subscribe((response:any)=>{     
-    //   console.log('response',response);
-    //     response.companys;       
-    // });
+  
 
     this.dailyService.getAllOnlyDailyActive().subscribe((response:any)=>{     
         this.dailys=response;  
@@ -153,7 +150,7 @@ export class AddMovimentComponent {
         });
         
         this.formulario?.controls['year'].setValue(!obj.Year ? '' :  obj.Year, { emitEvent: false });
-        console.log('ASSA',obj);
+      
 
         this.hearFieldCompanyData()
         
@@ -176,20 +173,28 @@ export class AddMovimentComponent {
 
   verifyExistAccount(field:any, index:number) {
         const fieldValue:any=(field as FormGroup).controls['account']
-
+    
         let codAccount=''      
 
         if (typeof fieldValue === 'object' && fieldValue !== null) {
-          codAccount=fieldValue.value.CodAccount;  
+          
+          if(fieldValue.value.CodAccount) {
+            codAccount=fieldValue.value.CodAccount;  
+          }           
+          else {
+            codAccount=fieldValue.value
+          }           
         }
-        else {
+        else {          
           codAccount=fieldValue.value
         }
+
        
+     
         if(fieldValue.value) {
           this.coaService.verifyExistsChartOfAccounts({codAccount:codAccount}).subscribe(async (response:any)=>{
             if(!response.message) {           
-                const resultado = await this.modal.openModal("A Conta cadastrada na linha " + (index).toString() + " não está cadastrada no plano de contas, tente outra!",true); 
+                const resultado = await this.modal.openModal("A Conta cadastrada na linha " + (index+1).toString() + " não está cadastrada no plano de contas ou não é uma conta de movimento, tente outra!",true); 
                 if (resultado) {
                   fieldValue.setValue(null,{ emitEvent: false });
                 }
@@ -473,7 +478,7 @@ export class AddMovimentComponent {
 
   async gravar() {   
 
-    console.log(this.formulario)
+  
     
     const hasErrors = await this.verifyErrorsMovement(true,true);
     if (hasErrors) {  
@@ -594,7 +599,7 @@ export class AddMovimentComponent {
                 objGravar.movements.push(elementMovement)  
           });     
                
-               console.log('objGravar',objGravar);
+        
       }   
   
       
@@ -613,7 +618,7 @@ export class AddMovimentComponent {
           catchError(async (error: HttpErrorResponse) => {
               
                 if (error.status === 500) {
-                  console.log('Interceptando requisição:', error)
+                 
                 
                   const resultado = await this.modal.openModal(error.message,true); 
                   if (resultado) {
@@ -622,7 +627,7 @@ export class AddMovimentComponent {
                 }
   
                 if (error.status === 401) {
-                    console.log('Interceptando requisição:', error.status)
+                    
                     // router.navigate(['/login']); // Redireciona para a página de login
                 }
                 return throwError(() => error);
@@ -635,7 +640,7 @@ export class AddMovimentComponent {
             this.movimentService.addMovement(objGravar).pipe(
               catchError((error: HttpErrorResponse) => {   
                 if (error.status === 401) {
-                  console.log('Interceptando requisição:', error.status);
+                  ;
                 }
                 return throwError(() => error);
               })
@@ -648,10 +653,10 @@ export class AddMovimentComponent {
                 this.moduloService.deleteFormArrayData(this.formMovements);     
                 this.addMovimento('','',(this.formMovements.controls.length+1).toString(),true,true,[]);
                 this.addNewItemMoviment();
-                console.log("Usuário confirmou!");
+
                 // Insira aqui a lógica para continuar após a confirmação
               } else {
-                console.log("Usuário cancelou.");
+                
               }
             });      
          }       
@@ -679,7 +684,7 @@ export class AddMovimentComponent {
 
     
     getAccountControl(movementIndex: number, itemIndex: number ,fieldName:string) {
-      // console.log(this.getMovementsItens(movementIndex).at(itemIndex));
+
       return this.getMovementsItens(movementIndex).at(itemIndex).get(fieldName);
     }
     
@@ -788,7 +793,7 @@ export class AddMovimentComponent {
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     const selectedOption = event.option.value; // Pega o valor da opção selecionada
 
-    console.log('Auto Complete',selectedOption);
+  
    
     if(selectedOption) { 
 
@@ -845,7 +850,7 @@ export class AddMovimentComponent {
 
      if(result) {
       const accountData= result?.accountData;
-      console.log('Resultado do modal:', result);
+  
       if(accountData) {
 
         var fieldAccount=this.getAccountControl(result?.movementIndex,result?.movementItenIndex,'account') as FormGroup
@@ -853,7 +858,7 @@ export class AddMovimentComponent {
         fieldAccount.setValue({CodAccount:accountData?.CodAccount})
         // this.getAccountControl(
         //   result?.movementIndex,result?.movementItenIndex,'account')?.setValue({codAccount:accountData?.CodAccount})
-         console.log('dsds',fieldAccount);
+       
       }
      }   
     

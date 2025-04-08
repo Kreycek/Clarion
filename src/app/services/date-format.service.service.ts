@@ -18,7 +18,7 @@ export class DateFormatService {
 
   // Formato inicial padrão
   private getDefaultFormat() {
-    console.log('getDefaultFormat');
+
     return {
       parse: { dateInput: 'DD/MM/YYYY' },
       display: {
@@ -34,7 +34,7 @@ export class DateFormatService {
   changeDateFormat(tp: string) {
     
     if (tp === '2') {
-      console.log('tp 2',tp);
+
       this.dateFormatSource.next({
         parse: { dateInput: 'DD/MM/YYYY' },
         display: {
@@ -45,7 +45,7 @@ export class DateFormatService {
         }
       });
     } else {
-      console.log('tp 1',tp);
+  
       this.dateFormatSource.next({
         parse: { dateInput: 'MM/YYYY' },
         display: {

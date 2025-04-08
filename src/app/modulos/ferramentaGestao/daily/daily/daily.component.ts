@@ -47,7 +47,7 @@ export class DailyComponent {
  
       this.dailyService.getAllOnlyDaily().subscribe((response:any)=>{     
         this.dailys=response;
-        console.log('getAllOnlyDaily',response);
+    
 
       })      
       this.dailyService.getAllDaily(this.currentPage,this.limit).subscribe((response:any)=>{     
@@ -112,7 +112,7 @@ export class DailyComponent {
       limit:this.limit
     };
 
-    console.log('objPesquisar',objPesquisar);
+
 
     this.dailyService.searchDaily(objPesquisar).subscribe((response:any)=>{
       this.dados=response.dailys;    
@@ -150,7 +150,7 @@ export class DailyComponent {
 
       if (resultado) {      
       } else {
-        console.log("Usuário cancelou.");
+   
       }
     }        
   }

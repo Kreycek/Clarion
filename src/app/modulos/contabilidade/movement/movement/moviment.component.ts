@@ -158,7 +158,7 @@ export class MovimentComponent {
 
     if(dados &&  dados.length>0) {
 
-      console.log('dados',dados);
+    
 
       dados.forEach((element:any) => {
 
@@ -180,7 +180,7 @@ export class MovimentComponent {
           element.descriptionDaily=''
           element.descriptionDocument=''
         }
-        // console.log('dailyGrid',dailyGrid);
+      
     })
 }
 

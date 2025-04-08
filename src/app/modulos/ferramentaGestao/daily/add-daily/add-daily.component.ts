@@ -51,13 +51,13 @@ export class AddDailyComponent {
         if(id) {
           this.isEdit=true;
           this.dailyService.getDailyById(id??'0').subscribe((response)=>{       
-            console.log('dailys',response);
+
             this.idDaily=id;    
             this.createForm(response);  
 
             if(response.Documents && response.Documents.length>0) {
               response.Documents.forEach((element:any) => {
-                console.log('element',element);
+           
                 this.documentForm.push(this.createDocumentForm(element.codDocument,element.description));
               });
             }
@@ -67,7 +67,7 @@ export class AddDailyComponent {
           this.isEdit=false;
           this.createForm({Active:true});   
         }
-        console.log('this.formulario',this.formulario);
+     
       });    
   }
 
@@ -85,7 +85,7 @@ export class AddDailyComponent {
         }); 
 
         this.formulario.get('FormNewDocuments.codDocument')?.valueChanges.subscribe(value => {
-          console.log('Novo valor de codDocument:', value);
+
           if(value) {
             this.isVisibleValidationCodDocumento=true;
           }
@@ -104,7 +104,7 @@ export class AddDailyComponent {
             this.isVisibleValidationDescription=false;
           }
           
-          console.log('Valores do FormNewDocuments:', value);
+      
         });
 
     }
@@ -180,7 +180,7 @@ export class AddDailyComponent {
         });              
       }   
   
-      console.log('objGravar',objGravar);
+
       if(this.idDaily) {
   
         objGravar.id=this.idDaily
@@ -196,7 +196,7 @@ export class AddDailyComponent {
           catchError(async (error: HttpErrorResponse) => {
               
                 if (error.status === 500) {
-                  console.log('Interceptando requisição:', error)
+          
                 
                   const resultado = await this.modal.openModal(error.message,true); 
                   if (resultado) {
@@ -206,7 +206,7 @@ export class AddDailyComponent {
                 }
   
                 if (error.status === 401) {
-                    console.log('Interceptando requisição:', error.status)
+                
                     // router.navigate(['/login']); // Redireciona para a página de login
                 }
                 return throwError(() => error);
@@ -228,7 +228,7 @@ export class AddDailyComponent {
             this.dailyService.addDaily(objGravar).pipe(
               catchError((error: HttpErrorResponse) => {   
                 if (error.status === 401) {
-                  console.log('Interceptando requisição:', error.status);
+                  ;
                 }
                 return throwError(() => error);
               })
@@ -237,10 +237,10 @@ export class AddDailyComponent {
               // Aguarda o resultado do modal antes de continuar
               const resultado = await this.modal.openModal("Diário cadastrado com sucesso",true);             
               if (resultado) {
-                console.log("Usuário confirmou!");
+            
                 // Insira aqui a lógica para continuar após a confirmação
               } else {
-                console.log("Usuário cancelou.");
+                
               }
             });
             

@@ -257,7 +257,7 @@ export class AddChartOfAccountsComponent {
         catchError(async (error: HttpErrorResponse) => {
             
               if (error.status === 500) {
-                console.log('Interceptando requisição:', error)
+               
               
                 const resultado = await this.modal.openModal(error.message,true); 
                 if (resultado) {
@@ -265,7 +265,7 @@ export class AddChartOfAccountsComponent {
                 }                
               }
               if (error.status === 401) {
-                  console.log('Interceptando requisição:', error.status)
+                  
                   // router.navigate(['/login']); // Redireciona para a página de login
               }
               return throwError(() => error);
@@ -285,7 +285,7 @@ export class AddChartOfAccountsComponent {
           this.coaService.addChartOfAccounts(objGravar).pipe(
             catchError((error: HttpErrorResponse) => {   
               if (error.status === 401) {
-                console.log('Interceptando requisição:', error.status);
+                ;
               }
               return throwError(() => error);
             })
@@ -301,7 +301,7 @@ export class AddChartOfAccountsComponent {
              this.loadYear([],true)             
               // Insira aqui a lógica para continuar após a confirmação
             } else {
-              console.log("Usuário cancelou.");
+              
             }
           });
           

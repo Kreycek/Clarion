@@ -199,7 +199,7 @@ export class AddUsuarioComponent {
           const resultado = await this.modal.openModal(response.message,true); 
           if (resultado) {           
           } else {
-            console.log("Usuário cancelou.");
+       
           }     
         }),
         catchError(async (error: HttpErrorResponse) => {
@@ -209,13 +209,13 @@ export class AddUsuarioComponent {
                 if (resultado) {
                  
                 } else {
-                  console.log("Usuário cancelou.");
+              
                 }
 
               }
 
               if (error.status === 401) {
-                  console.log('Interceptando requisição:', error.status)
+            
                   // router.navigate(['/login']); // Redireciona para a página de login
               }
               return throwError(() => error);
@@ -233,7 +233,7 @@ export class AddUsuarioComponent {
           const resultado = await this.modal.openModal("Usuário já cadastrado com esse email",true);
           if (resultado) {           
           } else {
-            console.log("Usuário cancelou.");
+
           }         
           
         } else {
@@ -251,7 +251,7 @@ export class AddUsuarioComponent {
                   catchError((error: HttpErrorResponse) => {
                       
                         if (error.status === 401) {
-                            console.log('Interceptando requisição:', error.status)                         
+                                
                           }
                       return throwError(() => error);
                     })).subscribe(()=>{})              

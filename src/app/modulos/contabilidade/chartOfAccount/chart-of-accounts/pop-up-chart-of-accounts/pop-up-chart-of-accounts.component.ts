@@ -21,7 +21,7 @@ export class PopUpChartOfAccountsComponent {
 
 
   ngOnInit() {
-    console.log('AAAAAAAAAAAAA',this.data);
+  
   }
 
   closeWindow() {

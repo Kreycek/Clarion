@@ -46,7 +46,7 @@ export class UsuarioComponent {
   ngOnInit() {
     this.perfilService.gePerfil().subscribe((response:any)=>{
       this.perfis=response;
-        console.log('perfis',response);
+      
     })
 
     this.limit=this.configService.limitPaginator;
@@ -104,7 +104,7 @@ export class UsuarioComponent {
       this.modal.isVisible=false;
     } else {
       this.modal.isVisible=false;
-      console.log("Usuário cancelou.");
+   
     }
   }
 

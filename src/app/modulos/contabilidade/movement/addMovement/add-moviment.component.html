@@ -184,7 +184,7 @@
                                                 placeholder="Procurar conta"
                                                 formControlName="account"  
                                                 (dblclick)="openDialogChartOfAccount(i,j)"      
-                                                (blur)="verifyExistAccount(movementItens, movement.get('order')?.value)" 
+                                                (blur)="verifyExistAccount(movementItens, j)" 
                                                 [matAutocomplete]="auto"
                                                 [ngClass]="{'is-invalid': getAccountControl(i,j,'account')?.invalid && getAccountControl(i,j,'account')?.touched}" 
                                                 >

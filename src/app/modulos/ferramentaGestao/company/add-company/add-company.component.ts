@@ -81,7 +81,7 @@ export class AddCompanyComponent {
 
         }      
       } else {
-        console.log('tste',this.formulario?.controls["FormNewDocuments"] as FormGroup);      
+   
         this.moduloService.ativarvalidadores(this.formulario?.controls["FormNewDocuments"] as FormGroup);       
       } 
       
@@ -116,12 +116,12 @@ export class AddCompanyComponent {
     
     async addPhone() {
 
-      console.log('Phones',this.formulario?.controls["FormNewPhones"]);
+
 
       if(this.formulario?.controls["FormNewPhones"].valid) {
        
         const form = this.formulario?.controls["FormNewPhones"] as FormGroup;
-        console.log();
+   
         const codCountry=form.controls["codCountry"].value;
         const codeState=form.controls["codState"].value;
         const phoneNumber=form.controls["phoneNumber"].value;
@@ -150,7 +150,7 @@ export class AddCompanyComponent {
         } 
             
       } else {
-        console.log('tste',this.formulario?.controls["FormNewPhones"] as FormGroup);      
+          
         this.moduloService.ativarvalidadores(this.formulario?.controls["FormNewPhones"] as FormGroup);       
       } 
       
@@ -176,7 +176,7 @@ export class AddCompanyComponent {
         const form = this.formulario?.controls["FormNewExercise"] as FormGroup;
        
         const year=+form.controls["year"].value;
-        console.log('year 1',year);
+    
         const startMonth=form.controls["startMonth"].value;
         const endMonth=form.controls["endMonth"].value;
 
@@ -185,7 +185,7 @@ export class AddCompanyComponent {
             return year===_year;
         })[0];
 
-        console.log('year 2',result);
+       
 
         if(result) {
           const resultado = await this.modal.openModal("Esse ano já está configurado para essa empresa",true); 
@@ -202,7 +202,7 @@ export class AddCompanyComponent {
         
         }      
       } else {
-        console.log('tste',this.formulario?.controls["FormNewExercise"] as FormGroup);      
+      
         this.moduloService.ativarvalidadores(this.formulario?.controls["FormNewExercise"] as FormGroup);       
       }      
     }
@@ -222,7 +222,7 @@ export class AddCompanyComponent {
      createForm(obj:any) {
 
       obj.Country=!obj.Country ? this.configService.nameCountryStandard : obj.Country
-      console.log('obj.Country',obj.Country);
+     
       this.formulario = this.fb.group({
         active: [obj.Active, Validators.required],
         codCompany: [obj.CodCompany, Validators.required],
@@ -266,7 +266,7 @@ export class AddCompanyComponent {
       }); 
 
       this.formulario.get('FormNewDocuments.codDocument')?.valueChanges.subscribe(value => {
-        console.log('Novo valor de codDocument:', value);
+
         if(value) {
          
         }
@@ -284,8 +284,7 @@ export class AddCompanyComponent {
         else {
           
         }
-        
-        console.log('Valores do FormNewDocuments:', value);
+
       });
 
   }
@@ -299,13 +298,13 @@ export class AddCompanyComponent {
         if(id) {
           this.isEdit=true;
           this.companyService.getCompanyById(id??'0').subscribe((response)=>{       
-            console.log('dailys',response);
+      
             this.idCompany=id;    
             this.createForm(response);  
 
             if(response.Documents && response.Documents.length>0) {
               response.Documents.forEach((element:any) => {
-                console.log('element',element);
+         
                 this.documentForm.push(this.createDocumentForm(
                   element.documentNumber,
                   element.nameDocument,
@@ -321,7 +320,7 @@ export class AddCompanyComponent {
 
             if(response.Phone && response.Phone.length>0) {
               response.Phone.forEach((element:any) => {
-                console.log('element',element);
+              
                 this.phoneForm.push(this.createPhoneForm(
                   element.codCountry,
                   element.codState,
@@ -333,7 +332,7 @@ export class AddCompanyComponent {
 
             if(response.Exercise && response.Exercise.length>0) {
               response.Exercise.forEach((element:any) => {
-                console.log('element',element);
+              
                 this.exerciseForm.push(this.createExerciseForm(
                   element.year,
                   element.startMonth,
@@ -392,15 +391,11 @@ export class AddCompanyComponent {
 
     this.moduloService.habilitaCamposFormGroup(formDocumentsInsert,['documentNumber','nameDocument','address'])
     this.moduloService.habilitaCamposFormGroup(formPonesInsert,['codCountry','codState','phoneNumber'])
-    this.moduloService.habilitaCamposFormGroup(formExercideInsert,['codDocument','description','address'])
-
-      
+    this.moduloService.habilitaCamposFormGroup(formExercideInsert,['codDocument','description','address'])      
       
       const formValues=this.formulario?.value;
 
-      console.log('formValues',formValues);
-
-      const objGravar: { 
+        const objGravar: { 
         id?:string |null;
         active:boolean;
         codCompany: string;
@@ -442,15 +437,6 @@ export class AddCompanyComponent {
 
       }
 
-      console.log('Passou',objGravar);
-      
-      // if(formValues.documents && formValues.documents.length) {       
-      //   formValues.documents.forEach((element:any) => {       
-      //     objGravar.documents.push({codDocument:element.codDocument, description:element.description})  
-      //   });              
-      // }   
-  
-      // console.log('objGravar',objGravar);
       if(this.idCompany) {
   
         objGravar.id=this.idCompany
@@ -465,14 +451,14 @@ export class AddCompanyComponent {
           catchError(async (error: HttpErrorResponse) => {
               
                 if (error.status === 500) {
-                  console.log('Interceptando requisição:', error)                
+                                 
                   const resultado = await this.modal.openModal(error.message,true); 
                   if (resultado) {
   
                   }                  
                 }  
                 if (error.status === 401) {
-                    console.log('Interceptando requisição:', error.status)
+                    
                     // router.navigate(['/login']); // Redireciona para a página de login
                 }
                 return throwError(() => error);
@@ -494,7 +480,7 @@ export class AddCompanyComponent {
             this.companyService.addCompany(objGravar).pipe(
               catchError((error: HttpErrorResponse) => {   
                 if (error.status === 401) {
-                  console.log('Interceptando requisição:', error.status);
+                  ;
                 }
                 return throwError(() => error);
               })
@@ -503,10 +489,10 @@ export class AddCompanyComponent {
               // Aguarda o resultado do modal antes de continuar
               const resultado = await this.modal.openModal("Empresa cadastrada com sucesso",true);             
               if (resultado) {
-                console.log("Usuário confirmou!");
+       
                 // Insira aqui a lógica para continuar após a confirmação
               } else {
-                console.log("Usuário cancelou.");
+                
               }
             });
             
