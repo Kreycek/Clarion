@@ -178,7 +178,7 @@ export class AddMovimentComponent {
 
         if (typeof fieldValue === 'object' && fieldValue !== null) {
           
-          if(fieldValue.value.CodAccount) {
+          if(fieldValue.value && fieldValue.value.CodAccount) {
             codAccount=fieldValue.value.CodAccount;  
           }           
           else {
