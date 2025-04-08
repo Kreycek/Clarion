@@ -12,13 +12,17 @@ import { Subject } from 'rxjs';
 export class ModalConfirmationComponent {
   isVisible = false;
   message: string = '';
+  textBtnSim='Sim';
+  textBtnNao='Não'
 
   private responseSubject = new Subject<boolean>();
 
   // Método para abrir o modal e retornar um Observable
-  openModal(isVisible:boolean, message:string): Promise<boolean> {
+  openModal(isVisible:boolean, message:string, textBtnSim:string='Sim', textBtnNao:string='Não'): Promise<boolean> {
     this.isVisible = isVisible;
     this.message=message;
+    this.textBtnSim=textBtnSim;
+    this.textBtnNao=textBtnNao;
     return new Promise(resolve => {
       this.responseSubject = new Subject<boolean>();
       this.responseSubject.subscribe(response => {
@@ -29,7 +33,7 @@ export class ModalConfirmationComponent {
   }
 
   confirm() {
-    console.log('confirm');
+    
     this.responseSubject.next(true);
     this.responseSubject.complete();
   }

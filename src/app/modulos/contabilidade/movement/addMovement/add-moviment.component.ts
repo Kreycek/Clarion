@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ModalOkComponent } from '../../../../modal/modal-ok/modal-ok.component';
@@ -19,6 +19,9 @@ import { ModuloService } from '../../../modulo.service';
 import { CompanyService } from '../../../ferramentaGestao/company/company.service';
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {MatTabsModule} from '@angular/material/tabs';
+import {MatDialog, MatDialogConfig, MatDialogModule} from '@angular/material/dialog';
+import { ChartOfAccountsComponent } from '../../chartOfAccount/chart-of-accounts/chart-of-accounts.component';
+import { PopUpChartOfAccountsComponent } from '../../chartOfAccount/chart-of-accounts/pop-up-chart-of-accounts/pop-up-chart-of-accounts.component';
 
 export interface User {
   name: string;
@@ -38,7 +41,8 @@ export interface User {
     MatNativeDateModule,
     MatSlideToggleModule,
     MatAutocompleteModule,
-    MatTabsModule
+    MatTabsModule,
+    MatDialogModule
   ],
   templateUrl: './add-moviment.component.html',
   styleUrl: './add-moviment.component.css',
@@ -68,7 +72,8 @@ export class AddMovimentComponent {
       viewBtnGravarItensMovement=false;
       view: boolean = true;
       textBtnViewAll='Ocultar todos'
-      filteredAccountOptions: Observable<any[]>;          
+      filteredAccountOptions: Observable<any[]>;    
+      readonly dialog = inject(MatDialog);      
 
       get formMovements(): FormArray {
         return this.formulario?.get('movements') as FormArray;
@@ -154,9 +159,6 @@ export class AddMovimentComponent {
         
        const movs:any[]=obj.Movements;
         if(movs && movs.length>0) {
-
-        
-
           // this.ascOrderMovements(obj.Movements);
 
           movs.forEach((element:any) => {
@@ -173,10 +175,19 @@ export class AddMovimentComponent {
   } 
 
   verifyExistAccount(field:any, index:number) {
-        const fieldValue=(field as FormGroup).controls['account']
-        console.log('fieldValue ',fieldValue);
+        const fieldValue:any=(field as FormGroup).controls['account']
+
+        let codAccount=''      
+
+        if (typeof fieldValue === 'object' && fieldValue !== null) {
+          codAccount=fieldValue.value.CodAccount;  
+        }
+        else {
+          codAccount=fieldValue.value
+        }
+       
         if(fieldValue.value) {
-          this.coaService.verifyExistsChartOfAccounts({codAccount:fieldValue.value}).subscribe(async (response:any)=>{
+          this.coaService.verifyExistsChartOfAccounts({codAccount:codAccount}).subscribe(async (response:any)=>{
             if(!response.message) {           
                 const resultado = await this.modal.openModal("A Conta cadastrada na linha " + (index).toString() + " não está cadastrada no plano de contas, tente outra!",true); 
                 if (resultado) {
@@ -566,18 +577,16 @@ export class AddMovimentComponent {
                           _account= elementItens.account
                         }
 
+                        let elementMovementsItens: ElementMovementsItens = {
+                          date: elementItens.date,
+                          codAccount: _account,
+                          debitValue: elementItens.debit,
+                          creditValue: elementItens.credit,
+                          codAccountIva: elementItens.accountIva,
+                          active: elementItens.active,
+                        };
 
-
-                            let elementMovementsItens: ElementMovementsItens = {
-                              date: elementItens.date,
-                              codAccount: _account,
-                              debitValue: elementItens.debit,
-                              creditValue: elementItens.credit,
-                              codAccountIva: elementItens.accountIva,
-                              active: elementItens.active,
-                            };
-
-                          elementMovement.movementsItens.push(elementMovementsItens);
+                        elementMovement.movementsItens.push(elementMovementsItens);
 
                         })
 
@@ -813,13 +822,42 @@ export class AddMovimentComponent {
 
   displayAccountFn(account: any): string {
     return account ? account.CodAccount : ''
-    //  + ' - ' + account.Description : '';
   } 
 
   ascOrderMovements(movements:any[]) {
-
     movements.sort((a, b) => {
       return a.codAccount.localeCompare(b.codAccount);
+    });
+  }
+
+  openDialogChartOfAccount(movementIndex:number, movementItenIndex:number) {
+    const dialogRef = this.dialog.open(PopUpChartOfAccountsComponent,  {
+      width: '1000px',
+      maxWidth: '100vw', // ou 'none' se quiser remover o limite, e também isso permite configurar a largura
+      data: {
+        movementIndex:movementIndex,
+        movementItenIndex:movementItenIndex
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+     // Agora você pode logar o objeto de forma mais clara
+
+     if(result) {
+      const accountData= result?.accountData;
+      console.log('Resultado do modal:', result);
+      if(accountData) {
+
+        var fieldAccount=this.getAccountControl(result?.movementIndex,result?.movementItenIndex,'account') as FormGroup
+
+        fieldAccount.setValue({CodAccount:accountData?.CodAccount})
+        // this.getAccountControl(
+        //   result?.movementIndex,result?.movementItenIndex,'account')?.setValue({codAccount:accountData?.CodAccount})
+         console.log('dsds',fieldAccount);
+      }
+     }   
+    
+     // Exibindo as propriedades do objeto
     });
   }
 }

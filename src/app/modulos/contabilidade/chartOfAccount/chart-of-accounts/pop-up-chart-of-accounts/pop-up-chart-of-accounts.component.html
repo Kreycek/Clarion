@@ -1,0 +1,18 @@
+<mat-dialog-content style="width: 100%; height: 100%;">
+
+    <div style="width: 100%; text-align: right; font-size: 18px; color: red;">
+        <i 
+        title="Fechar essa janela" 
+        style="cursor: pointer;" 
+        class="mdi mdi-window-close" 
+       (click)="closeWindow()"
+        ></i>
+    </div>
+    <div style="width: 100%;">
+        <app-chart-of-accounts [viaPopup]="true" *ngIf="!enableChartOfAccount" (newAccountPopup)="createNewAccount($event)" (dataForFatherpopUp)="selectAccount($event)"></app-chart-of-accounts>
+
+       <app-add-chart-of-accounts [viaPopup]="true" (returnSearchAccount)="returnThisPage($event)" *ngIf="enableChartOfAccount"></app-add-chart-of-accounts>
+    </div>
+    
+
+</mat-dialog-content>

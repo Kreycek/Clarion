@@ -1,15 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ModalConfirmationComponent } from "../../../../modal/modal-confirmation/modal-confirmation.component";
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ChartOfAccountService } from '../chartOfAccount.service';
 import { PaginatorComponent } from "../../../../paginator/paginator.component";
-
 import { ConfigService } from '../../../../services/config.service';
 import { ModalOkComponent } from "../../../../modal/modal-ok/modal-ok.component";
-
-
 
 @Component({
   selector: 'app-chart-of-accounts',
@@ -22,6 +19,12 @@ export class ChartOfAccountsComponent {
   
   @ViewChild(ModalConfirmationComponent) modal!: ModalConfirmationComponent;
   @ViewChild(ModalOkComponent) modalOk!: ModalOkComponent;  
+  @Input() viaPopup: boolean=false;
+  
+  @Output() dataForFatherpopUp: EventEmitter<any> = new EventEmitter();
+  @Output() newAccountPopup: EventEmitter<any> = new EventEmitter();
+
+
   constructor(
     private router: Router, 
     private chartOfAccountService: ChartOfAccountService,
@@ -73,7 +76,7 @@ export class ChartOfAccountsComponent {
     objPesquisar= { 
       codAccount: this.searchCodConta, 
       description: this.searchDescricao, 
-      year: this.searchYear,
+      year: +this.searchYear>0 ? [+this.searchYear] : [],
       type:this.searchType,
       page:currentPage,
       limit:this.limit
@@ -87,9 +90,13 @@ export class ChartOfAccountsComponent {
 
   }
 
-
   addChartOfAccount() {
-    this.router.navigate(['/aplicacao/addChartOfAccount']);
+    if(!this.viaPopup) // Se não for do popup segue o código normal
+      this.router.navigate(['/aplicacao/addChartOfAccount']);
+    else {
+      //Caso seja para cadastrar uma nova conta e venha do popup
+      this.newAccountPopup.emit(true);
+    }
   }
 
   updateChartOfAccount(id:string) {
@@ -103,27 +110,26 @@ export class ChartOfAccountsComponent {
 
   async updateAllChartOfAccountWithNextYear() {
 
-
-    const resultado = await this.modal.openModal(true,"Deseja atualiar todas as contas para "+ (this.currentYear + 1)); 
-    console.log('resultado');
+    const resultado = await this.modal.openModal(true,"Deseja atualiar todas as contas para "+ (this.currentYear + 1));    
 
     if (resultado) {
       this.modal.isVisible=false;
-      this.chartOfAccountService.updateAllChartOfAccountWithNextYear({year:this.currentYear+1}).subscribe()
-      
+      this.chartOfAccountService.updateAllChartOfAccountWithNextYear({year:this.currentYear+1}).subscribe();      
 
       const resultadook = await this.modalOk.openModal('Contas atualizadas com sucesso',true); 
 
       if (resultadook) { 
 
-
       }
 
     } else {
-      console.log("Usuário cancelou.");
+     
     }
  
   }
 
-  
+  selectAccount(accountObj:any) {
+    this.dataForFatherpopUp.emit(accountObj);
+  }
+
 }

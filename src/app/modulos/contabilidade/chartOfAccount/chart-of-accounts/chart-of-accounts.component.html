@@ -1,11 +1,5 @@
-<app-modal-confirmation 
-  
-  >
-</app-modal-confirmation>
-
-<app-modal-ok
-  
-  ></app-modal-ok>
+<app-modal-confirmation></app-modal-confirmation>
+<app-modal-ok></app-modal-ok>
 
 <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
@@ -14,7 +8,7 @@
         <p class="card-description" style="display: none;"> Add class <code>.table-striped</code>
         </p>
 
-        <div class="search-container" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <div class="search-container" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
           <div class="row">
             <div class="col-lg-3 col-md-4 col-sm-6 col-12">
               <div class="form-group">
@@ -33,7 +27,7 @@
             <div class="col-lg-2 col-md-2 col-sm-6 col-12">
               <div class="form-group">
                 <label for="year">Ano:</label>
-                <select id="year" [(ngModel)]="searchYear" class="form-select" multiple>
+                <select id="year" [(ngModel)]="searchYear" class="form-select">
                   <option value="">Todos</option>
                   <option *ngFor="let year of years" [value]="year">{{ year }}</option>
                 </select>
@@ -84,10 +78,22 @@
                 </td>
                 <td>{{item.Type}}</td>
                 <td>  {{item.Active ? 'Ativo' : 'Inativo'}}   </td>
-                <td style="text-align: right;">                                        
-                  <i (click)="updateChartOfAccount(item.ID)" style="font-size: 20px; cursor: pointer; " 
+                <td style="text-align: right;">    
+
+                  <i *ngIf="!viaPopup" 
+                  (click)="updateChartOfAccount(item.ID)" 
+                  style="font-size: 20px; cursor: pointer;" 
                   title="Editar plano de conta" 
-                  class="mdi mdi-table-edit"></i>
+                  class="mdi mdi-table-edit">
+                  </i>
+
+                  <i *ngIf="viaPopup"                  
+                  style="font-size: 20px; cursor: pointer;" 
+                  title="Usar essa conta" 
+                  class="mdi mdi-send"
+                  (click)="selectAccount(item)"
+                  >
+                  </i>
                 
              </td>               
               </tr>             

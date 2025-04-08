@@ -115,7 +115,11 @@
                                 <table class="tabela-customizada" style="border-spacing: 10px; width: 100%;">
                                   <thead>
                                     <tr>
-                                      <th class="alinhamento-centro" style="width: 26%;">Conta <span class="required">*</span></th>
+                                      <th class="alinhamento-centro" style="width: 26%;">
+                                        Conta <span class="required">*</span>
+                                       
+                                      
+                                      </th>
                                       <th class="alinhamento-centro" style="width: 25%;">Débito <span class="required">*</span></th>
                                       <th class="alinhamento-centro" style="width: 25%;">Crédito <span class="required">*</span></th>
                                       <th class="alinhamento-centro" style="width: 25%;">IVA</th>
@@ -178,7 +182,8 @@
                                                 <input type="text"
                                                 class="form-control" 
                                                 placeholder="Procurar conta"
-                                                formControlName="account"        
+                                                formControlName="account"  
+                                                (dblclick)="openDialogChartOfAccount(i,j)"      
                                                 (blur)="verifyExistAccount(movementItens, movement.get('order')?.value)" 
                                                 [matAutocomplete]="auto"
                                                 [ngClass]="{'is-invalid': getAccountControl(i,j,'account')?.invalid && getAccountControl(i,j,'account')?.touched}" 

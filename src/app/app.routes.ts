@@ -18,6 +18,7 @@ import { CostCenterComponent } from './modulos/ferramentaGestao/costCenter/cost-
 import { AddCostCenterComponent } from './modulos/ferramentaGestao/costCenter/add-cost-center/add-cost-center.component';
 import { BalanceteReportComponent } from './reports/balancete-report/balancete-report.component';
 import { BalanceteComponent } from './modulos/contabilidade/balancete/balancete.component';
+import { PopUpChartOfAccountsComponent } from './modulos/contabilidade/chartOfAccount/chart-of-accounts/pop-up-chart-of-accounts/pop-up-chart-of-accounts.component';
 
 export const routes: Routes = [
 
@@ -26,6 +27,9 @@ export const routes: Routes = [
         path:'aplicacao',
         component:AplicacaoComponent,
         children:[
+            { path: 'popup', component: PopUpChartOfAccountsComponent, children: [
+                { path: 'rota-interna', component: ChartOfAccountsComponent } ]
+            },
             {
                 path:'center',
                 component:CenterComponent,

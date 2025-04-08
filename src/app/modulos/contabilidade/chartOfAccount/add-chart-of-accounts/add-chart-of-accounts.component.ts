@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl,FormControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';import { catchError, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -8,6 +8,8 @@ import { ChartOfAccountService } from '../chartOfAccount.service';
 import { ConfigService } from '../../../../services/config.service';
 import { CostCenterService } from '../../../ferramentaGestao/costCenter/costCenter.service';
 import { ModuloService } from '../../../modulo.service';
+import { ModalConfirmationComponent } from '../../../../modal/modal-confirmation/modal-confirmation.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-chart-of-accounts',
@@ -26,6 +28,10 @@ export class AddChartOfAccountsComponent {
   costCenters:any[]=[]    
   costCentersSub:any[]=[]
   listCostCenters:any[]=[];
+  @Input() viaPopup: boolean=false;
+
+  @Output() returnSearchAccount: EventEmitter<any> = new EventEmitter();
+
 
   constructor(     
       private fb: FormBuilder,
@@ -34,10 +40,13 @@ export class AddChartOfAccountsComponent {
       private router: Router, 
       public configService:ConfigService,
       private costCenterService: CostCenterService,
-      public moduloService:ModuloService
+      public moduloService:ModuloService,
+      private dialog: MatDialog,
+    
   ) {} 
 
   @ViewChild(ModalOkComponent) modal!: ModalOkComponent;
+   @ViewChild(ModalConfirmationComponent) modalConfirmation!: ModalConfirmationComponent;
 
   validaYearSelecionado: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     if (control instanceof FormArray) {
@@ -301,8 +310,27 @@ export class AddChartOfAccountsComponent {
      }       
   }  
  
-  cancel() {
-    this.router.navigate(['/aplicacao/chartOfAccount']);
+  async cancel() {
+
+    if(this.viaPopup) {
+
+      const dialogRef = this.dialog.open(ModalConfirmationComponent);
+      const resultado = await dialogRef.componentInstance.openModal(true, "Deseja fechar a janela atual? ou retornar para a pesquisar?",'Retornar','Fechar');
+
+      if (resultado) {
+          this.returnSearchAccount.emit(true)
+          dialogRef.close()
+      } else {
+        this.returnSearchAccount.emit(false)
+        dialogRef.close()
+      }
+    }
+    else {
+      this.router.navigate(['/aplicacao/chartOfAccount']);
+      
+    }
+   
+   
   }
 
   async addCostCenter() {
